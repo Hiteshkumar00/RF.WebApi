@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Apis\Controllers\" />
+    <Folder Include="Apis\Extensions\" />
+    <Folder Include="Apis\Middleware\" />
+    <Folder Include="Apis\" />
+    <Folder Include="Application\Abstractions\" />
+    <Folder Include="Application\DTOs\" />
+    <Folder Include="Application\Features\" />
+    <Folder Include="Application\Mappings\" />
+    <Folder Include="Application\Validators\" />
+    <Folder Include="Domain\Common\" />
+    <Folder Include="Domain\Entities\" />
+    <Folder Include="Domain\Enums\" />
+    <Folder Include="Domain\Exceptions\" />
+    <Folder Include="Infrastructure\Services\" />
+  </ItemGroup>
+
+</Project>
