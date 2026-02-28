@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -92,7 +93,7 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     ExpenceType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    Date = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Date = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,7 +114,7 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     YearName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Date = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Date = table.Column<DateOnly>(type: "date", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,7 +139,7 @@ namespace RF.WebApi.Api.Migrations
                     Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Date = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true)
                 },
                 constraints: table =>
@@ -159,7 +160,6 @@ namespace RF.WebApi.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountId = table.Column<int>(type: "int", nullable: true),
-                    Username = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     MiddleName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Surname = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
@@ -181,6 +181,27 @@ namespace RF.WebApi.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RelatedEntity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RelatedEntityName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    RelatedDisplayName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    EntityId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RelatedEntity", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RelatedEntity_Entity_EntityId",
+                        column: x => x.EntityId,
+                        principalTable: "Entity",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AddContribution",
                 columns: table => new
                 {
@@ -188,7 +209,7 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountPersonId = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Date = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Date = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -236,7 +257,7 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountPersonId = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Date = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Date = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -281,8 +302,8 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AccountId = table.Column<int>(type: "int", nullable: false),
                     AgencyId = table.Column<int>(type: "int", nullable: false),
-                    BillNo = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Date = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    BillNo = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true)
                 },
                 constraints: table =>
@@ -310,7 +331,7 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Quntity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -325,33 +346,12 @@ namespace RF.WebApi.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RelatedEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RelatedEntityName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    RelatedDisplayName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    EntityId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RelatedEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RelatedEntity_User_EntityId",
-                        column: x => x.EntityId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AddContributionPayment",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     AddContributionId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -378,7 +378,7 @@ namespace RF.WebApi.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BusinessExpenceId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -432,7 +432,7 @@ namespace RF.WebApi.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     RemoveContributionId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -459,7 +459,7 @@ namespace RF.WebApi.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false),
                     ExpenceType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true)
@@ -488,8 +488,8 @@ namespace RF.WebApi.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Quntity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Quntity = table.Column<int>(type: "int", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -509,7 +509,7 @@ namespace RF.WebApi.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -538,9 +538,9 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemId = table.Column<int>(type: "int", nullable: false),
                     BillId = table.Column<int>(type: "int", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Month = table.Column<int>(type: "int", nullable: false),
-                    Day = table.Column<int>(type: "int", nullable: false)
+                    Year = table.Column<int>(type: "int", nullable: true),
+                    Month = table.Column<int>(type: "int", nullable: true),
+                    Day = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -564,7 +564,7 @@ namespace RF.WebApi.Api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BuyingBillExpenceId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -587,8 +587,8 @@ namespace RF.WebApi.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname", "Username" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "Hello@1234", null, "Support", "User", "SystemUser" });
+                columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$52So4Mfcbxeg0nJYcmU2cu6YTfS9zGWDWRknU5Ng.EBhC/Lod7Mk6", null, "SuperAdmin", "User" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountPerson_AccountId",
@@ -757,9 +757,9 @@ namespace RF.WebApi.Api.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_Username",
+                name: "IX_User_Email",
                 table: "User",
-                column: "Username",
+                column: "Email",
                 unique: true);
         }
 
@@ -788,9 +788,6 @@ namespace RF.WebApi.Api.Migrations
                 name: "BuyingBillPayment");
 
             migrationBuilder.DropTable(
-                name: "Entity");
-
-            migrationBuilder.DropTable(
                 name: "RelatedEntity");
 
             migrationBuilder.DropTable(
@@ -803,6 +800,9 @@ namespace RF.WebApi.Api.Migrations
                 name: "SellingItemWarrenty");
 
             migrationBuilder.DropTable(
+                name: "User");
+
+            migrationBuilder.DropTable(
                 name: "AddContribution");
 
             migrationBuilder.DropTable(
@@ -812,7 +812,7 @@ namespace RF.WebApi.Api.Migrations
                 name: "BuyingBillExpence");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Entity");
 
             migrationBuilder.DropTable(
                 name: "RemoveContribution");

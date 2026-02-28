@@ -751,6 +751,7 @@ namespace RF.WebApi.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -759,8 +760,7 @@ namespace RF.WebApi.Api.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<bool?>("IsActive")
-                        .IsRequired()
+                    b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
@@ -787,16 +787,11 @@ namespace RF.WebApi.Api.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("Username")
+                    b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("User", (string)null);
@@ -807,10 +802,10 @@ namespace RF.WebApi.Api.Migrations
                             Id = -1,
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
-                            Password = "Hello@1234",
-                            Role = "Support",
-                            Surname = "User",
-                            Username = "SystemUser"
+                            IsActive = false,
+                            Password = "$2a$11$52So4Mfcbxeg0nJYcmU2cu6YTfS9zGWDWRknU5Ng.EBhC/Lod7Mk6",
+                            Role = "SuperAdmin",
+                            Surname = "User"
                         });
                 });
 

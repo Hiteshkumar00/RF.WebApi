@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RF.WebApi.Api.Application.DTOs.User;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
 namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
@@ -16,11 +17,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(u => u.Id)
                    .ValueGeneratedOnAdd();
 
-            // 3. Required Fields & Max Lengths
-            builder.Property(u => u.Username)
-                   .IsRequired()
-                   .HasMaxLength(250);
-
             builder.Property(u => u.FirstName)
                    .IsRequired()
                    .HasMaxLength(250);
@@ -33,6 +29,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .HasMaxLength(250);
 
             builder.Property(u => u.Email)
+                    .IsRequired()
                    .HasMaxLength(250);
 
             builder.Property(u => u.PhoneNo)
@@ -46,7 +43,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired();
 
             // 4. Indexes (Performance & Uniqueness)
-            builder.HasIndex(u => u.Username)
+            builder.HasIndex(u => u.Email)
                    .IsUnique();
 
             // 5. Default Values (Database Level)
@@ -65,12 +62,11 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                 new List<User>() {
                     new User() {
                         Id = -1,
-                        Username = "SystemUser",
                         FirstName = "System",
                         Surname = "User",
                         Email = "hiteshkumar252020@gmail.com",
-                        Role = "Support",
-                        Password = "Hello@1234",
+                        Role = "SuperAdmin",
+                        Password = BCrypt.Net.BCrypt.HashPassword("Hello@123"),
                     }
                 }
            );

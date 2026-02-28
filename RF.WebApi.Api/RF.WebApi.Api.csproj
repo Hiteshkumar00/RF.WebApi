@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
@@ -18,20 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Apis\Controllers\" />
-    <Folder Include="Apis\Extensions\" />
-    <Folder Include="Apis\Middleware\" />
-    <Folder Include="Apis\" />
     <Folder Include="Application\Abstractions\" />
-    <Folder Include="Application\DTOs\" />
     <Folder Include="Application\Features\" />
-    <Folder Include="Application\Mappings\" />
     <Folder Include="Application\Validators\" />
-    <Folder Include="Domain\Common\" />
     <Folder Include="Domain\Entities\" />
     <Folder Include="Domain\Enums\" />
-    <Folder Include="Domain\Exceptions\" />
-    <Folder Include="Infrastructure\Services\" />
   </ItemGroup>
 
 </Project>

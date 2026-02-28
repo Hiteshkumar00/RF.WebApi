@@ -1,12 +1,25 @@
 using Microsoft.EntityFrameworkCore;
+using RF.WebApi.Api.Apis.Authentication;
+using RF.WebApi.Api.Apis.Extensions;
+using RF.WebApi.Api.Apis.Middleware;
+using RF.WebApi.Api.Domain.Interfaces;
+using RF.WebApi.Api.Infrastructure.Services;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//  CONTROLLERS & CONFIG 
+builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+
+// Custom Configurations
+builder.Services.ConfigureAutoMapper();
+builder.Services.ConfigureCustomValidationErrorResponse();
+builder.Services.AddIdentityServices(builder.Configuration);
+
+// SERVICE REGISTRATION 
+builder.Services.AddScoped<IUserService, UserService>();
+
 
 // Database
 // Add-Migration 'InitialCreate' -Context RFDBContext
@@ -15,15 +28,24 @@ builder.Services.AddDbContext<RFDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
+Token.Configure(httpContextAccessor);
+
+// MIDDLEWARE PIPELINE 
+app.UseCustomGlobalExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.Run();
+app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+app.Run();
