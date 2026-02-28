@@ -25,7 +25,7 @@
         public string? PhoneNo { get; set; }
 
         [Required]
-        [RegularExpression("^(SuperAdmin|Admin)$", UserMessages.InvalidRole]
+        [RegularExpression("^(SuperAdmin|Admin)$", ErrorMessage = UserMessages.InvalidRole)]
         public string Role { get; set; } = "Admin";
 
         [Required]
