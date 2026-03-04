@@ -9,28 +9,28 @@ namespace RF.WebApi.Api.Application.DTOs.User
         public int Id { get; set; }
         public int? AccountId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.FirstNameRequired)]
         [StringLength(100)]
         public string FirstName { get; set; } = string.Empty;
 
         public string? MiddleName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.SurnameRequired)]
         [StringLength(100)]
         public string Surname { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.EmailRequired)]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         [Phone]
         public string? PhoneNo { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.RoleRequired)]
         [RegularExpression("^(SuperAdmin|Admin)$", ErrorMessage = UserMessages.InvalidRole)]
         public string Role { get; set; } = "Admin";
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.IsActiveRequired)]
         public bool IsActive { get; set; }
     }
 }

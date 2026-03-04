@@ -7,32 +7,32 @@
     {
         public int? AccountId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.FirstNameRequired)]
         [StringLength(100)]
         public string FirstName { get; set; }
 
         public string? MiddleName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.SurnameRequired)]
         [StringLength(100)]
         public string Surname { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.EmailRequired)]
         [EmailAddress]
         public string Email { get; set; }
 
         [Phone]
         public string? PhoneNo { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.RoleRequired)]
         [RegularExpression("^(SuperAdmin|Admin)$", ErrorMessage = UserMessages.InvalidRole)]
         public string Role { get; set; } = "Admin";
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.PasswordRequired)]
         [StringLength(100, MinimumLength = 8)]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = UserMessages.IsActiveRequired)]
         public bool IsActive { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using RF.WebApi.Api.Domain.Common;
 
 namespace RF.WebApi.Api.Application.DTOs.Account
 {
@@ -7,7 +8,7 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         [Required]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = AccountMessages.ProfileNameRequired)]
         [StringLength(100)]
         public string ProfileName { get; set; } = string.Empty;
 

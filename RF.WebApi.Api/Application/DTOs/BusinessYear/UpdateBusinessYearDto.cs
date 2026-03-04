@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using RF.WebApi.Api.Domain.Common;
 
 namespace RF.WebApi.Api.Application.DTOs.BusinessYear
 {
@@ -8,11 +9,11 @@ namespace RF.WebApi.Api.Application.DTOs.BusinessYear
         [Required]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = BusinessYearMessages.YearNameRequired)]
         [StringLength(100)]
         public string YearName { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = BusinessYearMessages.DateRequired)]
         public DateOnly Date { get; set; }
     }
 }

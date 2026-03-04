@@ -1,11 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using RF.WebApi.Api.Domain.Common;
 
-namespace RF.WebApi.Api.Application.DTOs.AccountPerson
+namespace RF.WebApi.Api.Application.DTOs.AgencyPerson
 {
-    public class CreateAccountPersonDto
+    public class CreateAgencyPersonDto
     {
-        [Required(ErrorMessage = AccountPersonMessages.NameRequired)]
+        [Required(ErrorMessage = AgencyPersonMessages.AgencyRequired)]
+        public int AgencyId { get; set; }
+
+        [Required(ErrorMessage = AgencyPersonMessages.NameRequired)]
         [StringLength(250)]
         public string Name { get; set; } = string.Empty;
 

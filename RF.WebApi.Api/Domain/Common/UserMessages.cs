@@ -9,7 +9,15 @@
         public const string UnauthorizedAction = "You don't have permission to perform this action";
         public const string InvalidSession = "Invalid Session";
         public const string InvalidRole = "Invalid User Role";
-
+        public const string EmailRequired = "Email is required";
+        public const string PasswordRequired = "Password is required";
+        public const string NewPasswordRequired = "New Password is required";
+        public const string UserIdRequired = "User is required";
+        public const string FirstNameRequired = "First Name is required";
+        public const string SurnameRequired = "Surname is required";
+        public const string RoleRequired = "Role is required";
+        public const string IsActiveRequired = "IsActive is required";
+        public const string AccountRequired = "Account is required";
 
         // Auth & Password
         public const string InvalidLogin = "Invalid Email or Password";

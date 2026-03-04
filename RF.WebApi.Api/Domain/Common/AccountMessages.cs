@@ -5,5 +5,6 @@ namespace RF.WebApi.Api.Domain.Common
         // Validation & Errors
         public const string InvalidId = "Invalid Account Id";
         public const string NotFound = "Account not found";
+        public const string ProfileNameRequired = "Profile Name is required";
     }
 }
