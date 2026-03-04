@@ -1,0 +1,42 @@
+using AutoMapper;
+using RF.WebApi.Api.Application.DTOs.BuyingBill;
+using RF.WebApi.Api.Infrastructure.Data.Tables;
+
+namespace RF.WebApi.Api.Application.Mappings
+{
+    public class BuyingBillProfile : Profile
+    {
+        public BuyingBillProfile()
+        {
+            CreateMap<BuyingBill, BuyingBillDto>();
+            CreateMap<CreateBuyingBillDto, BuyingBill>();
+            CreateMap<UpdateBuyingBillDto, BuyingBill>();
+
+            CreateMap<BuyingBill, BuyingBillListDto>()
+                .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Agency != null ? src.Agency.AgencyName : string.Empty))
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => (i.Quntity ?? 0) * (i.Price ?? 0))))
+                .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Discount ?? 0))
+                .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src => 
+                    src.Items.Sum(i => (i.Quntity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)))
+                .ForMember(dest => dest.TotalExpence, opt => opt.MapFrom(src => src.Expences.Sum(e => e.Amount ?? 0)))
+                .ForMember(dest => dest.PaidAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)))
+                .ForMember(dest => dest.RemainingAmount, opt => opt.MapFrom(src => 
+                    (src.Items.Sum(i => (i.Quntity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)) // Net Amount
+                    + src.Expences.Sum(e => e.Amount ?? 0)                                       // + Expenses
+                    - src.Payments.Sum(p => p.Amount ?? 0)                                       // - Paid
+                ));
+
+            CreateMap<BuyingBillItem, BuyingBillItemDto>();
+            CreateMap<CreateBuyingBillItemDto, BuyingBillItem>();
+            CreateMap<UpdateBuyingBillItemDto, BuyingBillItem>();
+
+            CreateMap<BuyingBillPayment, BuyingBillPaymentDto>();
+            CreateMap<CreateBuyingBillPaymentDto, BuyingBillPayment>();
+            CreateMap<UpdateBuyingBillPaymentDto, BuyingBillPayment>();
+
+            CreateMap<BuyingBillExpence, BuyingBillExpenceDto>();
+            CreateMap<CreateBuyingBillExpenceDto, BuyingBillExpence>();
+            CreateMap<UpdateBuyingBillExpenceDto, BuyingBillExpence>();
+        }
+    }
+}

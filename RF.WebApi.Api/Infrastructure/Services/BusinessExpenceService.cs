@@ -101,9 +101,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<BusinessExpenceDto>>> GetAllBusinessExpences()
+        public Task<ServiceResponse<List<BusinessExpenceListDto>>> GetAllBusinessExpences()
         {
-            return ServiceResponse<List<BusinessExpenceDto>>.Execute(async err =>
+            return ServiceResponse<List<BusinessExpenceListDto>>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
 
@@ -125,7 +125,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .AsNoTracking()
                     .ToListAsync();
 
-                return _mapper.Map<List<BusinessExpenceDto>>(expenses);
+                return _mapper.Map<List<BusinessExpenceListDto>>(expenses);
             });
         }
     }

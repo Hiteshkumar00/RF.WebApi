@@ -26,7 +26,6 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
         public DbSet<BuyingBillItem> BuyingBillItems { get; set; }
         public DbSet<BuyingBillPayment> BuyingBillPayments { get; set; }
         public DbSet<BuyingBillExpence> BuyingBillExpences { get; set; }
-        public DbSet<BuyingBillExpencePayment> BuyingBillExpencePayments { get; set; }
         public DbSet<BusinessYear> BusinessYears { get; set; }
         public DbSet<AccountPerson> AccountPersons { get; set; }
         public DbSet<BusinessExpence> BusinessExpences { get; set; }
@@ -57,7 +56,6 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
             modelBuilder.ApplyConfiguration(new BuyingBillItemConfig());
             modelBuilder.ApplyConfiguration(new BuyingBillPaymentConfig());
             modelBuilder.ApplyConfiguration(new BuyingBillExpenceConfig());
-            modelBuilder.ApplyConfiguration(new BuyingBillExpencePaymentConfig());
             modelBuilder.ApplyConfiguration(new BusinessYearConfig());
             modelBuilder.ApplyConfiguration(new AccountPersonConfig());
             modelBuilder.ApplyConfiguration(new BusinessExpenceConfig());

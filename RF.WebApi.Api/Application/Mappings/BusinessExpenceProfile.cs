@@ -12,6 +12,9 @@ namespace RF.WebApi.Api.Application.Mappings
             CreateMap<CreateBusinessExpenceDto, BusinessExpence>();
             CreateMap<UpdateBusinessExpenceDto, BusinessExpence>();
 
+            CreateMap<BusinessExpence, BusinessExpenceListDto>()
+                .ForMember(dest => dest.PaidAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)));
+
             CreateMap<BusinessExpencePayment, BusinessExpencePaymentDto>();
             CreateMap<CreateBusinessExpencePaymentDto, BusinessExpencePayment>();
             CreateMap<UpdateBusinessExpencePaymentDto, BusinessExpencePayment>();
