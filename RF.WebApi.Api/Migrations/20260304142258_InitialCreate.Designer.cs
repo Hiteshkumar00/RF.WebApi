@@ -12,7 +12,7 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    [Migration("20260228185741_InitialCreate")]
+    [Migration("20260304142258_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -806,10 +806,38 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$52So4Mfcbxeg0nJYcmU2cu6YTfS9zGWDWRknU5Ng.EBhC/Lod7Mk6",
+                            Password = "$2a$11$vZnFi8JUf7F4BfKJf5eGpud1GVUF8dGO49LuliBAdW37XdzI3l7Ce",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
+                });
+
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.UserSelectedYearMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BusinessYearId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("BusinessYearId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSelectedYearMapping", (string)null);
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.AccountPerson", b =>
@@ -1065,7 +1093,28 @@ namespace RF.WebApi.Api.Migrations
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Account", null)
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
+                });
+
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.UserSelectedYearMapping", b =>
+                {
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BusinessYear", null)
+                        .WithMany()
+                        .HasForeignKey("BusinessYearId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

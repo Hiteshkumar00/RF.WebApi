@@ -23,19 +23,19 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.HasOne<Account>()
                    .WithMany()
                    .HasForeignKey(ap => ap.AccountId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             // Foreign Key: User
             builder.HasOne<User>() 
                    .WithMany()
                    .HasForeignKey(ap => ap.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             // Foreign Key: BusinessYear
             builder.HasOne<BusinessYear>()
                    .WithMany()
                    .HasForeignKey(ap => ap.BusinessYearId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.NoAction);
 
         }
 

@@ -176,8 +176,7 @@ namespace RF.WebApi.Api.Migrations
                         name: "FK_User_Account_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Account",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -343,6 +342,36 @@ namespace RF.WebApi.Api.Migrations
                         principalTable: "SellingBill",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSelectedYearMapping",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    AccountId = table.Column<int>(type: "int", nullable: false),
+                    BusinessYearId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSelectedYearMapping", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSelectedYearMapping_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserSelectedYearMapping_BusinessYear_BusinessYearId",
+                        column: x => x.BusinessYearId,
+                        principalTable: "BusinessYear",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserSelectedYearMapping_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -588,7 +617,7 @@ namespace RF.WebApi.Api.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$52So4Mfcbxeg0nJYcmU2cu6YTfS9zGWDWRknU5Ng.EBhC/Lod7Mk6", null, "SuperAdmin", "User" });
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$vZnFi8JUf7F4BfKJf5eGpud1GVUF8dGO49LuliBAdW37XdzI3l7Ce", null, "SuperAdmin", "User" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountPerson_AccountId",
@@ -761,6 +790,21 @@ namespace RF.WebApi.Api.Migrations
                 table: "User",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSelectedYearMapping_AccountId",
+                table: "UserSelectedYearMapping",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSelectedYearMapping_BusinessYearId",
+                table: "UserSelectedYearMapping",
+                column: "BusinessYearId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSelectedYearMapping_UserId",
+                table: "UserSelectedYearMapping",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -774,9 +818,6 @@ namespace RF.WebApi.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "BusinessExpencePayment");
-
-            migrationBuilder.DropTable(
-                name: "BusinessYear");
 
             migrationBuilder.DropTable(
                 name: "BuyingBillExpencePayment");
@@ -800,7 +841,7 @@ namespace RF.WebApi.Api.Migrations
                 name: "SellingItemWarrenty");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "UserSelectedYearMapping");
 
             migrationBuilder.DropTable(
                 name: "AddContribution");
@@ -819,6 +860,12 @@ namespace RF.WebApi.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "SellingBillItem");
+
+            migrationBuilder.DropTable(
+                name: "BusinessYear");
+
+            migrationBuilder.DropTable(
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "BuyingBill");
