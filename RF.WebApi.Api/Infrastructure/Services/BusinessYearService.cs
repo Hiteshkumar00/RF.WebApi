@@ -176,5 +176,63 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return true;
             });
         }
+
+        public Task<ServiceResponse<(DateOnly StartDate, DateOnly EndDate)>> GetSelectedBusinessYearDates()
+        {
+            return ServiceResponse<(DateOnly StartDate, DateOnly EndDate)>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+                var userId = Token.UserId;
+
+                // 1. Get ordered list of business years for the account
+                var businessYears = await _context.BusinessYears
+                    .Where(by => by.AccountId == accountId)
+                    .OrderBy(by => by.Date)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                if (!businessYears.Any())
+                {
+                    err.AddError("No Business Years configured for this account.");
+                    return default;
+                }
+
+                // 2. Identify selected year
+                var userMapping = await _context.UserSelectedYearMappings
+                    .FirstOrDefaultAsync(m => m.UserId == userId && m.AccountId == accountId);
+
+                BusinessYear? selectedYear = null;
+
+                if (userMapping != null)
+                {
+                    selectedYear = businessYears.FirstOrDefault(by => by.Id == userMapping.BusinessYearId);
+                }
+
+                // Fallback to the latest year if mapping missing or invalid
+                if (selectedYear == null)
+                {
+                    selectedYear = businessYears.Last();
+                }
+
+                var startDate = selectedYear.Date!.Value;
+                DateOnly endDate;
+
+                // 3. Find next sequential year
+                var nextYear = businessYears.FirstOrDefault(by => by.Date > startDate);
+
+                if (nextYear != null && nextYear.Date.HasValue)
+                {
+                    // End date is one day before the next year's start date
+                    endDate = nextYear.Date.Value.AddDays(-1);
+                }
+                else
+                {
+                    // If no next year, till now
+                    endDate = DateOnly.FromDateTime(DateTime.Now);
+                }
+
+                return (startDate, endDate);
+            });
+        }
     }
 }

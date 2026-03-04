@@ -10,5 +10,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> DeleteBusinessYear(int id);
         Task<ServiceResponse<List<BusinessYearListDto>>> GetAllBusinessYears();
         Task<ServiceResponse<bool>> ChangeSelectedYear(ChangeUserSelectedYearDto dto);
+        Task<ServiceResponse<(DateOnly StartDate, DateOnly EndDate)>> GetSelectedBusinessYearDates();
     }
 }

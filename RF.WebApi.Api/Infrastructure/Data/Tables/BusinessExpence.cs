@@ -6,5 +6,7 @@
         public int? AccountId { get; set; }
         public string? ExpenceType { get; set; }
         public DateOnly? Date { get; set; }
+
+        public ICollection<BusinessExpencePayment> Payments { get; set; } = new List<BusinessExpencePayment>();
     }
 }
