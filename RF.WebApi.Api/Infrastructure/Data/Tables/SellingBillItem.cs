@@ -7,5 +7,7 @@
         public int? Quntity { get; set; } // Matches your "Quntity" spelling in the requirement
         public decimal? Price { get; set; }
         public int? BillId { get; set; } // Navigation property/FK for the parent bill
+
+        public SellingItemWarrenty? Warrenty { get; set; }
     }
 }

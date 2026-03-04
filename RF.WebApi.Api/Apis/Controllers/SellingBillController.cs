@@ -1,0 +1,56 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using RF.WebApi.Api.Application.DTOs.SellingBill;
+using RF.WebApi.Api.Domain.Interfaces;
+using RF.WebApi.Api.Infrastructure.Data.Tables;
+
+namespace RF.WebApi.Api.Apis.Controllers
+{
+    [Authorize]
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    public class SellingBillController : BaseController
+    {
+        private readonly ISellingBillService _sellingBillService;
+
+        public SellingBillController(ISellingBillService sellingBillService)
+        {
+            _sellingBillService = sellingBillService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateSellingBillDto dto)
+        {
+            var result = await _sellingBillService.CreateSellingBill(dto);
+            return HandleResponse(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _sellingBillService.GetSellingBillById(id);
+            return HandleResponse(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateSellingBillDto dto)
+        {
+            var result = await _sellingBillService.UpdateSellingBill(dto);
+            return HandleResponse(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _sellingBillService.DeleteSellingBill(id);
+            return HandleResponse(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _sellingBillService.GetAllSellingBills();
+            return HandleResponse(result);
+        }
+    }
+}

@@ -18,7 +18,7 @@ builder.Services.ConfigureCustomValidationErrorResponse();
 builder.Services.AddIdentityServices(builder.Configuration);
 
 // SERVICE REGISTRATION 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddApplicationServices();
 
 
 // Database

@@ -1,4 +1,7 @@
-﻿namespace RF.WebApi.Api.Infrastructure.Data.Tables
+﻿using System;
+using System.Collections.Generic;
+
+namespace RF.WebApi.Api.Infrastructure.Data.Tables
 {
     public class SellingBill
     {
@@ -11,5 +14,8 @@
         public string? Address { get; set; }
         public DateOnly? Date { get; set; }
         public decimal? Discount { get; set; }
+
+        public ICollection<SellingBillItem> Items { get; set; } = new List<SellingBillItem>();
+        public ICollection<SellingBillPayment> Payments { get; set; } = new List<SellingBillPayment>();
     }
 }
