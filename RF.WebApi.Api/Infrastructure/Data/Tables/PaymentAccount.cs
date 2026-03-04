@@ -5,6 +5,6 @@
         public int? Id { get; set; }
         public string? MethodName { get; set; }
         public int? AccountId { get; set; }
-        public int? AccountPersonId { get; set; } // Nullable based on the lack of "Not Null" in image
+        public int? AccountPersonId { get; set; } 
     }
 }
