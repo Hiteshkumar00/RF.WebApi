@@ -32,7 +32,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.HasOne<Account>()
                    .WithMany()
                    .HasForeignKey(by => by.AccountId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

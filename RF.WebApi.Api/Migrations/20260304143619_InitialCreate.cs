@@ -124,7 +124,7 @@ namespace RF.WebApi.Api.Migrations
                         column: x => x.AccountId,
                         principalTable: "Account",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -176,7 +176,8 @@ namespace RF.WebApi.Api.Migrations
                         name: "FK_User_Account_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Account",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -361,7 +362,8 @@ namespace RF.WebApi.Api.Migrations
                         name: "FK_UserSelectedYearMapping_Account_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Account",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserSelectedYearMapping_BusinessYear_BusinessYearId",
                         column: x => x.BusinessYearId,
@@ -371,7 +373,8 @@ namespace RF.WebApi.Api.Migrations
                         name: "FK_UserSelectedYearMapping_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -617,7 +620,7 @@ namespace RF.WebApi.Api.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$vZnFi8JUf7F4BfKJf5eGpud1GVUF8dGO49LuliBAdW37XdzI3l7Ce", null, "SuperAdmin", "User" });
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$kZAWToKm.Cs0A59eSpW6AOMOH8sWPWoYeDgzhgmicCvmfZa.f7P7e", null, "SuperAdmin", "User" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountPerson_AccountId",

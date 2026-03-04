@@ -803,7 +803,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$vZnFi8JUf7F4BfKJf5eGpud1GVUF8dGO49LuliBAdW37XdzI3l7Ce",
+                            Password = "$2a$11$kZAWToKm.Cs0A59eSpW6AOMOH8sWPWoYeDgzhgmicCvmfZa.f7P7e",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -917,7 +917,7 @@ namespace RF.WebApi.Api.Migrations
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Account", null)
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -1090,7 +1090,7 @@ namespace RF.WebApi.Api.Migrations
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Account", null)
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.UserSelectedYearMapping", b =>
@@ -1098,7 +1098,7 @@ namespace RF.WebApi.Api.Migrations
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Account", null)
                         .WithMany()
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BusinessYear", null)
@@ -1110,7 +1110,7 @@ namespace RF.WebApi.Api.Migrations
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

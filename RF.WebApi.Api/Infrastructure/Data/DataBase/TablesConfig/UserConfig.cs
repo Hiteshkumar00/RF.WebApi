@@ -54,7 +54,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.HasOne<Account>()
                 .WithMany()
                 .HasForeignKey(u => u.AccountId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
 
 
 
