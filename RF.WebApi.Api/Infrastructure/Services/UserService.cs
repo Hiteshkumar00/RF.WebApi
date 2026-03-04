@@ -64,12 +64,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<string>.Execute(async err =>
             {
-                if (Token.UserId == 0)
-                {
-                    err.AddError("Invalid Session");
-                    return default;
-                }
-
                 if (!Token.IsSuperAdmin)
                 {
                     err.AddError(UserMessages.OnlySuperAdminSwitch);
