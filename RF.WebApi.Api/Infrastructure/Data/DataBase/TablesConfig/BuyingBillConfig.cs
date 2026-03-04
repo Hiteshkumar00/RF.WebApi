@@ -40,10 +40,26 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(b => b.AgencyId)
                    .IsRequired();
 
-            builder.HasOne<Agency>()
+            builder.HasOne(b => b.Agency)
                    .WithMany()
                    .HasForeignKey(b => b.AgencyId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            // 6. Navigation: Items, Payments, Expences
+            builder.HasMany(b => b.Items)
+                   .WithOne()
+                   .HasForeignKey(i => i.BillId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(b => b.Payments)
+                   .WithOne()
+                   .HasForeignKey(p => p.BillId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(b => b.Expences)
+                   .WithOne()
+                   .HasForeignKey(e => e.BillId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

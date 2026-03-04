@@ -24,10 +24,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(p => p.BusinessExpenceId)
                    .IsRequired();
 
-            builder.HasOne<BusinessExpence>()
-                   .WithMany()
-                   .HasForeignKey(p => p.BusinessExpenceId)
-                   .OnDelete(DeleteBehavior.Cascade);
+
 
             // 5. Foreign Key: PaymentAccount (Integer, Not Null)
             builder.Property(p => p.PaymentAccountId)

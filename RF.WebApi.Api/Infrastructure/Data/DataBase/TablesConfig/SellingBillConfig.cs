@@ -42,6 +42,17 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .WithMany()
                    .HasForeignKey(s => s.AccountId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            // 5. Navigation: Items, Payments
+            builder.HasMany(s => s.Items)
+                   .WithOne()
+                   .HasForeignKey(i => i.BillId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(s => s.Payments)
+                   .WithOne()
+                   .HasForeignKey(p => p.BillId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

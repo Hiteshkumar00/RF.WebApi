@@ -324,28 +324,6 @@ namespace RF.WebApi.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SellingBillItem",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Quntity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    BillId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SellingBillItem", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SellingBillItem_SellingBill_BillId",
-                        column: x => x.BillId,
-                        principalTable: "SellingBill",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserSelectedYearMapping",
                 columns: table => new
                 {
@@ -439,7 +417,8 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
-                    PaymentAccountId = table.Column<int>(type: "int", nullable: false)
+                    PaymentAccountId = table.Column<int>(type: "int", nullable: false),
+                    SellingBillId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -456,6 +435,11 @@ namespace RF.WebApi.Api.Migrations
                         principalTable: "SellingBill",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SellingBillPayment_SellingBill_SellingBillId",
+                        column: x => x.SellingBillId,
+                        principalTable: "SellingBill",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -494,7 +478,8 @@ namespace RF.WebApi.Api.Migrations
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
                     PaymentAccountId = table.Column<int>(type: "int", nullable: false),
-                    ExpenceType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true)
+                    ExpenceType = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    BuyingBillId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -505,6 +490,11 @@ namespace RF.WebApi.Api.Migrations
                         principalTable: "BuyingBill",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BuyingBillExpence_BuyingBill_BuyingBillId",
+                        column: x => x.BuyingBillId,
+                        principalTable: "BuyingBill",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_BuyingBillExpence_PaymentAccount_PaymentAccountId",
                         column: x => x.PaymentAccountId,
@@ -522,7 +512,8 @@ namespace RF.WebApi.Api.Migrations
                     ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Quntity = table.Column<int>(type: "int", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    BillId = table.Column<int>(type: "int", nullable: false)
+                    BillId = table.Column<int>(type: "int", nullable: false),
+                    BuyingBillId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -533,6 +524,11 @@ namespace RF.WebApi.Api.Migrations
                         principalTable: "BuyingBill",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BuyingBillItem_BuyingBill_BuyingBillId",
+                        column: x => x.BuyingBillId,
+                        principalTable: "BuyingBill",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -543,7 +539,8 @@ namespace RF.WebApi.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
-                    PaymentAccountId = table.Column<int>(type: "int", nullable: false)
+                    PaymentAccountId = table.Column<int>(type: "int", nullable: false),
+                    BuyingBillId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -555,11 +552,39 @@ namespace RF.WebApi.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_BuyingBillPayment_BuyingBill_BuyingBillId",
+                        column: x => x.BuyingBillId,
+                        principalTable: "BuyingBill",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_BuyingBillPayment_PaymentAccount_PaymentAccountId",
                         column: x => x.PaymentAccountId,
                         principalTable: "PaymentAccount",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SellingBillItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Quntity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    BillId = table.Column<int>(type: "int", nullable: false),
+                    WarrentyId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SellingBillItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SellingBillItem_SellingBill_BillId",
+                        column: x => x.BillId,
+                        principalTable: "SellingBill",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -590,37 +615,10 @@ namespace RF.WebApi.Api.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "BuyingBillExpencePayment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    BuyingBillExpenceId = table.Column<int>(type: "int", nullable: false),
-                    PaymentAccountId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BuyingBillExpencePayment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BuyingBillExpencePayment_BuyingBillExpence_BuyingBillExpenceId",
-                        column: x => x.BuyingBillExpenceId,
-                        principalTable: "BuyingBillExpence",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BuyingBillExpencePayment_PaymentAccount_PaymentAccountId",
-                        column: x => x.PaymentAccountId,
-                        principalTable: "PaymentAccount",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$kZAWToKm.Cs0A59eSpW6AOMOH8sWPWoYeDgzhgmicCvmfZa.f7P7e", null, "SuperAdmin", "User" });
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$Bch1OGu5MzXe5wFkC9tzgerad4qMd/gvMBE1f60Il4c3/Tyb/fNoi", null, "SuperAdmin", "User" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountPerson_AccountId",
@@ -688,18 +686,13 @@ namespace RF.WebApi.Api.Migrations
                 column: "BillId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BuyingBillExpence_BuyingBillId",
+                table: "BuyingBillExpence",
+                column: "BuyingBillId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BuyingBillExpence_PaymentAccountId",
                 table: "BuyingBillExpence",
-                column: "PaymentAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BuyingBillExpencePayment_BuyingBillExpenceId",
-                table: "BuyingBillExpencePayment",
-                column: "BuyingBillExpenceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BuyingBillExpencePayment_PaymentAccountId",
-                table: "BuyingBillExpencePayment",
                 column: "PaymentAccountId");
 
             migrationBuilder.CreateIndex(
@@ -708,9 +701,19 @@ namespace RF.WebApi.Api.Migrations
                 column: "BillId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BuyingBillItem_BuyingBillId",
+                table: "BuyingBillItem",
+                column: "BuyingBillId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BuyingBillPayment_BillId",
                 table: "BuyingBillPayment",
                 column: "BillId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuyingBillPayment_BuyingBillId",
+                table: "BuyingBillPayment",
+                column: "BuyingBillId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuyingBillPayment_PaymentAccountId",
@@ -764,6 +767,11 @@ namespace RF.WebApi.Api.Migrations
                 column: "BillId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SellingBillItem_WarrentyId",
+                table: "SellingBillItem",
+                column: "WarrentyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SellingBillPayment_BillId",
                 table: "SellingBillPayment",
                 column: "BillId");
@@ -772,6 +780,11 @@ namespace RF.WebApi.Api.Migrations
                 name: "IX_SellingBillPayment_PaymentAccountId",
                 table: "SellingBillPayment",
                 column: "PaymentAccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SellingBillPayment_SellingBillId",
+                table: "SellingBillPayment",
+                column: "SellingBillId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SellingItemWarrenty_BillId",
@@ -808,11 +821,34 @@ namespace RF.WebApi.Api.Migrations
                 name: "IX_UserSelectedYearMapping_UserId",
                 table: "UserSelectedYearMapping",
                 column: "UserId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_SellingBillItem_SellingItemWarrenty_WarrentyId",
+                table: "SellingBillItem",
+                column: "WarrentyId",
+                principalTable: "SellingItemWarrenty",
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_SellingBill_Account_AccountId",
+                table: "SellingBill");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_SellingBillItem_SellingBill_BillId",
+                table: "SellingBillItem");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_SellingItemWarrenty_SellingBill_BillId",
+                table: "SellingItemWarrenty");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_SellingBillItem_SellingItemWarrenty_WarrentyId",
+                table: "SellingBillItem");
+
             migrationBuilder.DropTable(
                 name: "AddContributionPayment");
 
@@ -823,7 +859,7 @@ namespace RF.WebApi.Api.Migrations
                 name: "BusinessExpencePayment");
 
             migrationBuilder.DropTable(
-                name: "BuyingBillExpencePayment");
+                name: "BuyingBillExpence");
 
             migrationBuilder.DropTable(
                 name: "BuyingBillItem");
@@ -841,9 +877,6 @@ namespace RF.WebApi.Api.Migrations
                 name: "SellingBillPayment");
 
             migrationBuilder.DropTable(
-                name: "SellingItemWarrenty");
-
-            migrationBuilder.DropTable(
                 name: "UserSelectedYearMapping");
 
             migrationBuilder.DropTable(
@@ -853,7 +886,7 @@ namespace RF.WebApi.Api.Migrations
                 name: "BusinessExpence");
 
             migrationBuilder.DropTable(
-                name: "BuyingBillExpence");
+                name: "BuyingBill");
 
             migrationBuilder.DropTable(
                 name: "Entity");
@@ -862,22 +895,13 @@ namespace RF.WebApi.Api.Migrations
                 name: "RemoveContribution");
 
             migrationBuilder.DropTable(
-                name: "SellingBillItem");
+                name: "PaymentAccount");
 
             migrationBuilder.DropTable(
                 name: "BusinessYear");
 
             migrationBuilder.DropTable(
                 name: "User");
-
-            migrationBuilder.DropTable(
-                name: "BuyingBill");
-
-            migrationBuilder.DropTable(
-                name: "PaymentAccount");
-
-            migrationBuilder.DropTable(
-                name: "SellingBill");
 
             migrationBuilder.DropTable(
                 name: "Agency");
@@ -887,6 +911,15 @@ namespace RF.WebApi.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Account");
+
+            migrationBuilder.DropTable(
+                name: "SellingBill");
+
+            migrationBuilder.DropTable(
+                name: "SellingItemWarrenty");
+
+            migrationBuilder.DropTable(
+                name: "SellingBillItem");
         }
     }
 }

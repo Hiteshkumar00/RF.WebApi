@@ -33,6 +33,12 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             // 5. Date (String, Not Null)
             builder.Property(be => be.Date)
                    .IsRequired();
+
+            // 6. Navigation: Payments
+            builder.HasMany(be => be.Payments)
+                   .WithOne()
+                   .HasForeignKey(p => p.BusinessExpenceId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

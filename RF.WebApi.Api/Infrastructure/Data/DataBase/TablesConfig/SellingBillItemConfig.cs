@@ -34,8 +34,14 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired();
 
             builder.HasOne<SellingBill>()
-                   .WithMany()
+                   .WithMany(sb => sb.Items)
                    .HasForeignKey(sbi => sbi.BillId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            // 7. Navigation: 1-to-1 Warranty
+            builder.HasOne(sbi => sbi.Warrenty)
+                   .WithOne()
+                   .HasForeignKey<SellingItemWarrenty>(w => w.ItemId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -134,7 +134,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .AsNoTracking()
                     .ToListAsync();
 
-                return _mapper.Map<List<BuyingBillDto>>(bills);
+                return _mapper.Map<List<BuyingBillListDto>>(bills);
             });
         }
 

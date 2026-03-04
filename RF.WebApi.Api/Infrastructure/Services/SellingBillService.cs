@@ -103,7 +103,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 {
                     if (item.Warrenty != null)
                     {
-                        _context.SellingItemWarrentys.Remove(item.Warrenty);
+                        _context.SellingItemWarrenties.Remove(item.Warrenty);
                     }
                 }
 
