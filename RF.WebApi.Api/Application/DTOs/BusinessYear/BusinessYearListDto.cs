@@ -7,7 +7,8 @@ namespace RF.WebApi.Api.Application.DTOs.BusinessYear
         public int Id { get; set; }
         public int? AccountId { get; set; }
         public string YearName { get; set; } = string.Empty;
-        public DateOnly? Date { get; set; }
+        public DateOnly? StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         
         public bool IsSelected { get; set; }
     }

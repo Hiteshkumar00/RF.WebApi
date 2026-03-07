@@ -85,25 +85,41 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<BusinessYearListDto>>> GetAllBusinessYears()
+        public async Task<ServiceResponse<List<BusinessYearListDto>>> GetAllBusinessYears()
         {
-            return ServiceResponse<List<BusinessYearListDto>>.Execute(async err =>
+            return await ServiceResponse<List<BusinessYearListDto>>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
                 var userId = Token.UserId;
 
-                // 1. Fetch all Business Years for this account, sorted Ascending by Date
-                var businessYears = await _context.BusinessYears
-                    .Where(by => by.AccountId == accountId)
-                    .OrderBy(by => by.Date)
-                    .AsNoTracking()
-                    .ToListAsync();
+                // 1. Fetch the computed DateRanges for this account
+                var dateRangesResponse = await GetAllBusinessYearDateRanges();
+                if (!dateRangesResponse.Success)
+                {
+                    err.SetErrors(dateRangesResponse);
+                    return default;
+                }
 
-                var dtoList = _mapper.Map<List<BusinessYearListDto>>(businessYears);
+                var dateRanges = dateRangesResponse.Data;
+                var dtoList = new List<BusinessYearListDto>();
 
-                if (!dtoList.Any())
+                if (dateRanges == null || !dateRanges.Any())
                 {
                     return dtoList;
+                }
+
+                // Convert DateRanges to BusinessYearListDto
+                foreach (var range in dateRanges)
+                {
+                    dtoList.Add(new BusinessYearListDto
+                    {
+                        Id = range.Id,
+                        AccountId = accountId,
+                        YearName = range.YearName,
+                        StartDate = range.StartDate,
+                        EndDate = range.EndDate,
+                        IsSelected = false 
+                    });
                 }
 
                 // 2. Fetch the User's selected year mapping
@@ -232,6 +248,51 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 return (startDate, endDate);
+            });
+        }
+
+        public Task<ServiceResponse<List<BusinessYearDateRangeDto>>> GetAllBusinessYearDateRanges()
+        {
+            return ServiceResponse<List<BusinessYearDateRangeDto>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var businessYears = await _context.BusinessYears
+                    .Where(by => by.AccountId == accountId)
+                    .OrderBy(by => by.Date)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var results = new List<BusinessYearDateRangeDto>();
+
+                for (int i = 0; i < businessYears.Count; i++)
+                {
+                    var currentYear = businessYears[i];
+
+                    if (!currentYear.Date.HasValue) continue;
+
+                    var startDate = currentYear.Date.Value;
+                    DateOnly endDate;
+
+                    if (i + 1 < businessYears.Count && businessYears[i + 1].Date.HasValue)
+                    {
+                        endDate = businessYears[i + 1].Date!.Value.AddDays(-1);
+                    }
+                    else
+                    {
+                        endDate = DateOnly.FromDateTime(DateTime.Now);
+                    }
+
+                    results.Add(new BusinessYearDateRangeDto
+                    {
+                        Id = currentYear.Id ?? 0,
+                        YearName = currentYear.YearName ?? "Unknown",
+                        StartDate = startDate,
+                        EndDate = endDate
+                    });
+                }
+
+                return results;
             });
         }
     }

@@ -21,6 +21,7 @@ namespace RF.WebApi.Api.Apis.Extensions
             services.AddScoped<IEntityService, EntityService>();
             services.AddScoped<IAddContributionService, AddContributionService>();
             services.AddScoped<IRemoveContributionService, RemoveContributionService>();
+            services.AddScoped<IDashboardService, DashboardService>();
 
             return services;
         }
