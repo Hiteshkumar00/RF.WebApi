@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace RF.WebApi.Api.Migrations
 {
     /// <inheritdoc />
@@ -616,9 +618,29 @@ namespace RF.WebApi.Api.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Entity",
+                columns: new[] { "Id", "DisplayName", "EntityName" },
+                values: new object[,]
+                {
+                    { 1, "User Role", "UserRole" },
+                    { 2, "Currency", "Currency" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$Bch1OGu5MzXe5wFkC9tzgerad4qMd/gvMBE1f60Il4c3/Tyb/fNoi", null, "SuperAdmin", "User" });
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$5URnlmvkTo2/cnQjxFzHT.bxm6PYJVktTUkLydHEeSPEScG2i12T.", null, "SuperAdmin", "User" });
+
+            migrationBuilder.InsertData(
+                table: "RelatedEntity",
+                columns: new[] { "Id", "EntityId", "RelatedDisplayName", "RelatedEntityName" },
+                values: new object[,]
+                {
+                    { 1, 1, "Super Admin", "SuperAdmin" },
+                    { 2, 1, "Admin", "Admin" },
+                    { 3, 2, "$", "Dollar" },
+                    { 4, 2, "₹", "INR" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountPerson_AccountId",

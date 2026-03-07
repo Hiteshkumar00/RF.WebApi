@@ -468,6 +468,20 @@ namespace RF.WebApi.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("Entity", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DisplayName = "User Role",
+                            EntityName = "UserRole"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DisplayName = "Currency",
+                            EntityName = "Currency"
+                        });
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.PaymentAccount", b =>
@@ -525,6 +539,36 @@ namespace RF.WebApi.Api.Migrations
                     b.HasIndex("EntityId");
 
                     b.ToTable("RelatedEntity", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            EntityId = 1,
+                            RelatedDisplayName = "Super Admin",
+                            RelatedEntityName = "SuperAdmin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            EntityId = 1,
+                            RelatedDisplayName = "Admin",
+                            RelatedEntityName = "Admin"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            EntityId = 2,
+                            RelatedDisplayName = "$",
+                            RelatedEntityName = "Dollar"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            EntityId = 2,
+                            RelatedDisplayName = "₹",
+                            RelatedEntityName = "INR"
+                        });
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.RemoveContribution", b =>
@@ -799,7 +843,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$Bch1OGu5MzXe5wFkC9tzgerad4qMd/gvMBE1f60Il4c3/Tyb/fNoi",
+                            Password = "$2a$11$5URnlmvkTo2/cnQjxFzHT.bxm6PYJVktTUkLydHEeSPEScG2i12T.",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -1001,11 +1045,13 @@ namespace RF.WebApi.Api.Migrations
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.RelatedEntity", b =>
                 {
-                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Entity", null)
-                        .WithMany()
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.Entity", "Entity")
+                        .WithMany("RelatedEntities")
                         .HasForeignKey("EntityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Entity");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.RemoveContribution", b =>
@@ -1131,6 +1177,11 @@ namespace RF.WebApi.Api.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.Entity", b =>
+                {
+                    b.Navigation("RelatedEntities");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", b =>

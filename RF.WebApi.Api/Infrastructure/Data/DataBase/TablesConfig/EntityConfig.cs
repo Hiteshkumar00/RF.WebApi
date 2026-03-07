@@ -27,6 +27,22 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             // 4. DisplayName (String)
             builder.Property(e => e.DisplayName)
                    .HasMaxLength(250);
+
+            // 5. Seed Data
+            builder.HasData(
+                new Entity 
+                { 
+                    Id = 1, 
+                    EntityName = "UserRole", 
+                    DisplayName = "User Role" 
+                },
+                new Entity 
+                { 
+                    Id = 2, 
+                    EntityName = "Currency", 
+                    DisplayName = "Currency" 
+                }
+            );
         }
     }
 }

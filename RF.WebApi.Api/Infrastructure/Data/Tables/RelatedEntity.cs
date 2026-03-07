@@ -5,6 +5,8 @@
         public int? Id { get; set; }
         public string? RelatedEntityName { get; set; }
         public string? RelatedDisplayName { get; set; }
-        public int? EntityId { get; set; } // Referenced as User FK in requirements
+        public int? EntityId { get; set; } 
+
+        public virtual Entity Entity { get; set; }
     }
 }

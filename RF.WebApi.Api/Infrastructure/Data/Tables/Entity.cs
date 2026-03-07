@@ -5,5 +5,7 @@
         public int? Id { get; set; }
         public string? EntityName { get; set; }
         public string? DisplayName { get; set; }
+
+        public virtual ICollection<RelatedEntity> RelatedEntities { get; set; } = new List<RelatedEntity>();
     }
 }

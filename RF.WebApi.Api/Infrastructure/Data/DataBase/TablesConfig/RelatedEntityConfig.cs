@@ -28,10 +28,42 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(re => re.EntityId)
                    .IsRequired();
 
-            builder.HasOne<Entity>()
-                   .WithMany()
+            builder.HasOne(re => re.Entity)
+                   .WithMany(e => e.RelatedEntities)
                    .HasForeignKey(re => re.EntityId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            // 5. Seed Data
+            builder.HasData(
+                new RelatedEntity 
+                { 
+                    Id = 1, 
+                    EntityId = 1, // UserRole
+                    RelatedEntityName = "SuperAdmin", 
+                    RelatedDisplayName = "Super Admin" 
+                },
+                new RelatedEntity 
+                { 
+                    Id = 2, 
+                    EntityId = 1, // UserRole
+                    RelatedEntityName = "Admin", 
+                    RelatedDisplayName = "Admin" 
+                },
+                new RelatedEntity 
+                { 
+                    Id = 3, 
+                    EntityId = 2, // Currency
+                    RelatedEntityName = "Dollar", 
+                    RelatedDisplayName = "$" 
+                },
+                new RelatedEntity 
+                { 
+                    Id = 4, 
+                    EntityId = 2, // Currency
+                    RelatedEntityName = "INR", 
+                    RelatedDisplayName = "₹" 
+                }
+            );
         }
     }
 }
