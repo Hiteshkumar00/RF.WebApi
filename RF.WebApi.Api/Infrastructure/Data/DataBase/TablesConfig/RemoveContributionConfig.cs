@@ -20,7 +20,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(rc => rc.AccountPersonId)
                    .IsRequired();
 
-            builder.HasOne<AccountPerson>()
+            builder.HasOne(rc => rc.AccountPerson)
                    .WithMany()
                    .HasForeignKey(rc => rc.AccountPersonId)
                    .OnDelete(DeleteBehavior.Cascade);
@@ -32,6 +32,12 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             // 5. Date (String, Not Null)
             builder.Property(rc => rc.Date)
                    .IsRequired();
+
+            // 6. Navigation
+            builder.HasMany(rc => rc.Payments)
+                   .WithOne()
+                   .HasForeignKey(p => p.RemoveContributionId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

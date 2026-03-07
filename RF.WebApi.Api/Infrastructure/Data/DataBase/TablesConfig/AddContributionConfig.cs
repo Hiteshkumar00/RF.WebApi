@@ -27,9 +27,15 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(c => c.AccountPersonId)
                    .IsRequired();
 
-            builder.HasOne<AccountPerson>()
+            builder.HasOne(c => c.AccountPerson)
                    .WithMany()
                    .HasForeignKey(c => c.AccountPersonId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            // 5. Navigation
+            builder.HasMany(c => c.Payments)
+                   .WithOne()
+                   .HasForeignKey(p => p.AddContributionId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }

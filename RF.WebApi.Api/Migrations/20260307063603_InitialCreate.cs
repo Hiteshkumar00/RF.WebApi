@@ -629,7 +629,7 @@ namespace RF.WebApi.Api.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$5URnlmvkTo2/cnQjxFzHT.bxm6PYJVktTUkLydHEeSPEScG2i12T.", null, "SuperAdmin", "User" });
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$atRAcJDNK8yLxN/5.qygW.CcmvwzHXQM6xpPJ2SicBOE9Yz84MsBu", null, "SuperAdmin", "User" });
 
             migrationBuilder.InsertData(
                 table: "RelatedEntity",

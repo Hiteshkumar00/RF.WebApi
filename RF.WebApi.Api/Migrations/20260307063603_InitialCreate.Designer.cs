@@ -12,7 +12,7 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    [Migration("20260307055758_InitialCreate")]
+    [Migration("20260307063603_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -846,7 +846,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$5URnlmvkTo2/cnQjxFzHT.bxm6PYJVktTUkLydHEeSPEScG2i12T.",
+                            Password = "$2a$11$atRAcJDNK8yLxN/5.qygW.CcmvwzHXQM6xpPJ2SicBOE9Yz84MsBu",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -891,17 +891,19 @@ namespace RF.WebApi.Api.Migrations
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.AddContribution", b =>
                 {
-                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.AccountPerson", null)
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.AccountPerson", "AccountPerson")
                         .WithMany()
                         .HasForeignKey("AccountPersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AccountPerson");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.AddContributionPayment", b =>
                 {
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.AddContribution", null)
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("AddContributionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1059,11 +1061,13 @@ namespace RF.WebApi.Api.Migrations
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.RemoveContribution", b =>
                 {
-                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.AccountPerson", null)
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.AccountPerson", "AccountPerson")
                         .WithMany()
                         .HasForeignKey("AccountPersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AccountPerson");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.RemoveContributionPayment", b =>
@@ -1075,7 +1079,7 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.RemoveContribution", null)
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("RemoveContributionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1168,6 +1172,11 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.AddContribution", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BusinessExpence", b =>
                 {
                     b.Navigation("Payments");
@@ -1185,6 +1194,11 @@ namespace RF.WebApi.Api.Migrations
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.Entity", b =>
                 {
                     b.Navigation("RelatedEntities");
+                });
+
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.RemoveContribution", b =>
+                {
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", b =>

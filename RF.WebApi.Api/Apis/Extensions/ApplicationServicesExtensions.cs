@@ -19,6 +19,8 @@ namespace RF.WebApi.Api.Apis.Extensions
             services.AddScoped<IBuyingBillService, BuyingBillService>();
             services.AddScoped<ISellingBillService, SellingBillService>();
             services.AddScoped<IEntityService, EntityService>();
+            services.AddScoped<IAddContributionService, AddContributionService>();
+            services.AddScoped<IRemoveContributionService, RemoveContributionService>();
 
             return services;
         }
