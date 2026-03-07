@@ -9,6 +9,8 @@ namespace RF.WebApi.Api.Application.Mappings
         public AgencyProfile()
         {
             CreateMap<Agency, AgencyDto>().ReverseMap();
+            CreateMap<Agency, AgencyAdvancedListDto>().ReverseMap();
+            CreateMap<Agency, ViewAgencyAllDetailDto>().ReverseMap();
             CreateMap<CreateAgencyDto, Agency>();
             CreateMap<UpdateAgencyDto, Agency>();
         }

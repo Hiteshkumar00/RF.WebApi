@@ -3,7 +3,7 @@
     public class ServiceResponse<T>
     {
         public bool Success { get; set; } = true;
-        public T? Data { get; set; }
+        public T Data { get; set; } = default;
         public List<string> Errors { get; set; } = new List<string>();
 
         public void AddError(string message)

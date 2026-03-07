@@ -196,7 +196,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalSelling = await _context.SellingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Items)
-                    .SumAsync(item => (item.Quntity ?? 0) * (item.Price ?? 0));
+                    .SumAsync(item => (item.Quantity ?? 0) * (item.Price ?? 0));
 
                 var totalSellingDiscounts = await _context.SellingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
@@ -213,7 +213,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalBuyingItems = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Items)
-                    .SumAsync(item => (item.Quntity ?? 0) * (item.Price ?? 0));
+                    .SumAsync(item => (item.Quantity ?? 0) * (item.Price ?? 0));
 
                 var totalBuyingExpence = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)

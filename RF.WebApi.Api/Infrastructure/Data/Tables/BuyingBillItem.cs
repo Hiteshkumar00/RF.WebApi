@@ -4,7 +4,7 @@
     {
         public int? Id { get; set; }
         public string? ItemName { get; set; }
-        public int? Quntity { get; set; } // Matches your "Quntity" spelling in the image
+        public int? Quantity { get; set; } // Matches your "Quantity" spelling in the image
         public decimal? Price { get; set; }
         public int? BillId { get; set; }
     }

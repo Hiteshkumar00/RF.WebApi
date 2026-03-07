@@ -16,13 +16,13 @@ namespace RF.WebApi.Api.Application.Mappings
 
             // List projection with mathematical rollups
             CreateMap<SellingBill, SellingBillListDto>()
-                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => (i.Quntity ?? 0) * (i.Price ?? 0))))
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0))))
                 .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Discount ?? 0))
                 .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src => 
-                    src.Items.Sum(i => (i.Quntity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)))
+                    src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)))
                 .ForMember(dest => dest.PaidAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)))
                 .ForMember(dest => dest.RemainingAmount, opt => opt.MapFrom(src => 
-                    (src.Items.Sum(i => (i.Quntity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)) // Net Amount
+                    (src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)) // Net Amount
                     - src.Payments.Sum(p => p.Amount ?? 0)                                       // - Paid
                 ));
 

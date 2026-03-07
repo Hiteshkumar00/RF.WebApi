@@ -51,5 +51,19 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _agencyService.GetAllAgencies();
             return HandleResponse(result);
         }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetAllAdvanced()
+        {
+            var result = await _agencyService.GetAllAgencysAdvancedAsync();
+            return HandleResponse(result);
+        }
+
+        [HttpGet()]
+        public async Task<IActionResult> ViewAllDetail(int agencyId)
+        {
+            var result = await _agencyService.GetAgencyAllDetailAsync(agencyId);
+            return HandleResponse(result);
+        }
     }
 }

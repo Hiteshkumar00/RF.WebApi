@@ -8,7 +8,7 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
     {
         public int Id { get; set; }
         public string ItemName { get; set; } = string.Empty;
-        public int Quntity { get; set; }
+        public int Quantity { get; set; }
         public decimal Price { get; set; }
     }
 
@@ -19,7 +19,7 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         public string ItemName { get; set; } = string.Empty;
 
         [Range(1, int.MaxValue, ErrorMessage = BuyingBillMessages.QuantityPositive)]
-        public int Quntity { get; set; }
+        public int Quantity { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = BuyingBillMessages.PricePositive)]
         public decimal Price { get; set; }

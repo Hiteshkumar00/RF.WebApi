@@ -10,5 +10,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> UpdateAgency(UpdateAgencyDto dto);
         Task<ServiceResponse<bool>> DeleteAgency(int id);
         Task<ServiceResponse<List<AgencyDto>>> GetAllAgencies();
+        Task<ServiceResponse<List<AgencyAdvancedListDto>>> GetAllAgencysAdvancedAsync();
+        Task<ServiceResponse<ViewAgencyAllDetailDto>> GetAgencyAllDetailAsync(int agencyId);
     }
 }

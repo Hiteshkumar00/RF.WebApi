@@ -37,7 +37,7 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
     {
         public int Id { get; set; }
         public string ItemName { get; set; } = string.Empty;
-        public int Quntity { get; set; } // Keeping original spelling
+        public int Quantity { get; set; } // Corrected spelling
         public decimal Price { get; set; }
 
         public SellingItemWarrentyDto? Warrenty { get; set; }
@@ -50,7 +50,7 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         public string ItemName { get; set; } = string.Empty;
 
         [Range(1, int.MaxValue, ErrorMessage = SellingBillMessages.QuantityPositive)]
-        public int Quntity { get; set; }
+        public int Quantity { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = SellingBillMessages.PricePositive)]
         public decimal Price { get; set; }

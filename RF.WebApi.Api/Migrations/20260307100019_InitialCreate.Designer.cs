@@ -12,7 +12,7 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    [Migration("20260307063603_InitialCreate")]
+    [Migration("20260307100019_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -402,7 +402,7 @@ namespace RF.WebApi.Api.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("Quntity")
+                    b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -698,7 +698,7 @@ namespace RF.WebApi.Api.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("Quntity")
+                    b.Property<int?>("Quantity")
                         .IsRequired()
                         .HasColumnType("int");
 
@@ -846,7 +846,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$atRAcJDNK8yLxN/5.qygW.CcmvwzHXQM6xpPJ2SicBOE9Yz84MsBu",
+                            Password = "$2a$11$xW9WstIUuodWu9UFPABk/OIxeWNdd9YHPdNqay7VyYeC.1YuL6Ai2",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });

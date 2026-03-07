@@ -21,8 +21,8 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired()
                    .HasMaxLength(500);
 
-            // 4. Quntity (Integer)
-            builder.Property(bi => bi.Quntity);
+            // 4. Quantity (Integer)
+            builder.Property(bi => bi.Quantity);
 
             // 5. Price (Decimal)
             builder.Property(bi => bi.Price)

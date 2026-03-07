@@ -512,7 +512,7 @@ namespace RF.WebApi.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Quntity = table.Column<int>(type: "int", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
                     BuyingBillId = table.Column<int>(type: "int", nullable: true)
@@ -573,7 +573,7 @@ namespace RF.WebApi.Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Quntity = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     BillId = table.Column<int>(type: "int", nullable: false),
                     WarrentyId = table.Column<int>(type: "int", nullable: true)
@@ -629,7 +629,7 @@ namespace RF.WebApi.Api.Migrations
             migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "Id", "AccountId", "Email", "FirstName", "MiddleName", "Password", "PhoneNo", "Role", "Surname" },
-                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$atRAcJDNK8yLxN/5.qygW.CcmvwzHXQM6xpPJ2SicBOE9Yz84MsBu", null, "SuperAdmin", "User" });
+                values: new object[] { -1, null, "hiteshkumar252020@gmail.com", "System", null, "$2a$11$xW9WstIUuodWu9UFPABk/OIxeWNdd9YHPdNqay7VyYeC.1YuL6Ai2", null, "SuperAdmin", "User" });
 
             migrationBuilder.InsertData(
                 table: "RelatedEntity",
