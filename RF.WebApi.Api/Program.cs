@@ -2,11 +2,21 @@ using Microsoft.EntityFrameworkCore;
 using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Apis.Extensions;
 using RF.WebApi.Api.Apis.Middleware;
-using RF.WebApi.Api.Domain.Interfaces;
-using RF.WebApi.Api.Infrastructure.Services;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// --- 1. ADD OPEN CORS SERVICE ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()   // Allows any website/localhost port
+                  .AllowAnyMethod()   // Allows GET, POST, PUT, DELETE, etc.
+                  .AllowAnyHeader();  // Allows any Headers (Content-Type, Authorization)
+        });
+});
 
 //  CONTROLLERS & CONFIG 
 builder.Services.AddControllers();
@@ -43,6 +53,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
