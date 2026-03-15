@@ -7,6 +7,7 @@ using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using RF.WebApi.Infrastructure.Data.DataBase.Extensions;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
@@ -85,9 +86,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
                 
-                // AutoMapper seamlessly handles syncing all scalar properties
-                // And adding/updating/deleting the nested Collections (RelatedEntities)
+                // Sync scalar properties (RelatedEntities is ignored in Profile)
                 _mapper.Map(dto, entity);
+
+                // Generic helper handles Add, Update, and Remove for the collection
+                _context.SyncCollection(entity.RelatedEntities, dto.RelatedEntities, (e, d) => e.Id == d.Id, _mapper);
 
                 await _context.SaveChangesAsync();
                 return true;

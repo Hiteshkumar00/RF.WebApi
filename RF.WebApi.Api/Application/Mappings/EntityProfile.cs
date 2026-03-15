@@ -11,7 +11,8 @@ namespace RF.WebApi.Api.Application.Mappings
         {
             CreateMap<Entity, EntityDto>().ReverseMap();
             CreateMap<CreateEntityDto, Entity>();
-            CreateMap<UpdateEntityDto, Entity>();
+            CreateMap<UpdateEntityDto, Entity>()
+                .ForMember(dest => dest.RelatedEntities, opt => opt.Ignore());
 
             CreateMap<RelatedEntity, RelatedEntityDto>().ReverseMap();
             CreateMap<CreateRelatedEntityDto, RelatedEntity>();
