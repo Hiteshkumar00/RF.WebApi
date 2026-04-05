@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
@@ -47,6 +47,21 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 if (createUserDto.Role == "SuperAdmin")
                 {
                     createUserDto.AccountId = null;
+                }
+                else if (createUserDto.Role == "Admin")
+                {
+                    if (createUserDto.AccountId == null || createUserDto.AccountId == 0)
+                    {
+                        err.AddError(UserMessages.AccountRequired);
+                        return default;
+                    }
+
+                    var accountExists = await _RFDBContext.Accounts.AnyAsync(a => a.Id == createUserDto.AccountId);
+                    if (!accountExists)
+                    {
+                        err.AddError(AccountMessages.NotFound);
+                        return default;
+                    }
                 }
 
                 var newUser = _mapper.Map<User>(createUserDto);
@@ -311,6 +326,21 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 if (dto.Role == "SuperAdmin")
                 {
                     dto.AccountId = null;
+                }
+                else if (dto.Role == "Admin")
+                {
+                    if (dto.AccountId == null || dto.AccountId == 0)
+                    {
+                        err.AddError(UserMessages.AccountRequired);
+                        return default;
+                    }
+
+                    var accountExists = await _RFDBContext.Accounts.AnyAsync(a => a.Id == dto.AccountId);
+                    if (!accountExists)
+                    {
+                        err.AddError(AccountMessages.NotFound);
+                        return default;
+                    }
                 }
 
                 var user = await _RFDBContext.Users.FindAsync(dto.Id);
