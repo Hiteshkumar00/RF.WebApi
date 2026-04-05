@@ -22,6 +22,7 @@
         public string Email { get; set; }
 
         [Phone]
+        [StringLength(50)]
         public string? PhoneNo { get; set; }
 
         [Required(ErrorMessage = UserMessages.RoleRequired)]

@@ -24,6 +24,7 @@ namespace RF.WebApi.Api.Application.DTOs.User
         public string Email { get; set; } = string.Empty;
 
         [Phone]
+        [StringLength(50)]
         public string? PhoneNo { get; set; }
 
         [Required(ErrorMessage = UserMessages.RoleRequired)]
