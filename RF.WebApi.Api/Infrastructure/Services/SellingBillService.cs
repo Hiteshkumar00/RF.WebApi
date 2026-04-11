@@ -49,6 +49,25 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 await _context.SaveChangesAsync();
 
+                // Autogenerate BillNo with ID
+                if (string.IsNullOrEmpty(bill.BillNo))
+                {
+                    var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == Token.AccountId);
+                    string initials = "ABC";
+                    if (account != null && !string.IsNullOrWhiteSpace(account.ProfileName))
+                    {
+                        var words = account.ProfileName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (words.Length > 0)
+                        {
+                            initials = string.Join("", words.Select(w => w[0])).ToUpper();
+                        }
+                    }
+                    
+                    string year = bill.Date.HasValue ? bill.Date.Value.Year.ToString() : DateTime.Now.Year.ToString();
+                    bill.BillNo = $"{initials}{year}SB{bill.Id}";
+                    await _context.SaveChangesAsync();
+                }
+
                 return bill.Id ?? default;
             });
         }

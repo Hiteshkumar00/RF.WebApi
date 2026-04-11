@@ -10,7 +10,6 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         [Required]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = SellingBillMessages.BillNoRequired)]
         [StringLength(100)]
         public string BillNo { get; set; } = string.Empty;
 

@@ -13,7 +13,6 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         [Required(ErrorMessage = BuyingBillMessages.AgencyIdRequired)]
         public int AgencyId { get; set; }
 
-        [Required(ErrorMessage = BuyingBillMessages.BillNoRequired)]
         [StringLength(100)]
         public string BillNo { get; set; } = string.Empty;
 

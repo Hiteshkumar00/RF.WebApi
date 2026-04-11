@@ -7,10 +7,6 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
 {
     public class CreateSellingBillDto
     {
-        [Required(ErrorMessage = SellingBillMessages.BillNoRequired)]
-        [StringLength(100)]
-        public string BillNo { get; set; } = string.Empty;
-
         [Required(ErrorMessage = SellingBillMessages.CustomerNameRequired)]
         [StringLength(250)]
         public string CustomerName { get; set; } = string.Empty;
