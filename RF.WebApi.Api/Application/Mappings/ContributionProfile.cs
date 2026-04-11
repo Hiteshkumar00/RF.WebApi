@@ -11,7 +11,8 @@ namespace RF.WebApi.Api.Application.Mappings
             // AddContribution Mappings
             CreateMap<AddContribution, AddContributionDto>().ReverseMap();
             CreateMap<CreateAddContributionDto, AddContribution>();
-            CreateMap<UpdateAddContributionDto, AddContribution>();
+            CreateMap<UpdateAddContributionDto, AddContribution>()
+                .ForMember(dest => dest.Payments, opt => opt.Ignore());
             CreateMap<AddContribution, AddContributionListDto>()
                 .ForMember(dest => dest.AccountPersonName, opt => opt.MapFrom(src => src.AccountPerson != null ? src.AccountPerson.Name : string.Empty))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)));
@@ -24,7 +25,8 @@ namespace RF.WebApi.Api.Application.Mappings
             // RemoveContribution Mappings
             CreateMap<RemoveContribution, RemoveContributionDto>().ReverseMap();
             CreateMap<CreateRemoveContributionDto, RemoveContribution>();
-            CreateMap<UpdateRemoveContributionDto, RemoveContribution>();
+            CreateMap<UpdateRemoveContributionDto, RemoveContribution>()
+                .ForMember(dest => dest.Payments, opt => opt.Ignore());
             CreateMap<RemoveContribution, RemoveContributionListDto>()
                 .ForMember(dest => dest.AccountPersonName, opt => opt.MapFrom(src => src.AccountPerson != null ? src.AccountPerson.Name : string.Empty))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)));

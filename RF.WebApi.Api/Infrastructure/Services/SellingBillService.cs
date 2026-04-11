@@ -7,6 +7,7 @@ using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using RF.WebApi.Infrastructure.Data.DataBase.Extensions;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
@@ -73,9 +74,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // AutoMapper seamlessly handles syncing scalar properties, child Collections (Items, Payments)
-                // AND the nested 1-to-1 Warranty properties inside each Item automatically!
                 _mapper.Map(dto, bill);
+
+                // Sync collections
+                _context.SyncCollection(bill.Items, dto.Items, (e, d) => e.Id == d.Id, _mapper);
+                _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => e.Id == d.Id, _mapper);
 
                 await _context.SaveChangesAsync();
                 return true;

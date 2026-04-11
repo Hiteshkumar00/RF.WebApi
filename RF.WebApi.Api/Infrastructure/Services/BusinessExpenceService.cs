@@ -7,6 +7,7 @@ using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using RF.WebApi.Infrastructure.Data.DataBase.Extensions;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
@@ -72,6 +73,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 _mapper.Map(dto, expense);
+                _context.SyncCollection(expense.Payments, dto.Payments, (e, d) => e.Id == d.Id, _mapper);
 
                 await _context.SaveChangesAsync();
                 return true;
