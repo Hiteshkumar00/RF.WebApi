@@ -7,6 +7,7 @@ using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using RF.WebApi.Infrastructure.Data.DataBase.Extensions;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
