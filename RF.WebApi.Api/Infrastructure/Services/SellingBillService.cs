@@ -73,9 +73,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // AutoMapper seamlessly handles syncing scalar properties, child Collections (Items, Payments)
-                // AND the nested 1-to-1 Warranty properties inside each Item automatically!
+                // Sync scalar properties (Items, Payments are ignored in Profile)
                 _mapper.Map(dto, bill);
+                
+                // Generic helper handles Add, Update, and Remove for collections safely
+                _context.SyncCollection(bill.Items, dto.Items, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+                _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
 
                 await _context.SaveChangesAsync();
                 return true;

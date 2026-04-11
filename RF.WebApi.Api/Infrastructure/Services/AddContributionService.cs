@@ -90,7 +90,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                 }
 
+                // Sync scalar properties (Payments is ignored in Profile)
                 _mapper.Map(dto, contribution);
+                
+                // Generic helper handles Add, Update, and Remove for collection safely
+                _context.SyncCollection(contribution.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
                 await _context.SaveChangesAsync();
                 
                 return true;

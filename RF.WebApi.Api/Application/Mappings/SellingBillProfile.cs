@@ -12,7 +12,9 @@ namespace RF.WebApi.Api.Application.Mappings
             // Main Bill mappings
             CreateMap<SellingBill, SellingBillDto>();
             CreateMap<CreateSellingBillDto, SellingBill>();
-            CreateMap<UpdateSellingBillDto, SellingBill>();
+            CreateMap<UpdateSellingBillDto, SellingBill>()
+                .ForMember(dest => dest.Items, opt => opt.Ignore())
+                .ForMember(dest => dest.Payments, opt => opt.Ignore());
 
             // List projection with mathematical rollups
             CreateMap<SellingBill, SellingBillListDto>()

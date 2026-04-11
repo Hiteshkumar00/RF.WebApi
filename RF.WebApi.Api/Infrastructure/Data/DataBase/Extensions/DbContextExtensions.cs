@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 
-namespace RF.WebApi.Infrastructure.Data.DataBase.Extensions
+namespace RF.WebApi.Infrastructure.Data.DataBase
 {
     public static class DbContextExtensions
     {
@@ -34,6 +34,8 @@ namespace RF.WebApi.Infrastructure.Data.DataBase.Extensions
             // 2. Add or Update items
             foreach (var dto in incomingList)
             {
+                // Find the existing item ONLY if the incoming DTO has a valid ID > 0
+                // This ensures that two new items with Id=0 are never merged
                 var existing = existingList.FirstOrDefault(e => identityEquality(e, dto));
 
                 if (existing != null)
@@ -43,8 +45,25 @@ namespace RF.WebApi.Infrastructure.Data.DataBase.Extensions
                 }
                 else
                 {
-                    // Add: Map DTO to a new entity and add to collection
+                    // Add: Map DTO to a new entity
                     var newEntity = mapper.Map<TEntity>(dto);
+                    
+                    // Since the global SaveChangesAsync override was removed, 
+                    // we must handle the Id=0 issue here to prevent Identity Insert errors.
+                    var idProp = typeof(TEntity).GetProperty("Id");
+                    if (idProp != null && idProp.CanWrite)
+                    {
+                        var val = idProp.GetValue(newEntity);
+                        if (val is int intVal && intVal == 0)
+                        {
+                            // Set to null if nullable, or skip for non-nullable (EF handles 0 for non-nullable Identity automatically)
+                            if (Nullable.GetUnderlyingType(idProp.PropertyType) != null || !idProp.PropertyType.IsValueType)
+                            {
+                                idProp.SetValue(newEntity, null);
+                            }
+                        }
+                    }
+
                     existingCollection.Add(newEntity);
                 }
             }

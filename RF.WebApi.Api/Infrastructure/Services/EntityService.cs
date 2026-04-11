@@ -7,7 +7,7 @@ using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
-using RF.WebApi.Infrastructure.Data.DataBase.Extensions;
+using RF.WebApi.Infrastructure.Data.DataBase;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
@@ -90,7 +90,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 _mapper.Map(dto, entity);
 
                 // Generic helper handles Add, Update, and Remove for the collection
-                _context.SyncCollection(entity.RelatedEntities, dto.RelatedEntities, (e, d) => e.Id == d.Id, _mapper);
+                _context.SyncCollection(entity.RelatedEntities, dto.RelatedEntities, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
 
                 await _context.SaveChangesAsync();
                 return true;
