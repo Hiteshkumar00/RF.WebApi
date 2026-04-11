@@ -30,11 +30,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var bill = _mapper.Map<BuyingBill>(dto);
                 bill.AccountId = Token.AccountId;
+                bill.BillNo = "TEMP_BILL_NO"; // Temporary value to bypass NOT NULL constraint during insert
 
                 _context.BuyingBills.Add(bill);
                 await _context.SaveChangesAsync();
 
-                if (string.IsNullOrEmpty(bill.BillNo))
+                if (bill.BillNo == "TEMP_BILL_NO")
                 {
                     var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == Token.AccountId);
                     string initials = "ABC";
