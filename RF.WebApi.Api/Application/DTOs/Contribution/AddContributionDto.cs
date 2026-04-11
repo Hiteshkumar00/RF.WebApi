@@ -5,7 +5,7 @@ namespace RF.WebApi.Api.Application.DTOs.Contribution
     public class AddContributionDto
     {
         public int Id { get; set; }
-        public int AccountPersonId { get; set; }
+        public int? AccountPersonId { get; set; }
         public string? Description { get; set; }
         public DateOnly Date { get; set; }
         public List<AddContributionPaymentDto>? Payments { get; set; }
@@ -13,8 +13,7 @@ namespace RF.WebApi.Api.Application.DTOs.Contribution
 
     public class CreateAddContributionDto
     {
-        [Required(ErrorMessage = "Account Person is required.")]
-        public int AccountPersonId { get; set; }
+        public int? AccountPersonId { get; set; }
 
         [StringLength(500)]
         public string? Description { get; set; }
@@ -30,8 +29,7 @@ namespace RF.WebApi.Api.Application.DTOs.Contribution
         [Required(ErrorMessage = "Id is required.")]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Account Person is required.")]
-        public int AccountPersonId { get; set; }
+        public int? AccountPersonId { get; set; }
 
         [StringLength(500)]
         public string? Description { get; set; }
@@ -45,7 +43,7 @@ namespace RF.WebApi.Api.Application.DTOs.Contribution
     public class AddContributionListDto
     {
         public int Id { get; set; }
-        public int AccountPersonId { get; set; }
+        public int? AccountPersonId { get; set; }
         public string AccountPersonName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateOnly Date { get; set; }

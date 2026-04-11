@@ -24,8 +24,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
             _businessYearService = businessYearService;
         }
 
-        private async Task<bool> ValidateAccountPersonOwnership(int accountPersonId)
+        private async Task<bool> ValidateAccountPersonOwnership(int? accountPersonId)
         {
+            if (accountPersonId == null) return true;
             return await _context.AccountPersons.AnyAsync(ap => ap.Id == accountPersonId && ap.AccountId == Token.AccountId);
         }
 
@@ -40,6 +41,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 var contribution = _mapper.Map<RemoveContribution>(dto);
+                contribution.AccountId = Token.AccountId;
                 _context.RemoveContributions.Add(contribution);
                 await _context.SaveChangesAsync();
 
@@ -53,8 +55,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var contribution = await _context.RemoveContributions
                     .Include(c => c.Payments)
-                    .FirstOrDefaultAsync(c => c.Id == id && 
-                        _context.AccountPersons.Any(ap => ap.Id == c.AccountPersonId && ap.AccountId == Token.AccountId));
+                    .FirstOrDefaultAsync(c => c.Id == id && c.AccountId == Token.AccountId);
 
                 if (contribution == null)
                 {
@@ -72,8 +73,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var contribution = await _context.RemoveContributions
                     .Include(c => c.Payments)
-                    .FirstOrDefaultAsync(c => c.Id == dto.Id && 
-                        _context.AccountPersons.Any(ap => ap.Id == c.AccountPersonId && ap.AccountId == Token.AccountId));
+                    .FirstOrDefaultAsync(c => c.Id == dto.Id && c.AccountId == Token.AccountId);
 
                 if (contribution == null)
                 {
@@ -107,8 +107,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var contribution = await _context.RemoveContributions
                     .Include(c => c.Payments)
-                    .FirstOrDefaultAsync(c => c.Id == id && 
-                        _context.AccountPersons.Any(ap => ap.Id == c.AccountPersonId && ap.AccountId == Token.AccountId));
+                    .FirstOrDefaultAsync(c => c.Id == id && c.AccountId == Token.AccountId);
 
                 if (contribution == null)
                 {
@@ -142,7 +141,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var contributions = await _context.RemoveContributions
                     .Include(c => c.AccountPerson)
                     .Include(c => c.Payments)
-                    .Where(c => _context.AccountPersons.Any(ap => ap.Id == c.AccountPersonId && ap.AccountId == accountId) &&
+                    .Where(c => c.AccountId == accountId &&
                                 c.Date >= startDate && c.Date <= endDate)
                     .OrderByDescending(c => c.Date)
                     .AsNoTracking()
@@ -170,8 +169,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var contributions = await _context.RemoveContributions
                     .Include(c => c.AccountPerson)
                     .Include(c => c.Payments)
-                    .Where(c => c.AccountPersonId == accountPersonId &&
-                                _context.AccountPersons.Any(ap => ap.Id == c.AccountPersonId && ap.AccountId == accountId) &&
+                    .Where(c => c.AccountId == accountId &&
+                                c.AccountPersonId == accountPersonId &&
                                 c.Date >= startDate && c.Date <= endDate)
                     .OrderByDescending(c => c.Date)
                     .AsNoTracking()

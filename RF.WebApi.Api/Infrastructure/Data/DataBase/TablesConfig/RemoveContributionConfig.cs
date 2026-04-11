@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -17,7 +17,9 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .ValueGeneratedOnAdd();
 
             // 3. Foreign Key: AccountPersonId (Integer, Not Null)
-            builder.Property(rc => rc.AccountPersonId)
+            builder.Property(rc => rc.AccountPersonId);
+
+            builder.Property(rc => rc.AccountId)
                    .IsRequired();
 
             builder.HasOne(rc => rc.AccountPerson)

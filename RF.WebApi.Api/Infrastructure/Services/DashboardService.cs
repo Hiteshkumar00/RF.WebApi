@@ -84,14 +84,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 // 5. Add Contributions
                 var addContributions = await _context.AddContributionPayments
-                    .Where(p => p.AddContributionId != null && _context.AddContributions.Any(c => c.Id == p.AddContributionId && _context.AccountPersons.Any(a => a.Id == c.AccountPersonId && a.AccountId == accountId)) && p.PaymentAccountId != null)
+                    .Where(p => p.AddContributionId != null && _context.AddContributions.Any(c => c.Id == p.AddContributionId && c.AccountId == accountId) && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
                 // 6. Remove Contributions
                 var removeContributions = await _context.RemoveContributionPayments
-                    .Where(p => p.RemoveContributionId != null && _context.RemoveContributions.Any(c => c.Id == p.RemoveContributionId && _context.AccountPersons.Any(a => a.Id == c.AccountPersonId && a.AccountId == accountId)) && p.PaymentAccountId != null)
+                    .Where(p => p.RemoveContributionId != null && _context.RemoveContributions.Any(c => c.Id == p.RemoveContributionId && c.AccountId == accountId) && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
