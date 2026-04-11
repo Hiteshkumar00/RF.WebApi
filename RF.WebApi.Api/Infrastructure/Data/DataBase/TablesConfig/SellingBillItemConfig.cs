@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -40,7 +40,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
 
             // 7. Navigation: 1-to-1 Warranty
             builder.HasOne(sbi => sbi.Warrenty)
-                   .WithOne()
+                   .WithOne(w => w.Item)
                    .HasForeignKey<SellingItemWarrenty>(w => w.ItemId)
                    .OnDelete(DeleteBehavior.Cascade);
         }

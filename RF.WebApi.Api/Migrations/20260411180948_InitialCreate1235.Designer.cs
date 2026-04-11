@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
@@ -11,9 +12,11 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    partial class RFDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260411180948_InitialCreate1235")]
+    partial class InitialCreate1235
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -825,7 +828,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$a4F2qge41Lu6wFcwAk5UP.M7.nzliCA5qJ9jB708JLFEtyfyprDUK",
+                            Password = "$2a$11$FYNX0A6r7pyp1P..KEQVqeg6cA1WjR6QTCs0.MDRg27jjAjRBvcL6",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -1070,7 +1073,7 @@ namespace RF.WebApi.Api.Migrations
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBillPayment", b =>
                 {
-                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", "Bill")
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", null)
                         .WithMany("Payments")
                         .HasForeignKey("BillId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1081,8 +1084,6 @@ namespace RF.WebApi.Api.Migrations
                         .HasForeignKey("PaymentAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Bill");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.SellingItemWarrenty", b =>

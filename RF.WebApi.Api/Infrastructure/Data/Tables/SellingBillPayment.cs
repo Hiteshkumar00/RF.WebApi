@@ -1,4 +1,4 @@
-﻿namespace RF.WebApi.Api.Infrastructure.Data.Tables
+namespace RF.WebApi.Api.Infrastructure.Data.Tables
 {
     public class SellingBillPayment
     {
@@ -6,5 +6,7 @@
         public decimal? Amount { get; set; }
         public int? BillId { get; set; }
         public int? PaymentAccountId { get; set; }
+
+        public SellingBill? Bill { get; set; }
     }
 }

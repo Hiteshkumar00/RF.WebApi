@@ -9,21 +9,21 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         public int Id { get; set; }
         public int ItemId { get; set; }
         public int BillId { get; set; }
-        public int Year { get; set; }
-        public int Month { get; set; }
-        public int Day { get; set; }
+        public int? Year { get; set; }
+        public int? Month { get; set; }
+        public int? Day { get; set; }
     }
 
     public class CreateSellingItemWarrentyDto
     {
         [Range(0, 50, ErrorMessage = SellingBillMessages.WarrantyYearPositive)]
-        public int Year { get; set; }
+        public int? Year { get; set; }
 
         [Range(0, 11, ErrorMessage = SellingBillMessages.WarrantyMonthPositive)]
-        public int Month { get; set; }
+        public int? Month { get; set; }
 
         [Range(0, 31, ErrorMessage = SellingBillMessages.WarrantyDayPositive)]
-        public int Day { get; set; }
+        public int? Day { get; set; }
     }
 
     public class UpdateSellingItemWarrentyDto : CreateSellingItemWarrentyDto
@@ -37,7 +37,7 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
     {
         public int Id { get; set; }
         public string ItemName { get; set; } = string.Empty;
-        public int Quantity { get; set; } // Corrected spelling
+        public int Quantity { get; set; } 
         public decimal Price { get; set; }
 
         public SellingItemWarrentyDto? Warrenty { get; set; }

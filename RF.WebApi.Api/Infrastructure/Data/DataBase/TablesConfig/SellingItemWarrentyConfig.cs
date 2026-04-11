@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -16,23 +16,23 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(w => w.Id)
                    .ValueGeneratedOnAdd();
 
-            // 3. Foreign Key: SellingBillItem (ItemId)
+            // 3. Relationship: SellingBillItem (ItemId)
             builder.Property(w => w.ItemId)
                    .IsRequired();
 
-            builder.HasOne<SellingBillItem>()
-                   .WithMany()
-                   .HasForeignKey(w => w.ItemId)
+            builder.HasOne(w => w.Item)
+                   .WithOne(i => i.Warrenty)
+                   .HasForeignKey<SellingItemWarrenty>(w => w.ItemId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // 4. Foreign Key: SellingBill (BillId)
+            // 4. Relationship: SellingBill (BillId)
             builder.Property(w => w.BillId)
                    .IsRequired();
 
-            builder.HasOne<SellingBill>()
+            builder.HasOne(w => w.Bill)
                    .WithMany()
                    .HasForeignKey(w => w.BillId)
-                   .OnDelete(DeleteBehavior.NoAction); // Avoid multiple cascade paths
+                   .OnDelete(DeleteBehavior.NoAction);
 
         }
     }

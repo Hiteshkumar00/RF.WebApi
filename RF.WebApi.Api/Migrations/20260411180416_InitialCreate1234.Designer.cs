@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
@@ -11,9 +12,11 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    partial class RFDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260411180416_InitialCreate1234")]
+    partial class InitialCreate1234
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -356,6 +359,9 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<int?>("BuyingBillId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ExpenceType")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -367,6 +373,8 @@ namespace RF.WebApi.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
+
+                    b.HasIndex("BuyingBillId");
 
                     b.HasIndex("PaymentAccountId");
 
@@ -385,6 +393,9 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<int?>("BuyingBillId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ItemName")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -400,6 +411,8 @@ namespace RF.WebApi.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
+
+                    b.HasIndex("BuyingBillId");
 
                     b.ToTable("BuyingBillItem", (string)null);
                 });
@@ -420,6 +433,9 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<int?>("BuyingBillId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("PaymentAccountId")
                         .IsRequired()
                         .HasColumnType("int");
@@ -427,6 +443,8 @@ namespace RF.WebApi.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
+
+                    b.HasIndex("BuyingBillId");
 
                     b.HasIndex("PaymentAccountId");
 
@@ -717,11 +735,16 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<int?>("SellingBillId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BillId");
 
                     b.HasIndex("PaymentAccountId");
+
+                    b.HasIndex("SellingBillId");
 
                     b.ToTable("SellingBillPayment", (string)null);
                 });
@@ -825,7 +848,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$a4F2qge41Lu6wFcwAk5UP.M7.nzliCA5qJ9jB708JLFEtyfyprDUK",
+                            Password = "$2a$11$YIvTmKr2Y3xT/F.6NeNDC.ach6or650JmXof8wMG/TcNYdHGxRGBW",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -964,10 +987,14 @@ namespace RF.WebApi.Api.Migrations
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillExpence", b =>
                 {
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
-                        .WithMany("Expences")
+                        .WithMany()
                         .HasForeignKey("BillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
+                        .WithMany("Expences")
+                        .HasForeignKey("BuyingBillId");
 
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.PaymentAccount", null)
                         .WithMany()
@@ -979,19 +1006,27 @@ namespace RF.WebApi.Api.Migrations
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillItem", b =>
                 {
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
-                        .WithMany("Items")
+                        .WithMany()
                         .HasForeignKey("BillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
+                        .WithMany("Items")
+                        .HasForeignKey("BuyingBillId");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillPayment", b =>
                 {
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
-                        .WithMany("Payments")
+                        .WithMany()
                         .HasForeignKey("BillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("BuyingBillId");
 
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.PaymentAccount", null)
                         .WithMany()
@@ -1070,8 +1105,8 @@ namespace RF.WebApi.Api.Migrations
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBillPayment", b =>
                 {
-                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", "Bill")
-                        .WithMany("Payments")
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", null)
+                        .WithMany()
                         .HasForeignKey("BillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1082,7 +1117,9 @@ namespace RF.WebApi.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Bill");
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.SellingBill", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("SellingBillId");
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.SellingItemWarrenty", b =>

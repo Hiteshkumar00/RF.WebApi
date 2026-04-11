@@ -32,6 +32,21 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 bill.AccountId = Token.AccountId;
 
                 _context.SellingBills.Add(bill);
+
+                // Propagate Bill navigation to nested warranties and payments for EF to handle BillId
+                foreach (var item in bill.Items)
+                {
+                    if (item.Warrenty != null)
+                    {
+                        item.Warrenty.Bill = bill;
+                    }
+                }
+
+                foreach (var payment in bill.Payments)
+                {
+                    payment.Bill = bill;
+                }
+
                 await _context.SaveChangesAsync();
 
                 return bill.Id ?? default;
@@ -80,6 +95,20 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // Generic helper handles Add, Update, and Remove for collections safely
                 _context.SyncCollection(bill.Items, dto.Items, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
                 _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+
+                // Propagate Bill navigation to newly added or updated warranties and payments
+                foreach (var item in bill.Items)
+                {
+                    if (item.Warrenty != null)
+                    {
+                        item.Warrenty.Bill = bill;
+                    }
+                }
+
+                foreach (var payment in bill.Payments)
+                {
+                    payment.Bill = bill;
+                }
 
                 await _context.SaveChangesAsync();
                 return true;
