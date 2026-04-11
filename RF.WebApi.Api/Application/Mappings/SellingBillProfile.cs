@@ -28,20 +28,34 @@ namespace RF.WebApi.Api.Application.Mappings
                     - src.Payments.Sum(p => p.Amount ?? 0)                                       // - Paid
                 ));
 
-            // Item mappings (EF handles the 1-to-1 Warrenty assignment automatically because of the identical nesting structure)
+            // Item mappings
             CreateMap<SellingBillItem, SellingBillItemDto>();
-            CreateMap<CreateSellingBillItemDto, SellingBillItem>();
-            CreateMap<UpdateSellingBillItemDto, SellingBillItem>();
+            CreateMap<CreateSellingBillItemDto, SellingBillItem>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
+            CreateMap<UpdateSellingBillItemDto, SellingBillItem>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
 
             // Warranty mappings
             CreateMap<SellingItemWarrenty, SellingItemWarrentyDto>();
-            CreateMap<CreateSellingItemWarrentyDto, SellingItemWarrenty>();
-            CreateMap<UpdateSellingItemWarrentyDto, SellingItemWarrenty>();
+            CreateMap<CreateSellingItemWarrentyDto, SellingItemWarrenty>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ItemId, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
+            CreateMap<UpdateSellingItemWarrentyDto, SellingItemWarrenty>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ItemId, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
 
             // Payment mappings
             CreateMap<SellingBillPayment, SellingBillPaymentDto>();
-            CreateMap<CreateSellingBillPaymentDto, SellingBillPayment>();
-            CreateMap<UpdateSellingBillPaymentDto, SellingBillPayment>();
+            CreateMap<CreateSellingBillPaymentDto, SellingBillPayment>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
+            CreateMap<UpdateSellingBillPaymentDto, SellingBillPayment>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
         }
     }
 }

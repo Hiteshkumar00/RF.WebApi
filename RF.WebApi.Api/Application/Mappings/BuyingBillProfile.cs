@@ -30,16 +30,28 @@ namespace RF.WebApi.Api.Application.Mappings
                 ));
 
             CreateMap<BuyingBillItem, BuyingBillItemDto>();
-            CreateMap<CreateBuyingBillItemDto, BuyingBillItem>();
-            CreateMap<UpdateBuyingBillItemDto, BuyingBillItem>();
+            CreateMap<CreateBuyingBillItemDto, BuyingBillItem>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
+            CreateMap<UpdateBuyingBillItemDto, BuyingBillItem>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
 
             CreateMap<BuyingBillPayment, BuyingBillPaymentDto>();
-            CreateMap<CreateBuyingBillPaymentDto, BuyingBillPayment>();
-            CreateMap<UpdateBuyingBillPaymentDto, BuyingBillPayment>();
+            CreateMap<CreateBuyingBillPaymentDto, BuyingBillPayment>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
+            CreateMap<UpdateBuyingBillPaymentDto, BuyingBillPayment>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
 
             CreateMap<BuyingBillExpence, BuyingBillExpenceDto>();
-            CreateMap<CreateBuyingBillExpenceDto, BuyingBillExpence>();
-            CreateMap<UpdateBuyingBillExpenceDto, BuyingBillExpence>();
+            CreateMap<CreateBuyingBillExpenceDto, BuyingBillExpence>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
+            CreateMap<UpdateBuyingBillExpenceDto, BuyingBillExpence>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.BillId, opt => opt.Ignore());
         }
     }
 }
