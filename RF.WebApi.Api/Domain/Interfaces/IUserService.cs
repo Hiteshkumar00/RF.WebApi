@@ -1,4 +1,4 @@
-﻿using RF.WebApi.Api.Application.DTOs.User;
+using RF.WebApi.Api.Application.DTOs.User;
 using RF.WebApi.Api.Domain.Exceptions;
 
 namespace RF.WebApi.Api.Domain.Interfaces
@@ -8,6 +8,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<int>> CreateUser(CreateUserDto createUserDto);
 
         Task<ServiceResponse<string>> LoginAsAdmin(int AccountId);
+        Task<ServiceResponse<string>> LoginAsSuperAdmin();
 
         Task<ServiceResponse<string>> Login(LoginUserDto loginDto);
 

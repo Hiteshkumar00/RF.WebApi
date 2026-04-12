@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RF.WebApi.Api.Application.DTOs.User;
 using RF.WebApi.Api.Domain.Interfaces;
@@ -29,6 +29,14 @@ namespace RF.WebApi.Api.Apis.Controllers
         public async Task<IActionResult> LoginAsAdmin(int AccountId)
         {
             var result = await _userService.LoginAsAdmin(AccountId);
+            return HandleResponse(result);
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPost()]
+        public async Task<IActionResult> LoginAsSuperAdmin()
+        {
+            var result = await _userService.LoginAsSuperAdmin();
             return HandleResponse(result);
         }
 

@@ -105,6 +105,34 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
+        public Task<ServiceResponse<string>> LoginAsSuperAdmin()
+        {
+            return ServiceResponse<string>.Execute(async err =>
+            {
+                if (!Token.IsSuperAdmin)
+                {
+                    err.AddError(UserMessages.UnauthorizedAction);
+                    return default;
+                }
+
+                var user = await _RFDBContext.Users.FindAsync(Token.UserId);
+                if (user == null)
+                {
+                    err.AddError(UserMessages.NotFound);
+                    return default;
+                }
+
+                var response = CreateToken(user, 0); // Passing 0 to ensure AccountId is 0 (Super Admin mode)
+                if (!response.Success)
+                {
+                    err.SetErrors(response);
+                    return default;
+                }
+
+                return response.Data;
+            });
+        }
+
         public Task<ServiceResponse<string>> Login(LoginUserDto loginDto)
         {
             return ServiceResponse<string>.Execute(async err =>
