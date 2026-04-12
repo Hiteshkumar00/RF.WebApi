@@ -24,6 +24,10 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src => 
                     src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)))
                 .ForMember(dest => dest.TotalExpence, opt => opt.MapFrom(src => src.Expences.Sum(e => e.Amount ?? 0)))
+                .ForMember(dest => dest.FinalAmount, opt => opt.MapFrom(src => 
+                    (src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)) // Net Amount
+                    + src.Expences.Sum(e => e.Amount ?? 0)                                       // + Expenses
+                ))
                 .ForMember(dest => dest.PaidAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)))
                 .ForMember(dest => dest.RemainingAmount, opt => opt.MapFrom(src => 
                     (src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - (src.Discount ?? 0)) // Net Amount
