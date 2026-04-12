@@ -1,5 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Application.DTOs.Account;
 using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
@@ -35,6 +36,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<AccountDto>.Execute(async err =>
             {
+                if (!Token.IsSuperAdmin && id != Token.AccountId)
+                {
+                    err.AddError(UserMessages.UnauthorizedAction);
+                    return default;
+                }
+
                 var account = await _context.Accounts.FindAsync(id);
                 if (account == null)
                 {
@@ -49,6 +56,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<bool>.Execute(async err =>
             {
+                if (!Token.IsSuperAdmin && updateAccountDto.Id != Token.AccountId)
+                {
+                    err.AddError(UserMessages.UnauthorizedAction);
+                    return false;
+                }
+
                 var account = await _context.Accounts.FindAsync(updateAccountDto.Id);
                 if (account == null)
                 {
