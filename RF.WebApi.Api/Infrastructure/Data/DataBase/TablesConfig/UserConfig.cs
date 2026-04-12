@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Application.DTOs.User;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
@@ -51,7 +51,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired()
                    .HasDefaultValue(true);
 
-            builder.HasOne<Account>()
+            builder.HasOne(u => u.Account)
                 .WithMany()
                 .HasForeignKey(u => u.AccountId)
                 .OnDelete(DeleteBehavior.SetNull);

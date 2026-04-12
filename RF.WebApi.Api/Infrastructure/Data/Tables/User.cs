@@ -1,4 +1,4 @@
-﻿namespace RF.WebApi.Api.Infrastructure.Data.Tables
+namespace RF.WebApi.Api.Infrastructure.Data.Tables
 {
     public class User
     {
@@ -12,5 +12,7 @@
         public string Role { get; set; }
         public string Password { get; set; }
         public bool IsActive { get; set; }
+
+        public virtual Account? Account { get; set; }
     }
 }

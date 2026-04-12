@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using RF.WebApi.Api.Domain.Common;
 
 namespace RF.WebApi.Api.Application.DTOs.User
@@ -8,6 +8,7 @@ namespace RF.WebApi.Api.Application.DTOs.User
         [Required]
         public int Id { get; set; }
         public int? AccountId { get; set; }
+        public string? AccountName { get; set; }
 
         [Required(ErrorMessage = UserMessages.FirstNameRequired)]
         [StringLength(100)]

@@ -389,7 +389,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<List<UserDto>>.Execute(async err =>
             {
-                IQueryable<User> query = _RFDBContext.Users.AsNoTracking();
+                IQueryable<User> query = _RFDBContext.Users
+                    .Include(u => u.Account)
+                    .AsNoTracking();
 
                 query = query.Where(u => u.Id > 0);
 

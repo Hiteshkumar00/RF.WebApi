@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using RF.WebApi.Api.Application.DTOs.User;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -14,7 +14,8 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
 
 
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.AccountName, opt => opt.MapFrom(src => src.Account != null ? src.Account.ProfileName : string.Empty));
 
             CreateMap<UserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
