@@ -32,7 +32,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Company Details
                         row.RelativeItem().Column(col =>
                         {
-                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.BlueGrey.Darken3);
+                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.Blue.Medium);
                             
                             if (!string.IsNullOrEmpty(account.Title))
                                 col.Item().Text(account.Title).FontSize(10).FontColor(Colors.Grey.Medium);
@@ -54,7 +54,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Invoice Meta Details
                         row.ConstantItem(180).AlignRight().Column(col =>
                         {
-                            col.Item().Text("TAX INVOICE").FontSize(20).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
+                            col.Item().Text("TAX INVOICE").FontSize(18).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
                             col.Item().PaddingTop(5).Text(text =>
                             {
                                 text.Span("Invoice No: ").SemiBold();
@@ -117,8 +117,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 header.Cell().Element(HeaderStyle).AlignRight().Text("Total");
 
                                 static IContainer HeaderStyle(IContainer container) =>
-                                    container.DefaultTextStyle(x => x.SemiBold().FontColor(Colors.White))
-                                        .Background(Colors.BlueGrey.Darken2)
+                                    container.DefaultTextStyle(x => x.SemiBold().FontColor(Colors.Blue.Darken4))
+                                        .Background(Colors.Blue.Lighten4)
                                         .PaddingVertical(8)
                                         .PaddingHorizontal(5);
                             });
@@ -224,7 +224,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Account / Internal Details
                         row.RelativeItem().Column(col =>
                         {
-                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.BlueGrey.Darken3);
+                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.Blue.Medium);
                             
                             if (!string.IsNullOrEmpty(account.Title))
                                 col.Item().Text(account.Title).FontSize(10).FontColor(Colors.Grey.Medium);
@@ -243,7 +243,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Document Meta Details
                         row.ConstantItem(180).AlignRight().Column(col =>
                         {
-                            col.Item().Text("PURCHASE").FontSize(20).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
+                            col.Item().Text("PURCHASE").FontSize(18).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
                             col.Item().PaddingTop(5).Text(text =>
                             {
                                 text.Span("Ref No: ").SemiBold();
@@ -305,8 +305,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 header.Cell().Element(HeaderStyle).AlignRight().Text("Total");
 
                                 static IContainer HeaderStyle(IContainer container) =>
-                                    container.DefaultTextStyle(x => x.SemiBold().FontColor(Colors.White))
-                                        .Background(Colors.BlueGrey.Darken2)
+                                    container.DefaultTextStyle(x => x.SemiBold().FontColor(Colors.Blue.Darken4))
+                                        .Background(Colors.Blue.Lighten4)
                                         .PaddingVertical(8)
                                         .PaddingHorizontal(5);
                             });
