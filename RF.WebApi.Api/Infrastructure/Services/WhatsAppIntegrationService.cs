@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
@@ -65,7 +65,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // 3. Send Template Message with Document Header
                 var url = $"https://graph.facebook.com/v19.0/{account.WhatsAppPhoneNumberId}/messages";
                 
-                var totalAmount = (bill.Items?.Sum(i => (i.Price ?? 0) * (i.Quentity ?? 0)) ?? 0) - (bill.Discount ?? 0);
+                var totalAmount = (bill.Items?.Sum(i => (i.Price ?? 0) * (i.Quantity ?? 0)) ?? 0) - (bill.Discount ?? 0);
                 var paidAmount = bill.Payments?.Sum(p => p.Amount ?? 0) ?? 0;
                 var remainingAmount = totalAmount - paidAmount;
 
@@ -99,7 +99,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                 };
 
-                var json = JsonConvert.SerializeObject(payload);
+                var json = JsonSerializer.Serialize(payload);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.WhatsAppAccessToken);
                 
                 var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
@@ -136,8 +136,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 if (!response.IsSuccessStatusCode) return null;
 
-                var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                return result?.id;
+                using var doc = JsonDocument.Parse(responseContent);
+                return doc.RootElement.GetProperty("id").GetString();
             }
             catch { return null; }
         }
