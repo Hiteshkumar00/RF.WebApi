@@ -23,6 +23,26 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
 
             builder.Property(a => a.ProfileLogoLink)
                    .IsRequired(false);
+            
+            builder.Property(a => a.Title)
+                   .HasMaxLength(250)
+                   .IsRequired(false);
+
+            builder.Property(a => a.Address)
+                   .HasMaxLength(500)
+                   .IsRequired(false);
+
+            builder.Property(a => a.Phone)
+                   .HasMaxLength(50)
+                   .IsRequired(false);
+
+            builder.Property(a => a.Email)
+                   .HasMaxLength(100)
+                   .IsRequired(false);
+
+            builder.Property(a => a.GSTIN)
+                   .HasMaxLength(50)
+                   .IsRequired(false);
 
             builder.Property(a => a.CurrencyType)
                    .IsRequired()

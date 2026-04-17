@@ -9,13 +9,11 @@ namespace RF.WebApi.Api.Application.Mappings
         public BuyingBillProfile()
         {
             CreateMap<BuyingBill, BuyingBillDto>();
-            CreateMap<CreateBuyingBillDto, BuyingBill>()
-                .ForMember(dest => dest.BillNo, opt => opt.Ignore());
+            CreateMap<CreateBuyingBillDto, BuyingBill>();
             CreateMap<UpdateBuyingBillDto, BuyingBill>()
                 .ForMember(dest => dest.Items, opt => opt.Ignore())
                 .ForMember(dest => dest.Payments, opt => opt.Ignore())
-                .ForMember(dest => dest.Expences, opt => opt.Ignore())
-                .ForMember(dest => dest.BillNo, opt => opt.Ignore());
+                .ForMember(dest => dest.Expences, opt => opt.Ignore());
 
             CreateMap<BuyingBill, BuyingBillListDto>()
                 .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Agency != null ? src.Agency.AgencyName : string.Empty))

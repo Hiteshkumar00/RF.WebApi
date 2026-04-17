@@ -3,6 +3,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace RF.WebApi.Api.Infrastructure.Services
@@ -31,18 +32,29 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Company Details
                         row.RelativeItem().Column(col =>
                         {
-                            col.Item().Text(account.ProfileName).FontSize(24).ExtraBold().FontColor(Colors.BlueGrey.Darken3);
-                            col.Item().Text("A Legacy of Quality Furniture").FontSize(10).FontColor(Colors.Grey.Medium);
+                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.BlueGrey.Darken3);
                             
-                            col.Item().PaddingTop(5).Text("123 Business Road, Cityville, State, 123456").FontSize(9);
-                            col.Item().Text("Phone: +91 98765 43210 | Email: contact@company.com").FontSize(9);
-                            col.Item().Text("GSTIN: 24AAAAA0000A1Z5").FontSize(9).SemiBold(); 
+                            if (!string.IsNullOrEmpty(account.Title))
+                                col.Item().Text(account.Title).FontSize(10).FontColor(Colors.Grey.Medium);
+                            
+                            if (!string.IsNullOrEmpty(account.Address))
+                                col.Item().PaddingTop(5).Text(account.Address).FontSize(9);
+                            
+                            var contactParts = new List<string>();
+                            if (!string.IsNullOrEmpty(account.Phone)) contactParts.Add($"Phone: {account.Phone}");
+                            if (!string.IsNullOrEmpty(account.Email)) contactParts.Add($"Email: {account.Email}");
+                            
+                            if (contactParts.Any())
+                                col.Item().Text(string.Join(" | ", contactParts)).FontSize(9);
+
+                            if (!string.IsNullOrEmpty(account.GSTIN))
+                                col.Item().Text($"GSTIN: {account.GSTIN}").FontSize(9).SemiBold();
                         });
 
                         // Invoice Meta Details
                         row.ConstantItem(180).AlignRight().Column(col =>
                         {
-                            col.Item().Text("TAX INVOICE").FontSize(26).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
+                            col.Item().Text("TAX INVOICE").FontSize(20).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
                             col.Item().PaddingTop(5).Text(text =>
                             {
                                 text.Span("Invoice No: ").SemiBold();
@@ -51,7 +63,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             col.Item().Text(text =>
                             {
                                 text.Span("Date: ").SemiBold();
-                                text.Span($"{bill.Date:dd-MMM-yyyy}");
+                                text.Span($"{bill.Date:dd-MMMM-yyyy}");
                             });
                         });
                     });
@@ -212,17 +224,26 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Account / Internal Details
                         row.RelativeItem().Column(col =>
                         {
-                            col.Item().Text(account.ProfileName).FontSize(24).ExtraBold().FontColor(Colors.BlueGrey.Darken3);
-                            col.Item().Text("Internal Purchase Record").FontSize(10).FontColor(Colors.Grey.Medium);
+                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.BlueGrey.Darken3);
                             
-                            col.Item().PaddingTop(5).Text("123 Business Road, Cityville, State, 123456").FontSize(9);
-                            col.Item().Text("Phone: +91 98765 43210 | Email: accounts@company.com").FontSize(9);
+                            if (!string.IsNullOrEmpty(account.Title))
+                                col.Item().Text(account.Title).FontSize(10).FontColor(Colors.Grey.Medium);
+                            
+                            if (!string.IsNullOrEmpty(account.Address))
+                                col.Item().PaddingTop(5).Text(account.Address).FontSize(9);
+                            
+                            var contactParts = new List<string>();
+                            if (!string.IsNullOrEmpty(account.Phone)) contactParts.Add($"Phone: {account.Phone}");
+                            if (!string.IsNullOrEmpty(account.Email)) contactParts.Add($"Email: {account.Email}");
+                            
+                            if (contactParts.Any())
+                                col.Item().Text(string.Join(" | ", contactParts)).FontSize(9);
                         });
 
                         // Document Meta Details
                         row.ConstantItem(180).AlignRight().Column(col =>
                         {
-                            col.Item().Text("PURCHASE").FontSize(26).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
+                            col.Item().Text("PURCHASE").FontSize(20).ExtraBold().FontColor(Colors.BlueGrey.Darken2);
                             col.Item().PaddingTop(5).Text(text =>
                             {
                                 text.Span("Ref No: ").SemiBold();
@@ -231,7 +252,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             col.Item().Text(text =>
                             {
                                 text.Span("Date: ").SemiBold();
-                                text.Span($"{bill.Date:dd-MMM-yyyy}");
+                                text.Span($"{bill.Date:dd-MMMM-yyyy}");
                             });
                         });
                     });
@@ -245,7 +266,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             // Vendor Box
                             row.RelativeItem().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(10).Column(c =>
                             {
-                                c.Item().Text("VENDOR / AGENCY DETAILS:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2);
+                                c.Item().Text("AGENCY DETAILS:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2);
                                 c.Item().Text(bill.Agency?.AgencyName ?? "Unknown Vendor").FontSize(12).Bold().FontColor(Colors.BlueGrey.Darken2);
                             });
 

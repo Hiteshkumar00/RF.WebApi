@@ -7,6 +7,11 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public int Id { get; set; }
         public string ProfileName { get; set; } = string.Empty;
         public string? ProfileLogoLink { get; set; }
+        public string? Title { get; set; }
+        public string? Address { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
+        public string? GSTIN { get; set; }
         public string? CurrencyType { get; set; }
         public bool EnableSuggestions { get; set; }
     }

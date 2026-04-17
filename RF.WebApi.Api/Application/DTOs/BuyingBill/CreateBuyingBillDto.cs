@@ -7,6 +7,9 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
 {
     public class CreateBuyingBillDto
     {
+        [StringLength(50)]
+        public string? BillNo { get; set; }
+
         [Required(ErrorMessage = BuyingBillMessages.AgencyIdRequired)]
         public int AgencyId { get; set; }
 
