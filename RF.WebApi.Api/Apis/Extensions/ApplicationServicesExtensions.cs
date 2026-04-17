@@ -22,6 +22,7 @@ namespace RF.WebApi.Api.Apis.Extensions
             services.AddScoped<IAddContributionService, AddContributionService>();
             services.AddScoped<IRemoveContributionService, RemoveContributionService>();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IPdfService, PdfService>();
 
             return services;
         }

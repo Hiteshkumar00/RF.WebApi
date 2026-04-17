@@ -59,5 +59,16 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _sellingBillService.GetItemSuggestions();
             return HandleResponse(result);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> DownloadInvoice(int id)
+        {
+            var result = await _sellingBillService.GenerateInvoicePdf(id);
+            if (result.Success)
+            {
+                return File(result.Data, "application/pdf", $"Selling_Bill_{id}.pdf");
+            }
+            return HandleResponse(result);
+        }
     }
 }

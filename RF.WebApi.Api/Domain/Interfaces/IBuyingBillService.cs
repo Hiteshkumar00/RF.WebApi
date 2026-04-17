@@ -13,5 +13,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<List<BuyingBillListDto>>> GetAllBuyingBillsByAgencyId(int agencyId);
         Task<ServiceResponse<List<BuyingBillItemSuggestionDto>>> GetItemSuggestions(int? agencyId);
         Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions();
+        Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id);
     }
 }

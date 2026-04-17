@@ -3,8 +3,11 @@ using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Apis.Extensions;
 using RF.WebApi.Api.Apis.Middleware;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 // --- 1. ADD OPEN CORS SERVICE ---
 builder.Services.AddCors(options =>

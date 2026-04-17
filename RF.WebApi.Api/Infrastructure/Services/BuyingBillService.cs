@@ -16,12 +16,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
         private readonly RFDBContext _context;
         private readonly IMapper _mapper;
         private readonly IBusinessYearService _businessYearService;
+        private readonly IPdfService _pdfService;
 
-        public BuyingBillService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService)
+        public BuyingBillService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService, IPdfService pdfService)
         {
             _context = context;
             _mapper = mapper;
             _businessYearService = businessYearService;
+            _pdfService = pdfService;
         }
 
         public async Task<ServiceResponse<int>> CreateBuyingBill(CreateBuyingBillDto dto)
@@ -241,6 +243,34 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                         .ToListAsync();
 
                 return suggestions;
+            });
+        }
+
+        public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)
+        {
+            return ServiceResponse<byte[]>.Execute(async err =>
+            {
+                var bill = await _context.BuyingBills
+                    .Include(b => b.Agency)
+                    .Include(b => b.Items)
+                    .Include(b => b.Payments)
+                    .Include(b => b.Expences)
+                    .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
+
+                if (bill == null)
+                {
+                    err.AddError(BuyingBillMessages.NotFound);
+                    return default;
+                }
+
+                var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == Token.AccountId);
+                if (account == null)
+                {
+                    err.AddError("Account not found");
+                    return default;
+                }
+
+                return _pdfService.GenerateBuyingBillPdf(bill, account);
             });
         }
     }
