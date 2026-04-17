@@ -11,5 +11,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> DeleteBuyingBill(int id);
         Task<ServiceResponse<List<BuyingBillListDto>>> GetAllBuyingBills();
         Task<ServiceResponse<List<BuyingBillListDto>>> GetAllBuyingBillsByAgencyId(int agencyId);
+        Task<ServiceResponse<List<BuyingBillItemSuggestionDto>>> GetItemSuggestions(int? agencyId);
+        Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions();
     }
 }

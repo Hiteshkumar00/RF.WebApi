@@ -10,5 +10,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> UpdateBusinessExpence(UpdateBusinessExpenceDto dto);
         Task<ServiceResponse<bool>> DeleteBusinessExpence(int id);
         Task<ServiceResponse<List<BusinessExpenceListDto>>> GetAllBusinessExpences();
+        Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions();
     }
 }

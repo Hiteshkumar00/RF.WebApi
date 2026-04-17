@@ -56,5 +56,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _businessExpenceService.GetAllBusinessExpences();
             return HandleResponse(result);
         }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetExpenceTypeSuggestions()
+        {
+            var result = await _businessExpenceService.GetExpenceTypeSuggestions();
+            return HandleResponse(result);
+        }
     }
 }

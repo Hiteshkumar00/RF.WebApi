@@ -190,5 +190,58 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return _mapper.Map<List<BuyingBillListDto>>(bills);
             });
         }
+
+        public Task<ServiceResponse<List<BuyingBillItemSuggestionDto>>> GetItemSuggestions(int? agencyId)
+        {
+            return ServiceResponse<List<BuyingBillItemSuggestionDto>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var query = from bbi in _context.BuyingBillItems
+                            join bb in _context.BuyingBills on bbi.BillId equals bb.Id
+                            where bb.AccountId == accountId && !string.IsNullOrWhiteSpace(bbi.ItemName)
+                            select new { bbi.ItemName, bbi.Price, bb.Date, bbi.Id, bb.AgencyId };
+
+                if (agencyId.HasValue)
+                {
+                    query = query.Where(x => x.AgencyId == agencyId.Value);
+                }
+
+                var items = await query.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id).ToListAsync();
+
+                // Group in-memory to get count and latest price
+                var suggestions = items
+                    .GroupBy(x => x.ItemName)
+                    .Select(g => new BuyingBillItemSuggestionDto
+                    {
+                        ItemName = g.Key,
+                        Count = g.Count(),
+                        Price = g.First().Price
+                    })
+                    .OrderByDescending(s => s.Count)
+                    .ToList();
+
+                return suggestions;
+            });
+        }
+
+        public Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions()
+        {
+            return ServiceResponse<List<string>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var suggestions = await (from bbe in _context.BuyingBillExpences
+                                         join bb in _context.BuyingBills on bbe.BillId equals bb.Id
+                                         where bb.AccountId == accountId && !string.IsNullOrWhiteSpace(bbe.ExpenceType)
+                                         select bbe.ExpenceType!)
+                                        .GroupBy(x => x.Trim())
+                                        .OrderByDescending(g => g.Count())
+                                        .Select(g => g.Key)
+                                        .ToListAsync();
+
+                return suggestions;
+            });
+        }
     }
 }

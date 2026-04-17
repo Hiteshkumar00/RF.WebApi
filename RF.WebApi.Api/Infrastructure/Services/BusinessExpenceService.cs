@@ -133,5 +133,23 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return _mapper.Map<List<BusinessExpenceListDto>>(expenses);
             });
         }
+
+        public Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions()
+        {
+            return ServiceResponse<List<string>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var suggestions = await _context.BusinessExpences
+                    .Where(e => e.AccountId == accountId && !string.IsNullOrWhiteSpace(e.ExpenceType))
+                    .Select(e => e.ExpenceType!)
+                    .GroupBy(x => x.Trim())
+                    .OrderByDescending(g => g.Count())
+                    .Select(g => g.Key)
+                    .ToListAsync();
+
+                return suggestions;
+            });
+        }
     }
 }
