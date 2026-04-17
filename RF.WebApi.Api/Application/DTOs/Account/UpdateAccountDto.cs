@@ -15,5 +15,6 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public string? ProfileLogoLink { get; set; }
 
         public string? CurrencyType { get; set; }
+        public bool EnableSuggestions { get; set; }
     }
 }

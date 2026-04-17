@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -28,6 +28,10 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired()
                    .HasMaxLength(50)
                    .HasDefaultValue("INR");
+
+            builder.Property(a => a.EnableSuggestions)
+                   .IsRequired()
+                   .HasDefaultValue(false);
         }
     }
 }

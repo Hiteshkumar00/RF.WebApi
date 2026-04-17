@@ -1,4 +1,4 @@
-﻿namespace RF.WebApi.Api.Infrastructure.Data.Tables
+namespace RF.WebApi.Api.Infrastructure.Data.Tables
 {
     public class Account
     {
@@ -6,5 +6,6 @@
         public string? ProfileName { get; set; }
         public string? ProfileLogoLink { get; set; }
         public string? CurrencyType { get; set; }
+        public bool EnableSuggestions { get; set; }
     }
 }
