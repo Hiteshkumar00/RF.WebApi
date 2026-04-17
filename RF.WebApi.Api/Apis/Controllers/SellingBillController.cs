@@ -70,5 +70,16 @@ namespace RF.WebApi.Api.Apis.Controllers
             }
             return HandleResponse(result);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> PrintInvoice(int id)
+        {
+            var result = await _sellingBillService.GenerateInvoicePdf(id);
+            if (result.Success)
+            {
+                return File(result.Data, "application/pdf");
+            }
+            return HandleResponse(result);
+        }
     }
 }

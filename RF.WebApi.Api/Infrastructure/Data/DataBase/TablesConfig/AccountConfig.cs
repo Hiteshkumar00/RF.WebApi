@@ -52,6 +52,14 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(a => a.EnableSuggestions)
                    .IsRequired()
                    .HasDefaultValue(false);
+
+            builder.Property(a => a.WhatsAppNumber)
+                   .HasMaxLength(50)
+                   .IsRequired(false);
+
+            builder.Property(a => a.EnableWhatsApp)
+                   .IsRequired()
+                   .HasDefaultValue(false);
         }
     }
 }

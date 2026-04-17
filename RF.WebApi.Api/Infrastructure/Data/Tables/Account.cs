@@ -12,5 +12,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public string? GSTIN { get; set; }
         public string? CurrencyType { get; set; }
         public bool EnableSuggestions { get; set; }
+        public string? WhatsAppNumber { get; set; }
+        public bool EnableWhatsApp { get; set; }
     }
 }

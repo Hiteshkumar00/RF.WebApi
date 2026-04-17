@@ -16,5 +16,7 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public string? Email { get; set; }
         public string? GSTIN { get; set; }
         public string? CurrencyType { get; set; }
+        public string? WhatsAppNumber { get; set; }
+        public bool EnableWhatsApp { get; set; }
     }
 }
