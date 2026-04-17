@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -53,15 +53,29 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                 { 
                     Id = 3, 
                     EntityId = 2, // Currency
-                    RelatedEntityName = "Dollar", 
-                    RelatedDisplayName = "$" 
+                    RelatedEntityName = "en-IN", 
+                    RelatedDisplayName = "INR (₹)" 
                 },
                 new RelatedEntity 
                 { 
                     Id = 4, 
                     EntityId = 2, // Currency
-                    RelatedEntityName = "INR", 
-                    RelatedDisplayName = "₹" 
+                    RelatedEntityName = "en-US", 
+                    RelatedDisplayName = "USD ($)"
+                },
+                new RelatedEntity 
+                { 
+                    Id = 5, 
+                    EntityId = 2, // Currency
+                    RelatedEntityName = "en-GB", 
+                    RelatedDisplayName = "GBP (£)" 
+                },
+                new RelatedEntity 
+                { 
+                    Id = 6, 
+                    EntityId = 2, // Currency
+                    RelatedEntityName = "en-IE", 
+                    RelatedDisplayName = "EUR (€)" 
                 }
             );
         }
