@@ -12,5 +12,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<List<SellingBillListDto>>> GetAllSellingBills();
         Task<ServiceResponse<List<SellingBillItemSuggestionDto>>> GetItemSuggestions();
         Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id);
+        Task<ServiceResponse<bool>> SendWhatsAppMessage(int id);
     }
 }

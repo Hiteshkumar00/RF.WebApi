@@ -17,13 +17,15 @@ namespace RF.WebApi.Api.Infrastructure.Services
         private readonly IMapper _mapper;
         private readonly IBusinessYearService _businessYearService;
         private readonly IPdfService _pdfService;
+        private readonly IWhatsAppIntegrationService _whatsAppIntegrationService;
 
-        public SellingBillService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService, IPdfService pdfService)
+        public SellingBillService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService, IPdfService pdfService, IWhatsAppIntegrationService whatsAppIntegrationService)
         {
             _context = context;
             _mapper = mapper;
             _businessYearService = businessYearService;
             _pdfService = pdfService;
+            _whatsAppIntegrationService = whatsAppIntegrationService;
         }
 
         public async Task<ServiceResponse<int>> CreateSellingBill(CreateSellingBillDto dto)
@@ -257,6 +259,45 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 return _pdfService.GenerateSellingBillPdf(bill, account);
+            });
+        }
+
+        public Task<ServiceResponse<bool>> SendWhatsAppMessage(int id)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var bill = await _context.SellingBills
+                    .Include(b => b.Items)
+                    .Include(b => b.Payments)
+                    .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
+
+                if (bill == null)
+                {
+                    err.AddError(SellingBillMessages.NotFound);
+                    return false;
+                }
+
+                var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == Token.AccountId);
+                if (account == null)
+                {
+                    err.AddError("Account not found");
+                    return false;
+                }
+
+                if (!account.EnableAdvancedWhatsApp)
+                {
+                    err.AddError("Advanced WhatsApp is not enabled for this account.");
+                    return false;
+                }
+
+                var result = await _whatsAppIntegrationService.SendBillAsync(bill, account);
+                if (!result.Success)
+                {
+                    err.SetErrors(result);
+                    return false;
+                }
+
+                return true;
             });
         }
     }

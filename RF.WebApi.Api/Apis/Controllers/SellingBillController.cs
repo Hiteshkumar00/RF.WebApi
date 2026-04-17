@@ -81,5 +81,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             }
             return HandleResponse(result);
         }
+
+        [HttpPost("{id}")]
+        public async Task<IActionResult> SendWhatsAppMessage(int id)
+        {
+            var result = await _sellingBillService.SendWhatsAppMessage(id);
+            return HandleResponse(result);
+        }
     }
 }
