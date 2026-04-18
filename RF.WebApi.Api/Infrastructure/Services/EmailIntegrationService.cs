@@ -13,6 +13,18 @@ namespace RF.WebApi.Api.Infrastructure.Services
         private readonly ILogger<EmailIntegrationService> _logger;
         private readonly IServiceProvider _serviceProvider;
 
+        private System.Globalization.CultureInfo GetCurrencyCulture(string? currencyType)
+        {
+            try
+            {
+                return new System.Globalization.CultureInfo(string.IsNullOrWhiteSpace(currencyType) ? "en-IN" : currencyType);
+            }
+            catch
+            {
+                return new System.Globalization.CultureInfo("en-IN");
+            }
+        }
+
         public EmailIntegrationService(ILogger<EmailIntegrationService> logger, IServiceProvider serviceProvider)
         {
             _logger = logger;
@@ -52,7 +64,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalAmount = subtotal - (bill.Discount ?? 0);
                 var paidAmount = bill.Payments?.Sum(p => p.Amount ?? 0) ?? 0;
                 var remainingAmount = totalAmount - paidAmount;
-                var currency = account.CurrencyType ?? "₹";
+                var culture = GetCurrencyCulture(account.CurrencyType);
+                var currency = culture.NumberFormat.CurrencySymbol;
                 var dateStr = bill.Date?.ToString("dd-MMM-yyyy") ?? "N/A";
 
                 // 3. Status Messaging
