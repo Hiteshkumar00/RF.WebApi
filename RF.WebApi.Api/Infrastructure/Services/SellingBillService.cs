@@ -18,14 +18,16 @@ namespace RF.WebApi.Api.Infrastructure.Services
         private readonly IBusinessYearService _businessYearService;
         private readonly IPdfService _pdfService;
         private readonly IWhatsAppIntegrationService _whatsAppIntegrationService;
+        private readonly IEmailIntegrationService _emailIntegrationService;
 
-        public SellingBillService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService, IPdfService pdfService, IWhatsAppIntegrationService whatsAppIntegrationService)
+        public SellingBillService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService, IPdfService pdfService, IWhatsAppIntegrationService whatsAppIntegrationService, IEmailIntegrationService emailIntegrationService)
         {
             _context = context;
             _mapper = mapper;
             _businessYearService = businessYearService;
             _pdfService = pdfService;
             _whatsAppIntegrationService = whatsAppIntegrationService;
+            _emailIntegrationService = emailIntegrationService;
         }
 
         public async Task<ServiceResponse<int>> CreateSellingBill(CreateSellingBillDto dto)
@@ -291,6 +293,39 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 var result = await _whatsAppIntegrationService.SendBillAsync(bill, account);
+                if (!result.Success)
+                {
+                    err.SetErrors(result);
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        public Task<ServiceResponse<bool>> SendEmailMessage(int id)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var bill = await _context.SellingBills
+                    .Include(b => b.Items)
+                    .Include(b => b.Payments)
+                    .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
+
+                if (bill == null)
+                {
+                    err.AddError(SellingBillMessages.NotFound);
+                    return false;
+                }
+
+                var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == Token.AccountId);
+                if (account == null)
+                {
+                    err.AddError("Account not found");
+                    return false;
+                }
+
+                var result = await _emailIntegrationService.SendBillAsync(bill, account);
                 if (!result.Success)
                 {
                     err.SetErrors(result);
