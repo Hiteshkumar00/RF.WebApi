@@ -8,5 +8,10 @@ namespace RF.WebApi.Api.Domain.Common
         // Custom required messages for validation
         public const string MethodNameRequired = "Method Name is required";
         public const string AccountPersonIdRequired = "Account Person is required";
+
+        public const string InUseInSellingBill = "Cannot delete because it is used in selling bill payments";
+        public const string InUseInBuyingBill = "Cannot delete because it is used in buying bill payments or expenses";
+        public const string InUseInExpense = "Cannot delete because it is used in business expense payments";
+        public const string InUseInContribution = "Cannot delete because it is used in contribution payments";
     }
 }

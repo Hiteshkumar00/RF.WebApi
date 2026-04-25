@@ -85,6 +85,15 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
+                var paymentAccount = await _context.PaymentAccounts
+                    .FirstOrDefaultAsync(pa => pa.AccountPersonId == id);
+
+                if (paymentAccount != null)
+                {
+                    err.AddError(string.Format(AccountPersonMessages.InUseInPaymentAccount, paymentAccount.MethodName));
+                    return false;
+                }
+
                 _context.AccountPersons.Remove(accountPerson);
                 await _context.SaveChangesAsync();
 

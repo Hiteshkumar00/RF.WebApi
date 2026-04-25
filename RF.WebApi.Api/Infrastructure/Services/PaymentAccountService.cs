@@ -85,6 +85,36 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
+                // 1. Check Selling Bill Payments
+                if (await _context.SellingBillPayments.AnyAsync(p => p.PaymentAccountId == id))
+                {
+                    err.AddError(PaymentAccountMessages.InUseInSellingBill);
+                    return false;
+                }
+
+                // 2. Check Buying Bill Payments or Expenses
+                if (await _context.BuyingBillPayments.AnyAsync(p => p.PaymentAccountId == id) ||
+                    await _context.BuyingBillExpences.AnyAsync(e => e.PaymentAccountId == id))
+                {
+                    err.AddError(PaymentAccountMessages.InUseInBuyingBill);
+                    return false;
+                }
+
+                // 3. Check Business Expenses
+                if (await _context.BusinessExpencePayments.AnyAsync(p => p.PaymentAccountId == id))
+                {
+                    err.AddError(PaymentAccountMessages.InUseInExpense);
+                    return false;
+                }
+
+                // 4. Check Contributions
+                if (await _context.AddContributionPayments.AnyAsync(p => p.PaymentAccountId == id) ||
+                    await _context.RemoveContributionPayments.AnyAsync(p => p.PaymentAccountId == id))
+                {
+                    err.AddError(PaymentAccountMessages.InUseInContribution);
+                    return false;
+                }
+
                 _context.PaymentAccounts.Remove(paymentAccount);
                 await _context.SaveChangesAsync();
 

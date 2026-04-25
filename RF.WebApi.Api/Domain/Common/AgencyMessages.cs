@@ -5,5 +5,6 @@ namespace RF.WebApi.Api.Domain.Common
         public const string InvalidId = "Invalid Agency Id";
         public const string NotFound = "Agency not found";
         public const string AgencyNameRequired = "Agency Name is required";
+        public const string InUseInBuyingBill = "Cannot delete because it is used in buying bill: {0}";
     }
 }

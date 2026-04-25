@@ -89,6 +89,15 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
+                var bill = await _context.BuyingBills
+                    .FirstOrDefaultAsync(b => b.AgencyId == id);
+
+                if (bill != null)
+                {
+                    err.AddError(string.Format(AgencyMessages.InUseInBuyingBill, bill.BillNo));
+                    return false;
+                }
+
                 _context.Agencies.Remove(agency);
                 await _context.SaveChangesAsync();
 

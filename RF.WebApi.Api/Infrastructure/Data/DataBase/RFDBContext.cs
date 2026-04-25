@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig;
 
