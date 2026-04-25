@@ -31,7 +31,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.HasOne(re => re.Entity)
                    .WithMany(e => e.RelatedEntities)
                    .HasForeignKey(re => re.EntityId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // 5. Seed Data
             builder.HasData(

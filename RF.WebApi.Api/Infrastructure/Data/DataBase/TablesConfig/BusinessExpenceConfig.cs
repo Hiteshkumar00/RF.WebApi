@@ -24,7 +24,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.HasOne<Account>()
                    .WithMany()
                    .HasForeignKey(be => be.AccountId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // 4. ExpenceType (String)
             builder.Property(be => be.ExpenceType)

@@ -22,10 +22,15 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(rc => rc.AccountId)
                    .IsRequired();
 
+            builder.HasOne<Account>()
+                   .WithMany()
+                   .HasForeignKey(rc => rc.AccountId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(rc => rc.AccountPerson)
                    .WithMany()
                    .HasForeignKey(rc => rc.AccountPersonId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // 4. Description (String)
             builder.Property(rc => rc.Description)

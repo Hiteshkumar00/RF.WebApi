@@ -43,7 +43,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.HasOne(b => b.Agency)
                    .WithMany()
                    .HasForeignKey(b => b.AgencyId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // 6. Navigation: Items, Payments, Expences
             builder.HasMany(b => b.Items)
