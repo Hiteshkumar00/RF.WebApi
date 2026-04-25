@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using RF.WebApi.Api.Application.Helpers;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
@@ -19,6 +20,18 @@ namespace RF.WebApi.Api.Infrastructure.Services
             _httpClient = httpClient;
             _logger = logger;
             _serviceProvider = serviceProvider;
+        }
+
+        private System.Globalization.CultureInfo GetCurrencyCulture(string? currencyType)
+        {
+            try
+            {
+                return new System.Globalization.CultureInfo(string.IsNullOrWhiteSpace(currencyType) ? "en-IN" : currencyType);
+            }
+            catch
+            {
+                return new System.Globalization.CultureInfo("en-IN");
+            }
         }
 
         public async Task<ServiceResponse<bool>> SendBillAsync(SellingBill bill, Account account)
@@ -51,9 +64,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var pdfBytes = pdfResponse.Data;
 
                 // 2. Upload Media to WhatsApp Meta API
-                var dateStr = bill.Date?.ToString("yyyyMMdd") ?? DateTime.Now.ToString("yyyyMMdd");
+                var dateStrForFile = bill.Date?.ToString("dd-MM-yyyy") ?? DateTime.Now.ToString("dd-MM-yyyy");
+                var dateStrForTemplate = DateFormatHelper.Format(bill.Date, account.DateFormat);
                 string customerName = bill.CustomerName?.Replace(" ", "_") ?? "Customer";
-                string fileName = $"Bill_{bill.BillNo}_{dateStr}_{customerName}.pdf";
+                string fileName = $"Bill_{bill.BillNo}_{dateStrForFile}_{customerName}.pdf";
 
                 var mediaId = await UploadMediaAsync(account.WhatsAppPhoneNumberId, account.WhatsAppAccessToken, pdfBytes, fileName);
                 if (string.IsNullOrEmpty(mediaId))
@@ -68,6 +82,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalAmount = (bill.Items?.Sum(i => (i.Price ?? 0) * (i.Quantity ?? 0)) ?? 0) - (bill.Discount ?? 0);
                 var paidAmount = bill.Payments?.Sum(p => p.Amount ?? 0) ?? 0;
                 var remainingAmount = totalAmount - paidAmount;
+                var culture = GetCurrencyCulture(account.CurrencyType);
+                var currency = culture.NumberFormat.CurrencySymbol;
 
                 var payload = new
                 {
@@ -91,8 +107,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 parameters = new[] {
                                     new { type = "text", text = bill.CustomerName ?? "Customer" },
                                     new { type = "text", text = bill.BillNo ?? bill.Id.ToString() },
-                                    new { type = "text", text = $"₹{totalAmount:N2}" },
-                                    new { type = "text", text = $"₹{remainingAmount:N2}" }
+                                    new { type = "text", text = dateStrForTemplate },
+                                    new { type = "text", text = $"{currency}{totalAmount:N2}" },
+                                    new { type = "text", text = $"{currency}{remainingAmount:N2}" }
                                 }
                             }
                         }

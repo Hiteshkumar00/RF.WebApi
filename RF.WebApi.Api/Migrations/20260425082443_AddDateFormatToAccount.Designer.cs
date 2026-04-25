@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
@@ -11,9 +12,11 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    partial class RFDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260425082443_AddDateFormatToAccount")]
+    partial class AddDateFormatToAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -957,7 +960,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$xW2.WIDfctwGnsWkt6DOWeI59iu6zeNMOmjnFCKAbed4T8ml0kgl2",
+                            Password = "$2a$11$bFNtUehM.YJz1hEOaRf61uEZDHWYa3GwppVgSq6FSbXBQn3VxWvjy",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });

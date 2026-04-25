@@ -49,6 +49,14 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .HasMaxLength(50)
                    .HasDefaultValue("INR");
 
+            builder.Property(a => a.DateFormat)
+                   .HasMaxLength(50)
+                   .IsRequired(false);
+
+            builder.Property(a => a.ShortDateFormat)
+                   .HasMaxLength(50)
+                   .IsRequired(false);
+
             builder.Property(a => a.EnableSuggestions)
                    .IsRequired()
                    .HasDefaultValue(false);

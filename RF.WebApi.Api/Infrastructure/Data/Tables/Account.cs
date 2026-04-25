@@ -11,6 +11,8 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public string? Email { get; set; }
         public string? GSTIN { get; set; }
         public string? CurrencyType { get; set; }
+        public string? DateFormat { get; set; }
+        public string? ShortDateFormat { get; set; }
         
         public bool EnableSuggestions { get; set; }
 

@@ -1,6 +1,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using RF.WebApi.Api.Application.Helpers;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using System.Collections.Generic;
@@ -76,7 +77,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             col.Item().Text(text =>
                             {
                                 text.Span("Date: ").SemiBold();
-                                text.Span($"{bill.Date:dd-MMMM-yyyy}");
+                                text.Span($"{DateFormatHelper.Format(bill.Date, account.DateFormat)}");
                             });
                         });
                     });
@@ -266,7 +267,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             col.Item().Text(text =>
                             {
                                 text.Span("Date: ").SemiBold();
-                                text.Span($"{bill.Date:dd-MMMM-yyyy}");
+                                text.Span($"{DateFormatHelper.Format(bill.Date, account.DateFormat)}");
                             });
                         });
                     });

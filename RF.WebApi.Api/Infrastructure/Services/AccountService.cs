@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RF.WebApi.Api.Apis.Authentication;
+using RF.WebApi.Api.Application.Helpers;
 using RF.WebApi.Api.Application.DTOs.Account;
 using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
@@ -27,6 +28,17 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return await ServiceResponse<int>.Execute(async err =>
             {
+                if (!DateFormatHelper.IsValidFormat(createAccountDto.DateFormat))
+                {
+                    err.AddError("Invalid Date Format. Please use valid .NET date format strings (e.g., dd-MMMM-yyyy).");
+                    return default;
+                }
+                if (!DateFormatHelper.IsValidFormat(createAccountDto.ShortDateFormat))
+                {
+                    err.AddError("Invalid Short Date Format. Please use valid .NET date format strings (e.g., dd-MMM-yyyy).");
+                    return default;
+                }
+
                 var newAccount = _mapper.Map<Account>(createAccountDto);
                 _context.Accounts.Add(newAccount);
                 await _context.SaveChangesAsync();
@@ -71,6 +83,17 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
                 
+                if (!DateFormatHelper.IsValidFormat(updateAccountDto.DateFormat))
+                {
+                    err.AddError("Invalid Date Format. Please use valid .NET date format strings (e.g., dd-MMMM-yyyy).");
+                    return false;
+                }
+                if (!DateFormatHelper.IsValidFormat(updateAccountDto.ShortDateFormat))
+                {
+                    err.AddError("Invalid Short Date Format. Please use valid .NET date format strings (e.g., dd-MMM-yyyy).");
+                    return false;
+                }
+
                 _mapper.Map(updateAccountDto, account);
                 await _context.SaveChangesAsync();
                 return true;

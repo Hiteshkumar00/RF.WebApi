@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RF.WebApi.Api.Application.Helpers;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
@@ -66,7 +67,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var remainingAmount = totalAmount - paidAmount;
                 var culture = GetCurrencyCulture(account.CurrencyType);
                 var currency = culture.NumberFormat.CurrencySymbol;
-                var dateStr = bill.Date?.ToString("dd-MMM-yyyy") ?? "N/A";
+                var dateStr = DateFormatHelper.Format(bill.Date, account.DateFormat);
 
                 // 3. Status Messaging
                 string statusHeading = remainingAmount > 0 ? "Pending Payment Reminder" : "Payment Successful";

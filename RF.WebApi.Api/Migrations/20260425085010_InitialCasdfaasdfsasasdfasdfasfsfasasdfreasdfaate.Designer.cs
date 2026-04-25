@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
@@ -11,9 +12,11 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    partial class RFDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260425085010_InitialCasdfaasdfsasasdfasdfasfsfasasdfreasdfaate")]
+    partial class InitialCasdfaasdfsasasdfasdfasfsfasasdfreasdfaate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
