@@ -24,10 +24,11 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPut()]
-        public async Task<IActionResult> Update(UpdateSystemConfigurationDto dto)
+        public async Task<IActionResult> UpdateMultiple(List<UpdateSystemConfigurationDto> dtos)
         {
-            var result = await _configService.UpdateConfiguration(dto);
+            var result = await _configService.UpdateMultipleConfigurations(dtos);
             return HandleResponse(result);
         }
     }

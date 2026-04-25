@@ -6,7 +6,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
     public interface ISystemConfigurationService
     {
         Task<ServiceResponse<List<SystemConfigurationDto>>> GetAllConfigurations();
-        Task<ServiceResponse<bool>> UpdateConfiguration(UpdateSystemConfigurationDto dto);
+        Task<ServiceResponse<bool>> UpdateMultipleConfigurations(List<UpdateSystemConfigurationDto> dtos);
         Task<bool> GetConfigurationValueAsBool(string propertyName);
         Task<string> GetConfigurationValueAsString(string propertyName);
     }

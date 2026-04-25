@@ -27,34 +27,33 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var configs = await _context.SystemConfigurations
                     .AsNoTracking()
                     .ToListAsync();
-
                 return _mapper.Map<List<SystemConfigurationDto>>(configs);
             });
         }
-
-        public async Task<ServiceResponse<bool>> UpdateConfiguration(UpdateSystemConfigurationDto dto)
+        public async Task<ServiceResponse<bool>> UpdateMultipleConfigurations(List<UpdateSystemConfigurationDto> dtos)
         {
             return await ServiceResponse<bool>.Execute(async err =>
             {
-                // Security Check: Only the root superadmin (UserId -1) can update system configuration
-                if (Token.UserId != -1)
+                if (dtos == null || !dtos.Any())
                 {
-                    err.AddError(UserMessages.UnauthorizedAction);
-                    return false;
+                    return true;
                 }
 
-                var config = await _context.SystemConfigurations
-                    .FirstOrDefaultAsync(c => c.Id == dto.Id);
+                var ids = dtos.Select(d => d.Id).ToList();
+                var configs = await _context.SystemConfigurations
+                    .Where(c => ids.Contains(c.Id))
+                    .ToListAsync();
 
-                if (config == null)
+                foreach (var dto in dtos)
                 {
-                    err.AddError("Configuration not found");
-                    return false;
+                    var config = configs.FirstOrDefault(c => c.Id == dto.Id);
+                    if (config != null)
+                    {
+                        config.PropertyValue = dto.PropertyValue;
+                    }
                 }
 
-                config.PropertyValue = dto.PropertyValue;
                 await _context.SaveChangesAsync();
-
                 return true;
             });
         }
