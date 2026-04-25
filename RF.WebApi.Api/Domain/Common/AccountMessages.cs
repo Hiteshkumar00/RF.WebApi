@@ -6,5 +6,6 @@ namespace RF.WebApi.Api.Domain.Common
         public const string InvalidId = "Invalid Account Id";
         public const string NotFound = "Account not found";
         public const string ProfileNameRequired = "Profile Name is required";
+        public const string DeletionDisabled = "Account deletion is currently disabled in system configuration.";
     }
 }

@@ -14,11 +14,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
     {
         private readonly RFDBContext _context;
         private readonly IMapper _mapper;
+        private readonly ISystemConfigurationService _configService;
 
-        public AccountService(RFDBContext context, IMapper mapper)
+        public AccountService(RFDBContext context, IMapper mapper, ISystemConfigurationService configService)
         {
             _context = context;
             _mapper = mapper;
+            _configService = configService;
         }
 
         public async Task<ServiceResponse<int>> CreateAccount(CreateAccountDto createAccountDto)
@@ -83,6 +85,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 if (account == null)
                 {
                     err.AddError(AccountMessages.NotFound);
+                    return false;
+                }
+
+                var canDelete = await _configService.GetConfigurationValueAsBool("EnableDeleteAccount");
+                if (!canDelete)
+                {
+                    err.AddError(AccountMessages.DeletionDisabled);
                     return false;
                 }
 
