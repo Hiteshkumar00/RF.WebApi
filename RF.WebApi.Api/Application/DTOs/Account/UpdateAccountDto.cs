@@ -22,6 +22,7 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public string? DateFormat { get; set; }
         public string? ShortDateFormat { get; set; }
         public bool EnableSuggestions { get; set; }
+        public bool EnableVoiceTyping { get; set; }
         public string? WhatsAppNumber { get; set; }
         public bool EnableWhatsApp { get; set; }
         public bool EnableAdvancedWhatsApp { get; set; }

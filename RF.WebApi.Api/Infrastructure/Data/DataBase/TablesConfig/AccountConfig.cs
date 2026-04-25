@@ -61,6 +61,10 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired()
                    .HasDefaultValue(false);
 
+            builder.Property(a => a.EnableVoiceTyping)
+                   .IsRequired()
+                   .HasDefaultValue(false);
+
             builder.Property(a => a.WhatsAppNumber)
                    .HasMaxLength(50)
                    .IsRequired(false);

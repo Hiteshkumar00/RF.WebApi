@@ -15,6 +15,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public string? ShortDateFormat { get; set; }
         
         public bool EnableSuggestions { get; set; }
+        public bool EnableVoiceTyping { get; set; }
 
         public string? WhatsAppNumber { get; set; }
         public bool EnableWhatsApp { get; set; }
