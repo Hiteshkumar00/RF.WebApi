@@ -34,7 +34,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                     PropertyName = "TableScrollHeight",
                     PropertyDisplayName = "Table Scroll Height",
                     PropertyType = "string",
-                    PropertyValue = "425px"
+                    PropertyValue = "65vh"
                 }
             );
         }
