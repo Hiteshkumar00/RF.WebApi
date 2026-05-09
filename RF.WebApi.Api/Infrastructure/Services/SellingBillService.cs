@@ -57,6 +57,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 foreach (var payment in bill.Payments)
                 {
                     payment.Bill = bill;
+                    if (payment.Date == null) payment.Date = bill.Date;
                 }
 
                 await _context.SaveChangesAsync();
@@ -139,6 +140,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 foreach (var payment in bill.Payments)
                 {
                     payment.Bill = bill;
+                    if (payment.Date == null) payment.Date = bill.Date;
                 }
 
                 await _context.SaveChangesAsync();

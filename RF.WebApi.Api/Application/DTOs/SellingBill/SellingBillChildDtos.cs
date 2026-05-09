@@ -74,6 +74,7 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         public int Id { get; set; }
         public decimal Amount { get; set; }
         public int PaymentAccountId { get; set; }
+        public DateOnly? Date { get; set; }
     }
 
     public class CreateSellingBillPaymentDto
@@ -83,6 +84,8 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
 
         [Required(ErrorMessage = SellingBillMessages.PaymentAccountRequired)]
         public int PaymentAccountId { get; set; }
+
+        public DateOnly? Date { get; set; }
     }
 
     public class UpdateSellingBillPaymentDto : CreateSellingBillPaymentDto

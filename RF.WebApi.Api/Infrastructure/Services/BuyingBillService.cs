@@ -42,6 +42,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 _context.BuyingBills.Add(bill);
+                
+                foreach (var payment in bill.Payments)
+                {
+                    if (payment.Date == null) payment.Date = bill.Date;
+                }
+
                 await _context.SaveChangesAsync();
 
                 if (bill.BillNo == "TEMP_BILL_NO")
@@ -137,6 +143,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 _context.SyncCollection(bill.Items, dto.Items, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
                 _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+ 
+                foreach (var payment in bill.Payments)
+                {
+                    if (payment.Date == null) payment.Date = bill.Date;
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -383,7 +394,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             Id = p.Id ?? 0,
                             Amount = p.Amount,
                             PaymentAccountId = p.PaymentAccountId,
-                            BusinessExpenceId = exp.Id ?? 0
+                            BusinessExpenceId = exp.Id ?? 0,
+                            Date = p.Date ?? billDate
                         }).ToList();
 
                         _context.SyncCollection(exp.Payments, incomingPayments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
@@ -406,7 +418,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         newExp.Payments.Add(new BusinessExpencePayment
                         {
                             Amount = p.Amount,
-                            PaymentAccountId = p.PaymentAccountId
+                            PaymentAccountId = p.PaymentAccountId,
+                            Date = p.Date ?? billDate
                         });
                     }
                     _context.BusinessExpences.Add(newExp);

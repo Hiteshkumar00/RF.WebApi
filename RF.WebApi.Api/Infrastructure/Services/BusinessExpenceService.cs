@@ -34,6 +34,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 expense.AccountId = accountId;
 
                 _context.BusinessExpences.Add(expense);
+                
+                foreach (var payment in expense.Payments)
+                {
+                    if (payment.Date == null) payment.Date = expense.Date;
+                }
+
                 await _context.SaveChangesAsync();
 
                 return expense.Id ?? default;
@@ -98,6 +104,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 // Generic helper handles Add, Update, and Remove for collection safely
                 _context.SyncCollection(expense.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+
+                foreach (var payment in expense.Payments)
+                {
+                    if (payment.Date == null) payment.Date = expense.Date;
+                }
 
                 await _context.SaveChangesAsync();
                 return true;

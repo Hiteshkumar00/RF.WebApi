@@ -43,6 +43,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var contribution = _mapper.Map<AddContribution>(dto);
                 contribution.AccountId = Token.AccountId;
                 _context.AddContributions.Add(contribution);
+ 
+                foreach (var payment in contribution.Payments)
+                {
+                    if (payment.Date == null) payment.Date = contribution.Date;
+                }
+ 
                 await _context.SaveChangesAsync();
 
                 return contribution.Id ?? default;
@@ -96,6 +102,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 
                 // Generic helper handles Add, Update, and Remove for collection safely
                 _context.SyncCollection(contribution.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+ 
+                foreach (var payment in contribution.Payments)
+                {
+                    if (payment.Date == null) payment.Date = contribution.Date;
+                }
+ 
                 await _context.SaveChangesAsync();
                 
                 return true;

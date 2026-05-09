@@ -11,5 +11,7 @@ namespace RF.WebApi.Api.Application.DTOs.BusinessExpence
 
         [Required(ErrorMessage = BusinessExpenceMessages.PaymentAccountRequired)]
         public int PaymentAccountId { get; set; }
+ 
+        public DateOnly? Date { get; set; }
     }
 }
