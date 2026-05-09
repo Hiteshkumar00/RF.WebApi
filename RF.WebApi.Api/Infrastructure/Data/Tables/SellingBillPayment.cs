@@ -9,5 +9,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public DateOnly? Date { get; set; }
 
         public SellingBill? Bill { get; set; }
+        public PaymentAccount? PaymentAccount { get; set; }
     }
 }

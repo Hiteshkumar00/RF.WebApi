@@ -7,5 +7,8 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public int? BusinessExpenceId { get; set; }
         public int? PaymentAccountId { get; set; }
         public DateOnly? Date { get; set; }
+
+        public BusinessExpence? BusinessExpence { get; set; }
+        public PaymentAccount? PaymentAccount { get; set; }
     }
 }

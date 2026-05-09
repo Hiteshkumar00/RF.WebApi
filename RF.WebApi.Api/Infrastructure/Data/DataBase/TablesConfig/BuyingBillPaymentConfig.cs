@@ -24,7 +24,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(bbp => bbp.BillId)
                    .IsRequired();
 
-            builder.HasOne<BuyingBill>()
+            builder.HasOne(bbp => bbp.Bill)
                    .WithMany(bb => bb.Payments)
                    .HasForeignKey(bbp => bbp.BillId)
                    .OnDelete(DeleteBehavior.Cascade);
@@ -33,7 +33,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(bbp => bbp.PaymentAccountId)
                    .IsRequired();
 
-            builder.HasOne<PaymentAccount>()
+            builder.HasOne(bbp => bbp.PaymentAccount)
                    .WithMany()
                    .HasForeignKey(bbp => bbp.PaymentAccountId)
                    .OnDelete(DeleteBehavior.Restrict);

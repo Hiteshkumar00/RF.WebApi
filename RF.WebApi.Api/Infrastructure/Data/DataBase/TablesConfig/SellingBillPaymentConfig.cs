@@ -33,7 +33,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(sbp => sbp.PaymentAccountId)
                    .IsRequired();
 
-            builder.HasOne<PaymentAccount>()
+            builder.HasOne(sbp => sbp.PaymentAccount)
                    .WithMany()
                    .HasForeignKey(sbp => sbp.PaymentAccountId)
                    .OnDelete(DeleteBehavior.Restrict);

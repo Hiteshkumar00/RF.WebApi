@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -22,15 +22,16 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
 
             // 4. Foreign Key: AddContribution (Integer, Not Null)
             builder.Property(p => p.AddContributionId)
-                   .IsRequired();
-
-
+                   .IsRequired();            builder.HasOne(p => p.AddContribution)
+                   .WithMany(c => c.Payments)
+                   .HasForeignKey(p => p.AddContributionId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // 5. Foreign Key: PaymentAccount (Integer, Not Null)
             builder.Property(p => p.PaymentAccountId)
                    .IsRequired();
 
-            builder.HasOne<PaymentAccount>()
+            builder.HasOne(p => p.PaymentAccount)
                    .WithMany()
                    .HasForeignKey(p => p.PaymentAccountId)
                    .OnDelete(DeleteBehavior.Restrict);

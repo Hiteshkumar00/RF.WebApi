@@ -51,5 +51,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _paymentAccountService.GetAllPaymentAccounts();
             return HandleResponse(result);
         }
+
+        [HttpPost()]
+        public async Task<IActionResult> GetHistory(PaymentHistoryFilterDto filter)
+        {
+            var result = await _paymentAccountService.GetPaymentHistory(filter);
+            return HandleResponse(result);
+        }
     }
 }

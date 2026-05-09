@@ -7,5 +7,8 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public int? AddContributionId { get; set; } // Referenced as AddContributione FK in your image
         public int? PaymentAccountId { get; set; }
         public DateOnly? Date { get; set; }
+
+        public AddContribution? AddContribution { get; set; }
+        public PaymentAccount? PaymentAccount { get; set; }
     }
 }
