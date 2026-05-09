@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace RF.WebApi.Api.Infrastructure.Data.Tables
@@ -16,6 +16,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
 
         public ICollection<BuyingBillItem> Items { get; set; } = new List<BuyingBillItem>();
         public ICollection<BuyingBillPayment> Payments { get; set; } = new List<BuyingBillPayment>();
-        public ICollection<BuyingBillExpence> Expences { get; set; } = new List<BuyingBillExpence>();
+        public ICollection<BusinessExpence> Expences { get; set; } = new List<BusinessExpence>();
     }
 }

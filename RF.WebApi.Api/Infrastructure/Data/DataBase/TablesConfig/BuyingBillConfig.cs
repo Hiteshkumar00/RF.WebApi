@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -57,9 +57,9 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(b => b.Expences)
-                   .WithOne()
-                   .HasForeignKey(e => e.BillId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .WithOne(e => e.BuyingBill)
+                   .HasForeignKey(e => e.BuyingBillId)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

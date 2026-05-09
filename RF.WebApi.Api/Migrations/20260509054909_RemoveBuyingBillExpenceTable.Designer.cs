@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
@@ -11,9 +12,11 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    partial class RFDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260509054909_RemoveBuyingBillExpenceTable")]
+    partial class RemoveBuyingBillExpenceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -947,7 +950,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$iLlcol8e7X6aPkCreK6XCO7t9RDfoBJ6kngrhb07qJwCedRf3wHI6",
+                            Password = "$2a$11$I6Az0ZSN76nXb6S//5PPxeBHN.ErMYV6D7oq4AU5NXNIDzL/SCZxu",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -1048,7 +1051,7 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", "BuyingBill")
-                        .WithMany("Expences")
+                        .WithMany()
                         .HasForeignKey("BuyingBillId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -1273,8 +1276,6 @@ namespace RF.WebApi.Api.Migrations
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", b =>
                 {
-                    b.Navigation("Expences");
-
                     b.Navigation("Items");
 
                     b.Navigation("Payments");

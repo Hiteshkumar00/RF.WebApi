@@ -70,11 +70,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var dateStr = DateFormatHelper.Format(bill.Date, account.DateFormat);
 
                 // 3. Status Messaging
-                string statusHeading = remainingAmount > 0 ? "Pending Payment Reminder" : "Payment Successful";
+                string statusHeading = remainingAmount > 0 ? "Remaining Payment Reminder" : "Payment Successful";
                 string statusColor = remainingAmount > 0 ? "#e67e22" : "#27ae60"; 
                 string statusText = remainingAmount > 0 
-                    ? $"Your bill {bill.BillNo} has a pending balance. Please settle the amount at your earliest convenience."
-                    : $"Your bill {bill.BillNo} has been successfully paid in full.";
+                    ? $"Your bill {bill.BillNo} has a remaining balance. Please settle the amount at your earliest convenience."
+                    : $"Thank you for your payment! Your bill {bill.BillNo} has been fully settled.";
 
                 // 4. Prepare Email
                 try

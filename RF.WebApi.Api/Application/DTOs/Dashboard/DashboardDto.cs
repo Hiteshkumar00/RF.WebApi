@@ -8,5 +8,6 @@ namespace RF.WebApi.Api.Application.DTOs.Dashboard
         public decimal TotalProfit { get; set; }
         public decimal SellingPendingAmount { get; set; }
         public decimal BuyingPendingAmount { get; set; }
+        public decimal ExpencePendingAmount { get; set; }
     }
 }

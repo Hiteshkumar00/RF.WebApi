@@ -55,12 +55,23 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
 
 
     // Buying Bill Expence DTOs
+    public class BuyingBillExpencePaymentDto
+    {
+        public int? Id { get; set; }
+        
+        [Range(0.01, double.MaxValue, ErrorMessage = BuyingBillMessages.AmountPositive)]
+        public decimal Amount { get; set; }
+        
+        [Required(ErrorMessage = BuyingBillMessages.PaymentAccountRequired)]
+        public int PaymentAccountId { get; set; }
+    }
+
     public class BuyingBillExpenceDto
     {
         public int Id { get; set; }
         public string ExpenceType { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public int PaymentAccountId { get; set; }
+        public decimal TotalAmount { get; set; }
+        public List<BuyingBillExpencePaymentDto> Payments { get; set; } = new();
     }
 
     public class CreateBuyingBillExpenceDto
@@ -70,10 +81,9 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         public string ExpenceType { get; set; } = string.Empty;
 
         [Range(0.01, double.MaxValue, ErrorMessage = BuyingBillMessages.AmountPositive)]
-        public decimal Amount { get; set; }
+        public decimal TotalAmount { get; set; }
 
-        [Required(ErrorMessage = BuyingBillMessages.PaymentAccountRequired)]
-        public int PaymentAccountId { get; set; }
+        public List<BuyingBillExpencePaymentDto> Payments { get; set; } = new();
     }
 
     public class UpdateBuyingBillExpenceDto : CreateBuyingBillExpenceDto

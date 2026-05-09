@@ -9,7 +9,10 @@ namespace RF.WebApi.Api.Application.DTOs.Agency
         public decimal TotalBillsAmount { get; set; }
         public decimal TotalPaidAmount { get; set; }
         public decimal TotalPendingAmount { get; set; }
-        
+
+        public decimal TotalExpenceAmount { get; set; }
+        public decimal TotalExpencePaidAmount { get; set; }
+        public decimal TotalExpencePendingAmount { get; set; }
         public List<AgencyPersonDto> AgencyPersons { get; set; } = new();
         public List<AgencyBillsByYearDto> BillsByYear { get; set; } = new();
     }

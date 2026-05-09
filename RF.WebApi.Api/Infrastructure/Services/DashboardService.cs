@@ -54,49 +54,43 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 // --- PAYMENT ACCOUNT DASHBOARD (ALL TIME) ---
 
-                // 1. Selling Bill Payments
+                // 1. Selling Bill Payments (money IN)
                 var sellingPayments = await _context.SellingBillPayments
                     .Where(p => p.BillId != null && _context.SellingBills.Any(b => b.Id == p.BillId && b.AccountId == accountId) && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
-                // 2. Buying Bill Payments
+                // 2. Buying Bill Payments (money OUT)
                 var buyingPayments = await _context.BuyingBillPayments
                     .Where(p => p.BillId != null && _context.BuyingBills.Any(b => b.Id == p.BillId && b.AccountId == accountId) && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
-                // 3. Buying Bill Expences
-                var buyingExpences = await _context.BuyingBillExpences
-                    .Where(e => e.BillId != null && _context.BuyingBills.Any(b => b.Id == e.BillId && b.AccountId == accountId) && e.PaymentAccountId != null)
-                    .GroupBy(e => e.PaymentAccountId)
-                    .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(e => e.Amount ?? 0) })
-                    .ToListAsync();
-                    
-                // 4. Business Expences
+                // 3. ALL Business Expences (direct + buying-bill-linked) — all reduce balance
                 var businessExpences = await _context.BusinessExpencePayments
-                    .Where(p => p.BusinessExpenceId != null && _context.BusinessExpences.Any(e => e.Id == p.BusinessExpenceId && e.AccountId == accountId) && p.PaymentAccountId != null)
+                    .Where(p => p.BusinessExpenceId != null
+                        && _context.BusinessExpences.Any(e => e.Id == p.BusinessExpenceId && e.AccountId == accountId)
+                        && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
-                // 5. Add Contributions
+                // 4. Add Contributions (money IN)
                 var addContributions = await _context.AddContributionPayments
                     .Where(p => p.AddContributionId != null && _context.AddContributions.Any(c => c.Id == p.AddContributionId && c.AccountId == accountId) && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
-                // 6. Remove Contributions
+                // 5. Remove Contributions (money OUT)
                 var removeContributions = await _context.RemoveContributionPayments
                     .Where(p => p.RemoveContributionId != null && _context.RemoveContributions.Any(c => c.Id == p.RemoveContributionId && c.AccountId == accountId) && p.PaymentAccountId != null)
                     .GroupBy(p => p.PaymentAccountId)
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
-                // Fetch all payment accounts for the user to assemble the final DTOs
                 var paymentAccounts = await _context.PaymentAccounts
                     .Where(pa => pa.AccountId == accountId)
                     .ToListAsync();
@@ -108,15 +102,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 {
                     var id = pa.Id!.Value;
 
-                    var selling = sellingPayments.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
+                    var selling   = sellingPayments.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
                     var buyingPay = buyingPayments.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
-                    var buyingExp = buyingExpences.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
-                    var busExp = businessExpences.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
-                    var addContrib = addContributions.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
-                    var remContrib = removeContributions.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
+                    var busExp    = businessExpences.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
+                    var addCont   = addContributions.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
+                    var remCont   = removeContributions.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
 
-                    // Formula: total selling - total buying payment - buying expance - business expnace + add contribution - remove contribution
-                    var balance = selling - buyingPay - buyingExp - busExp + addContrib - remContrib;
+                    // Formula: selling + addContrib - buyingPayments - allExpenses - removeContrib
+                    var balance = selling + addCont - buyingPay - busExp - remCont;
 
                     paymentAccountBalances.Add(new PaymentAccountBalanceDto
                     {
@@ -142,7 +135,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var accountId = Token.AccountId;
 
-                // 1. Fetch all Business Years Date Ranges from BusinessYearService
                 var dateRangesResponse = await _businessYearService.GetAllBusinessYearDateRanges();
                 if (!dateRangesResponse.Success)
                 {
@@ -159,7 +151,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 foreach (var dateRange in dateRangesResponse.Data)
                 {
-                    // Compile metrics constrained by this computed [startDate, endDate]
                     var metricsResponse = await CalculateDashboardMetricsForDateRange(accountId, dateRange.StartDate, dateRange.EndDate);
                     if (!metricsResponse.Success)
                     {
@@ -168,7 +159,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                     var metrics = metricsResponse.Data;
 
-                    // Add mapping output for this year
                     results.Add(new AllTimeDashboardItemDto
                     {
                         BusinessYearId = dateRange.Id,
@@ -180,7 +170,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         TotalExpenceAmount = metrics.TotalExpenceAmount,
                         TotalProfit = metrics.TotalProfit,
                         SellingPendingAmount = metrics.SellingPendingAmount,
-                        BuyingPendingAmount = metrics.BuyingPendingAmount
+                        BuyingPendingAmount = metrics.BuyingPendingAmount,
+                        ExpencePendingAmount = metrics.ExpencePendingAmount
                     });
                 }
 
@@ -192,7 +183,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return await ServiceResponse<DashboardDto>.Execute(async err =>
             {
-                // 1. Total Selling
+                // 1. Total Selling (net of discount)
                 var totalSelling = await _context.SellingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Items)
@@ -201,7 +192,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalSellingDiscounts = await _context.SellingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SumAsync(b => b.Discount ?? 0);
-                    
+
                 totalSelling -= totalSellingDiscounts;
 
                 var totalSellingPaid = await _context.SellingBills
@@ -209,47 +200,48 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .SelectMany(b => b.Payments)
                     .SumAsync(p => p.Amount ?? 0);
 
-                // 2. Total Buying
+                // 2. Total Buying — items only, net of discount (expenses live in BusinessExpence)
                 var totalBuyingItems = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Items)
                     .SumAsync(item => (item.Quantity ?? 0) * (item.Price ?? 0));
 
-                var totalBuyingExpence = await _context.BuyingBills
-                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
-                    .SelectMany(b => b.Expences)
-                    .SumAsync(e => e.Amount ?? 0);
-                    
                 var totalBuyingDiscounts = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SumAsync(b => b.Discount ?? 0);
 
-                var totalBuying = totalBuyingItems + totalBuyingExpence - totalBuyingDiscounts;
+                var totalBuying = totalBuyingItems - totalBuyingDiscounts;
 
                 var totalBuyingPaid = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Payments)
                     .SumAsync(p => p.Amount ?? 0);
 
-                // 3. Total Business Expence
-                var totalBusinessExpencePayments = await _context.BusinessExpences
-                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
-                    .SelectMany(b => b.Payments)
+                // 3. ALL Business Expences (direct + buying-bill-linked)
+                var totalBusinessExpenceDeclared = await _context.BusinessExpences
+                    .Where(e => e.AccountId == accountId && e.Date >= startDate && e.Date <= endDate)
+                    .SumAsync(e => e.TotalAmount ?? 0);
+
+                var totalBusinessExpencePaid = await _context.BusinessExpences
+                    .Where(e => e.AccountId == accountId && e.Date >= startDate && e.Date <= endDate)
+                    .SelectMany(e => e.Payments)
                     .SumAsync(p => p.Amount ?? 0);
 
-                // Calculations
-                var totalProfit = totalSelling - totalBuying - totalBusinessExpencePayments;
+                // Derived metrics
+                var totalProfit = totalSelling - totalBuying - totalBusinessExpenceDeclared;
                 var sellingPending = totalSelling - totalSellingPaid;
                 var buyingPending = totalBuying - totalBuyingPaid;
+                var expencePending = totalBusinessExpenceDeclared - totalBusinessExpencePaid;
 
                 return new DashboardDto
                 {
                     TotalSellingAmount = totalSelling,
                     TotalBuyingAmount = totalBuying,
-                    TotalExpenceAmount = totalBusinessExpencePayments,
+                    TotalExpenceAmount = totalBusinessExpenceDeclared,
                     TotalProfit = totalProfit,
                     SellingPendingAmount = sellingPending,
-                    BuyingPendingAmount = buyingPending
+                    BuyingPendingAmount = buyingPending,
+                    ExpencePendingAmount = expencePending
                 };
             });
         }

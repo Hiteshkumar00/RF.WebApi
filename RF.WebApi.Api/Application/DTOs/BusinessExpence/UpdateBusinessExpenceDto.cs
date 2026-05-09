@@ -17,7 +17,10 @@ namespace RF.WebApi.Api.Application.DTOs.BusinessExpence
         [Required(ErrorMessage = BusinessExpenceMessages.DateRequired)]
         public DateOnly Date { get; set; }
 
-        // We can allow updating payments alongside the expence
+        [Required(ErrorMessage = BusinessExpenceMessages.TotalAmountRequired)]
+        [Range(0.01, double.MaxValue, ErrorMessage = BusinessExpenceMessages.AmountPositive)]
+        public decimal TotalAmount { get; set; }
+
         public List<UpdateBusinessExpencePaymentDto> Payments { get; set; } = new List<UpdateBusinessExpencePaymentDto>();
     }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
@@ -11,9 +12,11 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 namespace RF.WebApi.Api.Migrations
 {
     [DbContext(typeof(RFDBContext))]
-    partial class RFDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260509052748_AddTotalAmountAndBuyingBillIdToBusinessExpence")]
+    partial class AddTotalAmountAndBuyingBillIdToBusinessExpence
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,6 +430,39 @@ namespace RF.WebApi.Api.Migrations
                     b.HasIndex("AgencyId");
 
                     b.ToTable("BuyingBill", (string)null);
+                });
+
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillExpence", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
+
+                    b.Property<decimal?>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("BillId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExpenceType")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("PaymentAccountId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillId");
+
+                    b.HasIndex("PaymentAccountId");
+
+                    b.ToTable("BuyingBillExpence", (string)null);
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillItem", b =>
@@ -947,7 +983,7 @@ namespace RF.WebApi.Api.Migrations
                             Email = "hiteshkumar252020@gmail.com",
                             FirstName = "System",
                             IsActive = false,
-                            Password = "$2a$11$iLlcol8e7X6aPkCreK6XCO7t9RDfoBJ6kngrhb07qJwCedRf3wHI6",
+                            Password = "$2a$11$eZzzdrc8DtUSe1kxEzjnI.0LmYHErrCk8RfN0PP6/WMtgAwDtoVJq",
                             Role = "SuperAdmin",
                             Surname = "User"
                         });
@@ -1048,7 +1084,7 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", "BuyingBill")
-                        .WithMany("Expences")
+                        .WithMany()
                         .HasForeignKey("BuyingBillId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -1094,6 +1130,21 @@ namespace RF.WebApi.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Agency");
+                });
+
+            modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillExpence", b =>
+                {
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBill", null)
+                        .WithMany("Expences")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RF.WebApi.Api.Infrastructure.Data.Tables.PaymentAccount", null)
+                        .WithMany()
+                        .HasForeignKey("PaymentAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RF.WebApi.Api.Infrastructure.Data.Tables.BuyingBillItem", b =>

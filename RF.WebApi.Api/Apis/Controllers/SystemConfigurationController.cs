@@ -17,6 +17,7 @@ namespace RF.WebApi.Api.Apis.Controllers
             _configService = configService;
         }
 
+        [AllowAnonymous]
         [HttpGet()]
         public async Task<IActionResult> GetAll()
         {

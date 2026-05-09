@@ -7,6 +7,7 @@ namespace RF.WebApi.Api.Domain.Common
         public const string NotFound = "Business Expence not found";
         public const string ExpenceTypeRequired = "Expence Type is required";
         public const string DateRequired = "Date is required";
+        public const string TotalAmountRequired = "Total Amount is required";
 
         // Business Expence Payment
         public const string PaymentInvalidId = "Invalid Business Expence Payment Id";

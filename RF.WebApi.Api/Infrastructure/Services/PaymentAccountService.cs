@@ -92,9 +92,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // 2. Check Buying Bill Payments or Expenses
-                if (await _context.BuyingBillPayments.AnyAsync(p => p.PaymentAccountId == id) ||
-                    await _context.BuyingBillExpences.AnyAsync(e => e.PaymentAccountId == id))
+                // 2. Check Buying Bill Payments
+                if (await _context.BuyingBillPayments.AnyAsync(p => p.PaymentAccountId == id))
                 {
                     err.AddError(PaymentAccountMessages.InUseInBuyingBill);
                     return false;

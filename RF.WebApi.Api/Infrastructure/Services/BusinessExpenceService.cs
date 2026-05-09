@@ -46,6 +46,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var expense = await _context.BusinessExpences
                     .Include(e => e.Payments)
+                    .Include(e => e.BuyingBill)
+                        .ThenInclude(b => b != null ? b.Agency : null)
                     .FirstOrDefaultAsync(e => e.Id == id && e.AccountId == Token.AccountId);
 
                 if (expense == null)
@@ -54,7 +56,26 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return default;
                 }
 
-                return _mapper.Map<BusinessExpenceDto>(expense);
+                var dto = _mapper.Map<BusinessExpenceDto>(expense);
+                dto.AgencyName = expense.BuyingBill?.Agency?.AgencyName;
+
+                // Resolve payment account names
+                var accountIds = expense.Payments
+                    .Where(p => p.PaymentAccountId.HasValue)
+                    .Select(p => p.PaymentAccountId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var accounts = await _context.PaymentAccounts
+                    .Where(pa => accountIds.Contains(pa.Id!.Value))
+                    .ToDictionaryAsync(pa => pa.Id!.Value, pa => pa.MethodName ?? string.Empty);
+
+                foreach (var payment in dto.Payments)
+                {
+                    payment.PaymentAccountName = accounts.TryGetValue(payment.PaymentAccountId, out var name) ? name : string.Empty;
+                }
+
+                return dto;
             });
         }
 
@@ -63,7 +84,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             return ServiceResponse<bool>.Execute(async err =>
             {
                 var expense = await _context.BusinessExpences
-                    .Include(e => e.Payments) 
+                    .Include(e => e.Payments)
                     .FirstOrDefaultAsync(e => e.Id == dto.Id && e.AccountId == Token.AccountId);
 
                 if (expense == null)
@@ -72,9 +93,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // Sync scalar properties (Payments is ignored in Profile)
+                // Sync scalar properties (Payments and BuyingBillId are preserved as-is)
                 _mapper.Map(dto, expense);
-                
+
                 // Generic helper handles Add, Update, and Remove for collection safely
                 _context.SyncCollection(expense.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
 
@@ -122,15 +143,25 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 var (startDate, endDate) = dateRangeResponse.Data;
 
-                // Fetch Business Expences with included payments within this range
+                // 2. Fetch all expenses (both direct and buying-bill-linked) with Agency info
                 var expenses = await _context.BusinessExpences
                     .Include(e => e.Payments)
+                    .Include(e => e.BuyingBill)
+                        .ThenInclude(b => b != null ? b.Agency : null)
                     .Where(e => e.AccountId == accountId && e.Date >= startDate && e.Date <= endDate)
                     .OrderByDescending(e => e.Date)
                     .AsNoTracking()
                     .ToListAsync();
 
-                return _mapper.Map<List<BusinessExpenceListDto>>(expenses);
+                // 3. Map and resolve AgencyName manually
+                var result = expenses.Select(e =>
+                {
+                    var dto = _mapper.Map<BusinessExpenceListDto>(e);
+                    dto.AgencyName = e.BuyingBill?.Agency?.AgencyName;
+                    return dto;
+                }).ToList();
+
+                return result;
             });
         }
 

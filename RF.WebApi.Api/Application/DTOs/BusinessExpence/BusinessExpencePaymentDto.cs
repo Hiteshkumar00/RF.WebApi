@@ -6,5 +6,6 @@ namespace RF.WebApi.Api.Application.DTOs.BusinessExpence
         public decimal Amount { get; set; }
         public int BusinessExpenceId { get; set; }
         public int PaymentAccountId { get; set; }
+        public string? PaymentAccountName { get; set; }
     }
 }

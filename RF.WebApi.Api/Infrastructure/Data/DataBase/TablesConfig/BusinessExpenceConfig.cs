@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -17,7 +17,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .ValueGeneratedOnAdd();
 
             // 3. Foreign Key: AccountId (Integer, Not Null)
-            // Linked to Account as per the "SellingBill FK" requirement
             builder.Property(be => be.AccountId)
                    .IsRequired();
 
@@ -30,11 +29,26 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(be => be.ExpenceType)
                    .HasMaxLength(250);
 
-            // 5. Date (String, Not Null)
+            // 5. TotalAmount (Decimal, Not Null)
+            builder.Property(be => be.TotalAmount)
+                   .HasPrecision(18, 2)
+                   .IsRequired();
+
+            // 6. Date (Not Null)
             builder.Property(be => be.Date)
                    .IsRequired();
 
-            // 6. Navigation: Payments
+            // 6. BuyingBillId (Nullable FK) — links expense back to its source buying bill
+            builder.Property(be => be.BuyingBillId)
+                   .IsRequired(false);
+
+            builder.HasOne(be => be.BuyingBill)
+                   .WithMany(b => b.Expences)
+                   .HasForeignKey(be => be.BuyingBillId)
+                   .IsRequired(false)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            // 7. Navigation: Payments
             builder.HasMany(be => be.Payments)
                    .WithOne()
                    .HasForeignKey(p => p.BusinessExpenceId)

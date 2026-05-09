@@ -142,16 +142,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         .SelectMany(b => b.Items)
                         .SumAsync(i => (i.Quantity ?? 0) * (i.Price ?? 0));
 
-                    var totalExpences = await _context.BuyingBills
-                        .Where(b => b.AccountId == accountId && b.AgencyId == agency.Id)
-                        .SelectMany(b => b.Expences)
-                        .SumAsync(e => e.Amount ?? 0);
-
                     var totalDiscounts = await _context.BuyingBills
                         .Where(b => b.AccountId == accountId && b.AgencyId == agency.Id)
                         .SumAsync(b => b.Discount ?? 0);
 
-                    dto.TotalBillsAmount = totalItems + totalExpences - totalDiscounts;
+                    dto.TotalBillsAmount = totalItems - totalDiscounts;
 
                     // 2. Total Paid Amount
                     dto.TotalPaidAmount = await _context.BuyingBillPayments
@@ -160,6 +155,15 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                     // 3. Total Pending Amount
                     dto.TotalPendingAmount = dto.TotalBillsAmount - dto.TotalPaidAmount;
+
+                    // 4. Total Expense Amounts
+                    var expencesForAgency = _context.BusinessExpences
+                        .Where(e => e.AccountId == accountId && e.BuyingBillId != null && 
+                                    _context.BuyingBills.Any(b => b.Id == e.BuyingBillId && b.AgencyId == agency.Id));
+
+                    dto.TotalExpenceAmount = await expencesForAgency.SumAsync(e => e.TotalAmount ?? 0);
+                    dto.TotalExpencePaidAmount = await expencesForAgency.SelectMany(e => e.Payments).SumAsync(p => p.Amount ?? 0);
+                    dto.TotalExpencePendingAmount = dto.TotalExpenceAmount - dto.TotalExpencePaidAmount;
 
                     results.Add(dto);
                 }
@@ -191,22 +195,25 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .SelectMany(b => b.Items)
                     .SumAsync(i => (i.Quantity ?? 0) * (i.Price ?? 0));
 
-                var totalExpences = await _context.BuyingBills
-                    .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
-                    .SelectMany(b => b.Expences)
-                    .SumAsync(e => e.Amount ?? 0);
-
                 var totalDiscounts = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
                     .SumAsync(b => b.Discount ?? 0);
 
-                dto.TotalBillsAmount = totalItems + totalExpences - totalDiscounts;
+                dto.TotalBillsAmount = totalItems - totalDiscounts;
 
                 dto.TotalPaidAmount = await _context.BuyingBillPayments
                     .Where(p => p.BillId != null && _context.BuyingBills.Any(b => b.Id == p.BillId && b.AccountId == accountId && b.AgencyId == agencyId))
                     .SumAsync(p => p.Amount ?? 0);
 
                 dto.TotalPendingAmount = dto.TotalBillsAmount - dto.TotalPaidAmount;
+
+                var expencesForAgency = _context.BusinessExpences
+                    .Where(e => e.AccountId == accountId && e.BuyingBillId != null && 
+                                _context.BuyingBills.Any(b => b.Id == e.BuyingBillId && b.AgencyId == agency.Id));
+
+                dto.TotalExpenceAmount = await expencesForAgency.SumAsync(e => e.TotalAmount ?? 0);
+                dto.TotalExpencePaidAmount = await expencesForAgency.SelectMany(e => e.Payments).SumAsync(p => p.Amount ?? 0);
+                dto.TotalExpencePendingAmount = dto.TotalExpenceAmount - dto.TotalExpencePaidAmount;
 
 
                 // --- 2. List of Agency Persons ---
