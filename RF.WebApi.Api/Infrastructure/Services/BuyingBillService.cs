@@ -43,6 +43,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 _context.BuyingBills.Add(bill);
                 
+                foreach (var stock in bill.Stocks)
+                {
+                    stock.Date = bill.Date;
+                }
+
                 foreach (var payment in bill.Payments)
                 {
                     if (payment.Date == null) payment.Date = bill.Date;
@@ -87,7 +92,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
             return ServiceResponse<BuyingBillDto>.Execute(async err =>
             {
                 var bill = await _context.BuyingBills
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
+                        .ThenInclude(s => s.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
@@ -128,7 +134,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
             return ServiceResponse<bool>.Execute(async err =>
             {
                 var bill = await _context.BuyingBills
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
+                        .ThenInclude(s => s.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == dto.Id && b.AccountId == Token.AccountId);
 
@@ -138,12 +145,17 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // Sync scalar properties (Items, Payments are synced; Expences go to BusinessExpence)
+                // Sync scalar properties (Stocks, Payments are synced; Expences go to BusinessExpence)
                 _mapper.Map(dto, bill);
 
-                _context.SyncCollection(bill.Items, dto.Items, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+                _context.SyncCollection(bill.Stocks, dto.Stocks, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
                 _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
  
+                foreach (var stock in bill.Stocks)
+                {
+                    stock.Date = bill.Date;
+                }
+
                 foreach (var payment in bill.Payments)
                 {
                     if (payment.Date == null) payment.Date = bill.Date;
@@ -171,7 +183,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
             return ServiceResponse<bool>.Execute(async err =>
             {
                 var bill = await _context.BuyingBills
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
+                        .ThenInclude(s => s.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
@@ -193,7 +206,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     _context.BusinessExpences.Remove(exp);
                 }
 
-                _context.BuyingBillItems.RemoveRange(bill.Items);
+                _context.Stocks.RemoveRange(bill.Stocks);
                 _context.BuyingBillPayments.RemoveRange(bill.Payments);
                 _context.BuyingBills.Remove(bill);
 
@@ -220,7 +233,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 var bills = await _context.BuyingBills
                     .Include(b => b.Agency)
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
                     .Include(b => b.Payments)
                     .Include(b => b.Expences)
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
@@ -249,7 +262,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 var bills = await _context.BuyingBills
                     .Include(b => b.Agency)
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
                     .Include(b => b.Payments)
                     .Include(b => b.Expences)
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId && b.Date >= startDate && b.Date <= endDate)
@@ -267,10 +280,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var accountId = Token.AccountId;
 
-                var query = from bbi in _context.BuyingBillItems
-                            join bb in _context.BuyingBills on bbi.BillId equals bb.Id
-                            where bb.AccountId == accountId && !string.IsNullOrWhiteSpace(bbi.ItemName)
-                            select new { bbi.ItemName, bbi.Price, bb.Date, bbi.Id, bb.AgencyId };
+                var query = from s in _context.Stocks
+                            join bb in _context.BuyingBills on s.BuyingBillId equals bb.Id
+                            join p in _context.Products on s.ProductId equals p.Id
+                            where bb.AccountId == accountId
+                            select new { p.ProductName, s.PurchasePrice, bb.Date, s.Id, bb.AgencyId };
 
                 if (agencyId.HasValue)
                 {
@@ -280,12 +294,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var items = await query.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id).ToListAsync();
 
                 var suggestions = items
-                    .GroupBy(x => x.ItemName)
+                    .GroupBy(x => x.ProductName)
                     .Select(g => new BuyingBillItemSuggestionDto
                     {
                         ItemName = g.Key,
                         Count = g.Count(),
-                        Price = g.First().Price
+                        Price = g.First().PurchasePrice
                     })
                     .OrderByDescending(s => s.Count)
                     .ToList();
@@ -319,7 +333,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var bill = await _context.BuyingBills
                     .Include(b => b.Agency)
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
+                        .ThenInclude(s => s.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 

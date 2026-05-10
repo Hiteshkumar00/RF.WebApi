@@ -10,9 +10,8 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         public int AgencyId { get; set; }
         public string BillNo { get; set; } = string.Empty;
         public DateOnly Date { get; set; }
-        public decimal Discount { get; set; }
 
-        public List<BuyingBillItemDto> Items { get; set; } = new List<BuyingBillItemDto>();
+        public List<StockDto> Stocks { get; set; } = new List<StockDto>();
         public List<BuyingBillPaymentDto> Payments { get; set; } = new List<BuyingBillPaymentDto>();
         public List<BuyingBillExpenceDto> Expences { get; set; } = new List<BuyingBillExpenceDto>();
     }

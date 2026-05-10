@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
@@ -31,8 +31,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(s => s.Email)
                    .HasMaxLength(250);
 
-            builder.Property(s => s.Discount)
-                   .HasPrecision(18, 2); // Standard precision for decimal currency/discounts
 
             // 4. Foreign Key (Account FK)
             builder.Property(s => s.AccountId)

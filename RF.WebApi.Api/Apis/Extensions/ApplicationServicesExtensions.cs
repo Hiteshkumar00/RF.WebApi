@@ -26,6 +26,7 @@ namespace RF.WebApi.Api.Apis.Extensions
             services.AddHttpClient<IWhatsAppIntegrationService, WhatsAppIntegrationService>();
             services.AddScoped<IEmailIntegrationService, EmailIntegrationService>();
             services.AddScoped<ISystemConfigurationService, SystemConfigurationService>();
+            services.AddScoped<IProductService, ProductService>();
 
             return services;
         }

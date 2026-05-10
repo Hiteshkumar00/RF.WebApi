@@ -139,12 +139,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     // 1. Total Bills Amount (Items + Expences - Discounts for this specific agency)
                     var totalItems = await _context.BuyingBills
                         .Where(b => b.AccountId == accountId && b.AgencyId == agency.Id)
-                        .SelectMany(b => b.Items)
-                        .SumAsync(i => (i.Quantity ?? 0) * (i.Price ?? 0));
+                        .SelectMany(b => b.Stocks)
+                        .SumAsync(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0));
 
                     var totalDiscounts = await _context.BuyingBills
                         .Where(b => b.AccountId == accountId && b.AgencyId == agency.Id)
-                        .SumAsync(b => b.Discount ?? 0);
+                        .SelectMany(b => b.Stocks)
+                        .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
 
                     dto.TotalBillsAmount = totalItems - totalDiscounts;
 
@@ -192,12 +193,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // --- 1. Top Level Totals ---
                 var totalItems = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
-                    .SelectMany(b => b.Items)
-                    .SumAsync(i => (i.Quantity ?? 0) * (i.Price ?? 0));
+                    .SelectMany(b => b.Stocks)
+                    .SumAsync(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0));
 
                 var totalDiscounts = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
-                    .SumAsync(b => b.Discount ?? 0);
+                    .SelectMany(b => b.Stocks)
+                    .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
 
                 dto.TotalBillsAmount = totalItems - totalDiscounts;
 
@@ -234,7 +236,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // First, fetch the raw flattened bills to avoid N+1 querying in loops
                 var billsResult = await _context.BuyingBills
                     .Include(b => b.Agency)
-                    .Include(b => b.Items)
+                    .Include(b => b.Stocks)
                     .Include(b => b.Payments)
                     .Include(b => b.Expences)
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)

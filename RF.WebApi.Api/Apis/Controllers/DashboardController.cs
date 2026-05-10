@@ -36,5 +36,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _dashboardService.GetAllTimeDashboardMetricsAsync();
             return HandleResponse(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductProfitMetrics()
+        {
+            var result = await _dashboardService.GetProductProfitMetricsAsync();
+            return HandleResponse(result);
+        }
     }
 }
