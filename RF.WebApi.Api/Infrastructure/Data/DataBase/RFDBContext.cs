@@ -35,6 +35,7 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
         public DbSet<RemoveContributionPayment> RemoveContributionPayments { get; set; }
         public DbSet<UserSelectedYearMapping> UserSelectedYearMappings { get; set; }
         public DbSet<SystemConfiguration> SystemConfigurations { get; set; }
+        public DbSet<PaymentTransfer> PaymentTransfers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,6 +66,7 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
             modelBuilder.ApplyConfiguration(new RemoveContributionPaymentConfig());
             modelBuilder.ApplyConfiguration(new UserSelectedYearMappingConfig());
             modelBuilder.ApplyConfiguration(new SystemConfigurationConfig());
+            modelBuilder.ApplyConfiguration(new PaymentTransferConfig());
         }
     }
 }

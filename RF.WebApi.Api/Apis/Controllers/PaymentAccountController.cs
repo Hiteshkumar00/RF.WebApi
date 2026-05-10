@@ -58,5 +58,34 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _paymentAccountService.GetPaymentHistory(filter);
             return HandleResponse(result);
         }
+
+        // Payment Transfer
+        [HttpPost()]
+        public async Task<IActionResult> CreateTransfer(CreatePaymentTransferDto dto)
+        {
+            var result = await _paymentAccountService.CreatePaymentTransfer(dto);
+            return HandleResponse(result);
+        }
+
+        [HttpPut()]
+        public async Task<IActionResult> UpdateTransfer(UpdatePaymentTransferDto dto)
+        {
+            var result = await _paymentAccountService.UpdatePaymentTransfer(dto);
+            return HandleResponse(result);
+        }
+
+        [HttpDelete()]
+        public async Task<IActionResult> DeleteTransfer(int id)
+        {
+            var result = await _paymentAccountService.DeletePaymentTransfer(id);
+            return HandleResponse(result);
+        }
+
+        [HttpPost()]
+        public async Task<IActionResult> GetTransfers(PaymentTransferFilterDto filter)
+        {
+            var result = await _paymentAccountService.GetPaymentTransfers(filter);
+            return HandleResponse(result);
+        }
     }
 }

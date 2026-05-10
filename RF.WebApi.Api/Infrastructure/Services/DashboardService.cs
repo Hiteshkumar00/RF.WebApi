@@ -78,6 +78,20 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
+                // 6. Transfers OUT (money OUT)
+                var transfersOut = await _context.PaymentTransfers
+                    .Where(t => t.AccountId == accountId && t.FromPaymentAccountId != null)
+                    .GroupBy(t => t.FromPaymentAccountId)
+                    .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(t => t.Amount ?? 0) })
+                    .ToListAsync();
+
+                // 7. Transfers IN (money IN)
+                var transfersIn = await _context.PaymentTransfers
+                    .Where(t => t.AccountId == accountId && t.ToPaymentAccountId != null)
+                    .GroupBy(t => t.ToPaymentAccountId)
+                    .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(t => t.Amount ?? 0) })
+                    .ToListAsync();
+
                 var paymentAccounts = await _context.PaymentAccounts
                     .Where(pa => pa.AccountId == accountId)
                     .ToListAsync();
@@ -94,9 +108,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     var busExp    = businessExpences.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
                     var addCont   = addContributions.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
                     var remCont   = removeContributions.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
+                    var transOut  = transfersOut.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
+                    var transIn   = transfersIn.FirstOrDefault(x => x.PaymentAccountId == id)?.Amount ?? 0;
 
-                    // Formula: selling + addContrib - buyingPayments - allExpenses - removeContrib
-                    var balance = selling + addCont - buyingPay - busExp - remCont;
+                    // Formula: selling + addCont + transIn - buyingPay - busExp - remCont - transOut
+                    var balance = selling + addCont + transIn - buyingPay - busExp - remCont - transOut;
 
                     paymentAccountBalances.Add(new PaymentAccountBalanceDto
                     {
