@@ -16,9 +16,7 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         [Required(ErrorMessage = BuyingBillMessages.DateRequired)]
         public DateOnly Date { get; set; }
 
-        public decimal Discount { get; set; }
-
-        public List<CreateBuyingBillItemDto> Items { get; set; } = new List<CreateBuyingBillItemDto>();
+        public List<CreateStockDto> Stocks { get; set; } = new List<CreateStockDto>();
         public List<CreateBuyingBillPaymentDto> Payments { get; set; } = new List<CreateBuyingBillPaymentDto>();
         public List<CreateBuyingBillExpenceDto> Expences { get; set; } = new List<CreateBuyingBillExpenceDto>();
     }

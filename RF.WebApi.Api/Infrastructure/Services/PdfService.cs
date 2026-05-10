@@ -26,7 +26,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
         public byte[] GenerateSellingBillPdf(SellingBill bill, Account account)
         {
             var totalAmount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Price ?? 0));
-            var netAmount = totalAmount - (bill.Discount ?? 0);
+            var totalDiscount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
+            var netAmount = totalAmount - totalDiscount;
             var paidAmount = bill.Payments.Sum(x => x.Amount ?? 0);
             var remainingAmount = netAmount - paidAmount;
             var culture = GetCurrencyCulture(account.CurrencyType);
@@ -144,14 +145,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 table.Cell().Element(CellStyle).Text(index++.ToString());
                                     table.Cell().Element(CellStyle).Column(c =>
                                     {
-                                        c.Item().Text(item.ItemName).SemiBold();
+                                        c.Item().Text(item.Product?.ProductName ?? "Unknown Product").SemiBold();
                                         
-                                        if (item.Warrenty != null && (item.Warrenty?.Year > 0 || item.Warrenty?.Month > 0 || item.Warrenty?.Day > 0))
+                                        if (item.Product != null && ((item.Product.WarrantyYear ?? 0) > 0 || (item.Product.WarrantyMonth ?? 0) > 0 || (item.Product.WarrantyDay ?? 0) > 0))
                                         {
                                             var parts = new System.Collections.Generic.List<string>();
-                                            if ((item.Warrenty.Year ?? 0) > 0) parts.Add($"{item.Warrenty.Year} Year{(item.Warrenty.Year > 1 ? "s" : "")}");
-                                            if ((item.Warrenty.Month ?? 0) > 0) parts.Add($"{item.Warrenty.Month} Month{(item.Warrenty.Month > 1 ? "s" : "")}");
-                                            if ((item.Warrenty.Day ?? 0) > 0) parts.Add($"{item.Warrenty.Day} Day{(item.Warrenty.Day > 1 ? "s" : "")}");
+                                            if ((item.Product.WarrantyYear ?? 0) > 0) parts.Add($"{item.Product.WarrantyYear} Year{(item.Product.WarrantyYear > 1 ? "s" : "")}");
+                                            if ((item.Product.WarrantyMonth ?? 0) > 0) parts.Add($"{item.Product.WarrantyMonth} Month{(item.Product.WarrantyMonth > 1 ? "s" : "")}");
+                                            if ((item.Product.WarrantyDay ?? 0) > 0) parts.Add($"{item.Product.WarrantyDay} Day{(item.Product.WarrantyDay > 1 ? "s" : "")}");
 
                                             if (parts.Count > 0)
                                             {
@@ -161,7 +162,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                     });
                                 table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString());
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.Price ?? 0).ToString("C2", culture));
-                                table.Cell().Element(RowTotalStyle).AlignRight().Text(((item.Quantity ?? 0) * (item.Price ?? 0)).ToString("C2", culture));
+                                table.Cell().Element(RowTotalStyle).AlignRight().Text(((item.Quantity ?? 0) * ((item.Price ?? 0) - (item.Discount ?? 0))).ToString("C2", culture));
 
                                 static IContainer CellStyle(IContainer container) =>
                                     container.BorderBottom(1).BorderColor(Colors.Grey.Lighten3).PaddingVertical(8).PaddingHorizontal(5);
@@ -180,7 +181,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             row.ConstantItem(250).Background(Colors.Grey.Lighten4).Padding(10).Column(totals =>
                             {
                                 totals.Item().Row(r => { r.RelativeItem().Text(t => t.Span("Subtotal:")); r.ConstantItem(100).AlignRight().Text(t => t.Span(totalAmount.ToString("C2", culture))); });
-                                totals.Item().PaddingVertical(2).Row(r => { r.RelativeItem().Text(t => t.Span("Discount:").FontColor(Colors.Orange.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span($"- {(bill.Discount ?? 0).ToString("C2", culture)}").FontColor(Colors.Orange.Darken1)); });
+                                totals.Item().PaddingVertical(2).Row(r => { r.RelativeItem().Text(t => t.Span("Discount:").FontColor(Colors.Orange.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span($"- {totalDiscount.ToString("C2", culture)}").FontColor(Colors.Orange.Darken1)); });
                                 
                                 totals.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
                                 
@@ -218,9 +219,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
         public byte[] GenerateBuyingBillPdf(BuyingBill bill, Account account, IEnumerable<BusinessExpence> expences)
         {
             var expencesList = expences?.ToList() ?? new List<BusinessExpence>();
-            var totalAmount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Price ?? 0));
+            var totalAmount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.PurchasePrice ?? 0));
+            var totalDiscount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
             var totalExpence = expencesList.Sum(x => x.TotalAmount ?? 0);
-            var finalAmount = (totalAmount - (bill.Discount ?? 0));
+            var finalAmount = totalAmount - totalDiscount;
             var paidAmount = bill.Payments.Sum(x => x.Amount ?? 0);
             var remainingAmount = finalAmount - paidAmount;
             var culture = GetCurrencyCulture(account.CurrencyType);
@@ -329,13 +331,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                             // Table Rows
                             int index = 1;
-                            foreach (var item in bill.Items)
+                            foreach (var item in bill.Stocks)
                             {
                                 table.Cell().Element(CellStyle).Text(index++.ToString());
-                                table.Cell().Element(CellStyle).Text(item.ItemName).SemiBold();
+                                table.Cell().Element(CellStyle).Text(item.Product?.ProductName ?? "Unknown Product").SemiBold();
                                 table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString());
-                                table.Cell().Element(CellStyle).AlignRight().Text((item.Price ?? 0).ToString("C2", culture));
-                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Quantity ?? 0) * (item.Price ?? 0)).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text((item.PurchasePrice ?? 0).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Quantity ?? 0) * ((item.PurchasePrice ?? 0) - (item.Discount ?? 0))).ToString("C2", culture));
 
                                 static IContainer CellStyle(IContainer container) =>
                                     container.BorderBottom(1).BorderColor(Colors.Grey.Lighten3).PaddingVertical(8).PaddingHorizontal(5);
@@ -353,9 +355,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Sub Total:").SemiBold()); r.ConstantItem(100).AlignRight().Text(t => t.Span(totalAmount.ToString("C2", culture))); });
                                 
-                                if ((bill.Discount ?? 0) > 0)
+                                if (totalDiscount > 0)
                                 {
-                                    totals.Item().PaddingVertical(2).Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Discount:").FontColor(Colors.Orange.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span($"- {(bill.Discount ?? 0).ToString("C2", culture)}").FontColor(Colors.Orange.Darken1)); });
+                                    totals.Item().PaddingVertical(2).Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Discount:").FontColor(Colors.Orange.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span($"- {totalDiscount.ToString("C2", culture)}").FontColor(Colors.Orange.Darken1)); });
                                 }
                                 
                                 totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("FINAL AMOUNT:").SemiBold().FontSize(12).FontColor(Colors.BlueGrey.Darken2)); r.ConstantItem(100).AlignRight().Text(t => t.Span(finalAmount.ToString("C2", culture)).SemiBold().FontSize(12).FontColor(Colors.BlueGrey.Darken2)); });

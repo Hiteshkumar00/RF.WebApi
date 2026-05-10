@@ -45,15 +45,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 _context.SellingBills.Add(bill);
 
-                // Propagate Bill navigation to nested warranties and payments for EF to handle BillId
-                foreach (var item in bill.Items)
-                {
-                    if (item.Warrenty != null)
-                    {
-                        item.Warrenty.Bill = bill;
-                    }
-                }
-
                 foreach (var payment in bill.Payments)
                 {
                     payment.Bill = bill;
@@ -92,7 +83,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bill = await _context.SellingBills
                     .Include(b => b.Payments)
                     .Include(b => b.Items)
-                        .ThenInclude(i => i.Warrenty) // Must explicitly include the 1-to-1 child
+                        .ThenInclude(i => i.Product)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
@@ -112,7 +103,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bill = await _context.SellingBills
                     .Include(b => b.Payments)
                     .Include(b => b.Items)
-                        .ThenInclude(i => i.Warrenty) // Must explicitly include to track updates/deletes
+                        .ThenInclude(i => i.Product)
                     .FirstOrDefaultAsync(b => b.Id == dto.Id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
@@ -127,15 +118,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // Generic helper handles Add, Update, and Remove for collections safely
                 _context.SyncCollection(bill.Items, dto.Items, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
                 _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
-
-                // Propagate Bill navigation to newly added or updated warranties and payments
-                foreach (var item in bill.Items)
-                {
-                    if (item.Warrenty != null)
-                    {
-                        item.Warrenty.Bill = bill;
-                    }
-                }
 
                 foreach (var payment in bill.Payments)
                 {
@@ -155,22 +137,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bill = await _context.SellingBills
                      .Include(b => b.Payments)
                      .Include(b => b.Items)
-                        .ThenInclude(i => i.Warrenty) 
                      .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
                 {
                     err.AddError(SellingBillMessages.NotFound);
                     return false;
-                }
-
-                // Delete Items & their nested Warranties first
-                foreach (var item in bill.Items)
-                {
-                    if (item.Warrenty != null)
-                    {
-                        _context.SellingItemWarrenties.Remove(item.Warrenty);
-                    }
                 }
 
                 _context.SellingBillItems.RemoveRange(bill.Items);
@@ -199,7 +171,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 var bills = await _context.SellingBills
                     .Include(b => b.Payments)
-                    .Include(b => b.Items) // Warranties are not needed for List mathematical rollups
+                    .Include(b => b.Items)
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .OrderByDescending(b => b.Date)
                     .AsNoTracking()
@@ -218,14 +190,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // Fetch items with their names and prices, joined with bills to check AccountId and get latest date
                 var items = await (from sbi in _context.SellingBillItems
                                    join sb in _context.SellingBills on sbi.BillId equals sb.Id
-                                   where sb.AccountId == accountId && !string.IsNullOrWhiteSpace(sbi.ItemName)
+                                   where sb.AccountId == accountId && sbi.Product != null && !string.IsNullOrWhiteSpace(sbi.Product.ProductName)
                                    orderby sb.Date descending, sbi.Id descending
-                                   select new { sbi.ItemName, sbi.Price })
+                                   select new { sbi.Product.ProductName, sbi.Price })
                                   .ToListAsync();
 
                 // Group in-memory to get count and latest price
                 var suggestions = items
-                    .GroupBy(x => x.ItemName)
+                    .GroupBy(x => x.ProductName)
                     .Select(g => new SellingBillItemSuggestionDto
                     {
                         ItemName = g.Key,
@@ -245,7 +217,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var bill = await _context.SellingBills
                     .Include(b => b.Items)
-                        .ThenInclude(i => i.Warrenty)
+                        .ThenInclude(i => i.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
@@ -272,6 +244,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var bill = await _context.SellingBills
                     .Include(b => b.Items)
+                        .ThenInclude(i => i.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
@@ -311,6 +284,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             {
                 var bill = await _context.SellingBills
                     .Include(b => b.Items)
+                        .ThenInclude(i => i.Product)
                     .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 

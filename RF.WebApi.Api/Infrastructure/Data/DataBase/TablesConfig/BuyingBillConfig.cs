@@ -24,8 +24,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
             builder.Property(b => b.Date)
                    .IsRequired();
 
-            builder.Property(b => b.Discount)
-                   .HasPrecision(18, 2);
 
             // 4. Foreign Key: AccountId (Account FK)
             builder.Property(b => b.AccountId)
@@ -45,10 +43,10 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .HasForeignKey(b => b.AgencyId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // 6. Navigation: Items, Payments, Expences
-            builder.HasMany(b => b.Items)
-                   .WithOne()
-                   .HasForeignKey(i => i.BillId)
+            // 6. Navigation: Stocks, Payments, Expences
+            builder.HasMany(b => b.Stocks)
+                   .WithOne(s => s.BuyingBill)
+                   .HasForeignKey(s => s.BuyingBillId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(b => b.Payments)

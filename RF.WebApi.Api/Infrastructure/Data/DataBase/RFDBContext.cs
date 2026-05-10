@@ -19,11 +19,11 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
         public DbSet<SellingBill> SellingBills { get; set; }
         public DbSet<SellingBillPayment> SellingBillPayments { get; set; }
         public DbSet<SellingBillItem> SellingBillItems { get; set; }
-        public DbSet<SellingItemWarrenty> SellingItemWarrenties { get; set; }
         public DbSet<Agency> Agencies { get; set; }
         public DbSet<AgencyPerson> AgencyPersons { get; set; }
         public DbSet<BuyingBill> BuyingBills { get; set; }
-        public DbSet<BuyingBillItem> BuyingBillItems { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<BuyingBillPayment> BuyingBillPayments { get; set; }
         public DbSet<BusinessYear> BusinessYears { get; set; }
         public DbSet<AccountPerson> AccountPersons { get; set; }
@@ -49,11 +49,11 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
             modelBuilder.ApplyConfiguration(new SellingBillConfig());
             modelBuilder.ApplyConfiguration(new SellingBillPaymentConfig());
             modelBuilder.ApplyConfiguration(new SellingBillItemConfig());
-            modelBuilder.ApplyConfiguration(new SellingItemWarrentyConfig());
             modelBuilder.ApplyConfiguration(new AgencyConfig());
             modelBuilder.ApplyConfiguration(new AgencyPersonConfig());
             modelBuilder.ApplyConfiguration(new BuyingBillConfig());
-            modelBuilder.ApplyConfiguration(new BuyingBillItemConfig());
+            modelBuilder.ApplyConfiguration(new ProductConfig());
+            modelBuilder.ApplyConfiguration(new StockConfig());
             modelBuilder.ApplyConfiguration(new BuyingBillPaymentConfig());
             modelBuilder.ApplyConfiguration(new BusinessYearConfig());
             modelBuilder.ApplyConfiguration(new AccountPersonConfig());

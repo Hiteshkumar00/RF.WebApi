@@ -3,29 +3,35 @@ using RF.WebApi.Api.Domain.Common;
 
 namespace RF.WebApi.Api.Application.DTOs.BuyingBill
 {
-    // Buying Bill Item DTOs
-    public class BuyingBillItemDto
+    // Stock DTOs
+    public class StockDto
     {
         public int Id { get; set; }
-        public string ItemName { get; set; } = string.Empty;
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
         public int Quantity { get; set; }
-        public decimal Price { get; set; }
+        public decimal PurchasePrice { get; set; }
+        public decimal Discount { get; set; }
+        public DateOnly? Date { get; set; }
     }
 
-    public class CreateBuyingBillItemDto
+    public class CreateStockDto
     {
-        [Required(ErrorMessage = BuyingBillMessages.ItemNameRequired)]
-        [StringLength(250)]
-        public string ItemName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Product is required")]
+        public int ProductId { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = BuyingBillMessages.QuantityPositive)]
         public int Quantity { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = BuyingBillMessages.PricePositive)]
-        public decimal Price { get; set; }
+        public decimal PurchasePrice { get; set; }
+        
+        public decimal Discount { get; set; }
+        
+        public DateOnly? Date { get; set; }
     }
 
-    public class UpdateBuyingBillItemDto : CreateBuyingBillItemDto
+    public class UpdateStockDto : CreateStockDto
     {
         public int? Id { get; set; } // Null if added during update
     }

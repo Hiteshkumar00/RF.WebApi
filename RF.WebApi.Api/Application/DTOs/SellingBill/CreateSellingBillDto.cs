@@ -27,8 +27,6 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         [Required(ErrorMessage = SellingBillMessages.DateRequired)]
         public DateOnly Date { get; set; }
 
-        public decimal Discount { get; set; }
-
         // Nested Collections
         public List<CreateSellingBillItemDto> Items { get; set; } = new List<CreateSellingBillItemDto>();
         public List<CreateSellingBillPaymentDto> Payments { get; set; } = new List<CreateSellingBillPaymentDto>();

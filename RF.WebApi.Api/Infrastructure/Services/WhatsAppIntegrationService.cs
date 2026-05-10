@@ -79,7 +79,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // 3. Send Template Message with Document Header
                 var url = $"https://graph.facebook.com/v19.0/{account.WhatsAppPhoneNumberId}/messages";
                 
-                var totalAmount = (bill.Items?.Sum(i => (i.Price ?? 0) * (i.Quantity ?? 0)) ?? 0) - (bill.Discount ?? 0);
+                var totalAmount = bill.Items?.Sum(i => (i.Quantity ?? 0) * ((i.Price ?? 0) - (i.Discount ?? 0))) ?? 0;
                 var paidAmount = bill.Payments?.Sum(p => p.Amount ?? 0) ?? 0;
                 var remainingAmount = totalAmount - paidAmount;
                 var culture = GetCurrencyCulture(account.CurrencyType);

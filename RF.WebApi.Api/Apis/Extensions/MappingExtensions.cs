@@ -21,6 +21,7 @@ namespace RF.WebApi.Api.Apis.Extensions
                 cfg.AddProfile<EntityProfile>();
                 cfg.AddProfile<PaymentAccountProfile>();
                 cfg.AddProfile<SystemConfigurationProfile>();
+                cfg.AddProfile<ProductProfile>();
 
                 // Add more profiles here as you create them
             });
