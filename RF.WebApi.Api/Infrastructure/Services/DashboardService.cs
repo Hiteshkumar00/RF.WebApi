@@ -171,6 +171,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         TotalSellingAmount = metrics.TotalSellingAmount,
                         TotalBuyingAmount = metrics.TotalBuyingAmount,
                         TotalExpenceAmount = metrics.TotalExpenceAmount,
+                        GrossProfit = metrics.GrossProfit,
                         TotalProfit = metrics.TotalProfit,
                         SellingPendingAmount = metrics.SellingPendingAmount,
                         BuyingPendingAmount = metrics.BuyingPendingAmount,
