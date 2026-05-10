@@ -114,6 +114,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
+                // 5. Check Transfers
+                if (await _context.PaymentTransfers.AnyAsync(p => p.FromPaymentAccountId == id || p.ToPaymentAccountId == id))
+                {
+                    err.AddError(PaymentAccountMessages.InUseInTransfer);
+                    return false;
+                }
+
                 _context.PaymentAccounts.Remove(paymentAccount);
                 await _context.SaveChangesAsync();
 
@@ -294,7 +301,166 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                 }
 
+                // 6. Payment Transfers
+                var transfersQuery = _context.PaymentTransfers
+                    .Include(t => t.FromPaymentAccount)
+                    .Include(t => t.ToPaymentAccount)
+                    .Where(t => t.AccountId == accountId)
+                    .Where(t => filter.FromDate == null || t.Date >= filter.FromDate)
+                    .Where(t => filter.ToDate == null || t.Date <= filter.ToDate)
+                    .AsQueryable();
+
+                if (filter.PaymentAccountId != null)
+                {
+                    transfersQuery = transfersQuery.Where(t => t.FromPaymentAccountId == filter.PaymentAccountId || t.ToPaymentAccountId == filter.PaymentAccountId);
+                }
+
+                var transfers = await transfersQuery.ToListAsync();
+
+                foreach (var transfer in transfers)
+                {
+                    if (filter.PaymentAccountId == null || transfer.FromPaymentAccountId == filter.PaymentAccountId)
+                    {
+                        if (string.IsNullOrEmpty(filter.Direction) || filter.Direction == "Paid")
+                        {
+                            if (string.IsNullOrEmpty(filter.PaymentType) || filter.PaymentType == "Transfer")
+                            {
+                                history.Add(new PaymentHistoryDto
+                                {
+                                    Id = transfer.Id ?? 0,
+                                    PaymentAccountName = transfer.FromPaymentAccount?.MethodName ?? "",
+                                    Description = $"Transferred from {transfer.FromPaymentAccount?.MethodName} to {transfer.ToPaymentAccount?.MethodName}",
+                                    Direction = "Paid",
+                                    Amount = transfer.Amount ?? 0,
+                                    Date = transfer.Date ?? default,
+                                    PaymentType = "Transfer",
+                                });
+                            }
+                        }
+                    }
+
+                    if (filter.PaymentAccountId == null || transfer.ToPaymentAccountId == filter.PaymentAccountId)
+                    {
+                        if (string.IsNullOrEmpty(filter.Direction) || filter.Direction == "Received")
+                        {
+                            if (string.IsNullOrEmpty(filter.PaymentType) || filter.PaymentType == "Transfer")
+                            {
+                                history.Add(new PaymentHistoryDto
+                                {
+                                    Id = transfer.Id ?? 0,
+                                    PaymentAccountName = transfer.ToPaymentAccount?.MethodName ?? "",
+                                    Description = $"Transferred from {transfer.FromPaymentAccount?.MethodName} to {transfer.ToPaymentAccount?.MethodName}",
+                                    Direction = "Received",
+                                    Amount = transfer.Amount ?? 0,
+                                    Date = transfer.Date ?? default,
+                                    PaymentType = "Transfer",
+                                });
+                            }
+                        }
+                    }
+                }
+
                 return history.OrderByDescending(h => h.Date).ThenByDescending(h => h.Id).ToList();
+            });
+        }
+
+        public async Task<ServiceResponse<int>> CreatePaymentTransfer(CreatePaymentTransferDto dto)
+        {
+            return await ServiceResponse<int>.Execute(async err =>
+            {
+                var transfer = _mapper.Map<PaymentTransfer>(dto);
+                transfer.AccountId = Token.AccountId;
+
+                _context.PaymentTransfers.Add(transfer);
+                await _context.SaveChangesAsync();
+
+                return transfer.Id ?? default;
+            });
+        }
+
+        public async Task<ServiceResponse<bool>> UpdatePaymentTransfer(UpdatePaymentTransferDto dto)
+        {
+            return await ServiceResponse<bool>.Execute(async err =>
+            {
+                var transfer = await _context.PaymentTransfers
+                    .FirstOrDefaultAsync(t => t.Id == dto.Id && t.AccountId == Token.AccountId);
+
+                if (transfer == null)
+                {
+                    err.AddError("Transfer not found");
+                    return false;
+                }
+
+                _mapper.Map(dto, transfer);
+                await _context.SaveChangesAsync();
+
+                return true;
+            });
+        }
+
+        public async Task<ServiceResponse<bool>> DeletePaymentTransfer(int id)
+        {
+            return await ServiceResponse<bool>.Execute(async err =>
+            {
+                var transfer = await _context.PaymentTransfers
+                    .FirstOrDefaultAsync(t => t.Id == id && t.AccountId == Token.AccountId);
+
+                if (transfer == null)
+                {
+                    err.AddError("Transfer not found");
+                    return false;
+                }
+
+                _context.PaymentTransfers.Remove(transfer);
+                await _context.SaveChangesAsync();
+
+                return true;
+            });
+        }
+
+        public async Task<ServiceResponse<List<PaymentTransferDto>>> GetPaymentTransfers(PaymentTransferFilterDto filter)
+        {
+            return await ServiceResponse<List<PaymentTransferDto>>.Execute(async err =>
+            {
+                var query = _context.PaymentTransfers
+                    .Include(t => t.FromPaymentAccount)
+                    .Include(t => t.ToPaymentAccount)
+                    .Where(t => t.AccountId == Token.AccountId)
+                    .AsQueryable();
+
+                if (filter.FromPaymentAccountId != null)
+                    query = query.Where(t => t.FromPaymentAccountId == filter.FromPaymentAccountId);
+
+                if (filter.ToPaymentAccountId != null)
+                    query = query.Where(t => t.ToPaymentAccountId == filter.ToPaymentAccountId);
+
+                if (filter.FromDate != null)
+                    query = query.Where(t => t.Date >= filter.FromDate);
+
+                if (filter.ToDate != null)
+                    query = query.Where(t => t.Date <= filter.ToDate);
+
+                var transfers = await query.OrderByDescending(t => t.Date).ToListAsync();
+                return _mapper.Map<List<PaymentTransferDto>>(transfers);
+            });
+        }
+
+        public async Task<ServiceResponse<PaymentTransferDto>> GetTransferById(int id)
+        {
+            return await ServiceResponse<PaymentTransferDto>.Execute(async err =>
+            {
+                var transfer = await _context.PaymentTransfers
+                    .Include(t => t.FromPaymentAccount)
+                    .Include(t => t.ToPaymentAccount)
+                    .FirstOrDefaultAsync(t => t.Id == id && t.AccountId == Token.AccountId);
+
+                if (transfer == null)
+                {
+                    err.AddError("Transfer not found");
+                    return default;
+                }
+
+                return _mapper.Map<PaymentTransferDto>(transfer);
             });
         }
     }

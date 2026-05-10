@@ -13,5 +13,6 @@ namespace RF.WebApi.Api.Domain.Common
         public const string InUseInBuyingBill = "Cannot delete because it is used in buying bill payments or expenses";
         public const string InUseInExpense = "Cannot delete because it is used in business expense payments";
         public const string InUseInContribution = "Cannot delete because it is used in contribution payments";
+        public const string InUseInTransfer = "Cannot delete because it is used in payment transfers";
     }
 }

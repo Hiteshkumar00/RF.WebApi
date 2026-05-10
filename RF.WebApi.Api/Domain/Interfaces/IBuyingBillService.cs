@@ -14,5 +14,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<List<BuyingBillItemSuggestionDto>>> GetItemSuggestions(int? agencyId);
         Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions();
         Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id);
+        Task<ServiceResponse<bool>> UpdatePayments(int billId, List<BuyingBillPaymentDto> payments);
     }
 }

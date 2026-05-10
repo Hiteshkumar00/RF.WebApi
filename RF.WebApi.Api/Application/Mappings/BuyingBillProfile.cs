@@ -8,7 +8,12 @@ namespace RF.WebApi.Api.Application.Mappings
     {
         public BuyingBillProfile()
         {
-            CreateMap<BuyingBill, BuyingBillDto>();
+            CreateMap<BuyingBill, BuyingBillDto>()
+                .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Agency != null ? src.Agency.AgencyName : string.Empty))
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0))))
+                .ForMember(dest => dest.TotalExpence, opt => opt.MapFrom(src => src.Expences.Sum(e => e.TotalAmount ?? 0)))
+                .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src =>
+                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))));
             CreateMap<CreateBuyingBillDto, BuyingBill>()
                 .ForMember(dest => dest.Stocks, opt => opt.MapFrom(src => src.Stocks))
                 .ForMember(dest => dest.Expences, opt => opt.Ignore());
@@ -48,6 +53,7 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.Date, opt => opt.Ignore());
 
             CreateMap<BuyingBillPayment, BuyingBillPaymentDto>();
+            CreateMap<BuyingBillPaymentDto, BuyingBillPayment>();
             CreateMap<CreateBuyingBillPaymentDto, BuyingBillPayment>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.BillId, opt => opt.Ignore());

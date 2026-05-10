@@ -10,7 +10,11 @@ namespace RF.WebApi.Api.Application.Mappings
         public SellingBillProfile()
         {
             // Main Bill mappings
-            CreateMap<SellingBill, SellingBillDto>();
+            CreateMap<SellingBill, SellingBillDto>()
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0))))
+                .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src => 
+                    src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - src.Items.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))));
+            
             CreateMap<CreateSellingBillDto, SellingBill>();
             CreateMap<UpdateSellingBillDto, SellingBill>()
                 .ForMember(dest => dest.Items, opt => opt.Ignore())
@@ -40,6 +44,7 @@ namespace RF.WebApi.Api.Application.Mappings
 
             // Payment mappings
             CreateMap<SellingBillPayment, SellingBillPaymentDto>();
+            CreateMap<SellingBillPaymentDto, SellingBillPayment>();
             CreateMap<CreateSellingBillPaymentDto, SellingBillPayment>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.BillId, opt => opt.Ignore());

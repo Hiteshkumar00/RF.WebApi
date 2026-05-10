@@ -117,9 +117,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 columns.ConstantColumn(30);
                                 columns.RelativeColumn();
-                                columns.ConstantColumn(50);
-                                columns.ConstantColumn(80);
-                                columns.ConstantColumn(90);
+                                                                columns.ConstantColumn(35);
+                                columns.ConstantColumn(75);
+                                columns.ConstantColumn(65);
+                                columns.ConstantColumn(75);
+                                columns.ConstantColumn(85);
+                                
+                                
                             });
 
                             // Styled Header
@@ -129,6 +133,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 header.Cell().Element(HeaderStyle).Text("Item Description");
                                 header.Cell().Element(HeaderStyle).AlignCenter().Text("Qty");
                                 header.Cell().Element(HeaderStyle).AlignRight().Text("Unit Price");
+                                header.Cell().Element(HeaderStyle).AlignRight().Text("Discount");
+                                header.Cell().Element(HeaderStyle).AlignRight().Text("Net Price");
                                 header.Cell().Element(HeaderStyle).AlignRight().Text("Total");
 
                                 static IContainer HeaderStyle(IContainer container) =>
@@ -162,6 +168,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                     });
                                 table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString());
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.Price ?? 0).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text((item.Discount ?? 0).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Price ?? 0) - (item.Discount ?? 0)).ToString("C2", culture));
                                 table.Cell().Element(RowTotalStyle).AlignRight().Text(((item.Quantity ?? 0) * ((item.Price ?? 0) - (item.Discount ?? 0))).ToString("C2", culture));
 
                                 static IContainer CellStyle(IContainer container) =>
@@ -308,9 +316,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 columns.ConstantColumn(30);
                                 columns.RelativeColumn();
-                                columns.ConstantColumn(50);
-                                columns.ConstantColumn(80);
-                                columns.ConstantColumn(90);
+                                                                columns.ConstantColumn(35);
+                                columns.ConstantColumn(75);
+                                columns.ConstantColumn(65);
+                                columns.ConstantColumn(75);
+                                columns.ConstantColumn(85);
+                                
+                                
                             });
 
                             // Styled Header
@@ -320,6 +332,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 header.Cell().Element(HeaderStyle).Text("Item Description");
                                 header.Cell().Element(HeaderStyle).AlignCenter().Text("Qty");
                                 header.Cell().Element(HeaderStyle).AlignRight().Text("Unit Cost");
+                                header.Cell().Element(HeaderStyle).AlignRight().Text("Discount");
+                                header.Cell().Element(HeaderStyle).AlignRight().Text("Net Cost");
                                 header.Cell().Element(HeaderStyle).AlignRight().Text("Total");
 
                                 static IContainer HeaderStyle(IContainer container) =>
@@ -337,6 +351,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 table.Cell().Element(CellStyle).Text(item.Product?.ProductName ?? "Unknown Product").SemiBold();
                                 table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString());
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.PurchasePrice ?? 0).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text((item.Discount ?? 0).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text(((item.PurchasePrice ?? 0) - (item.Discount ?? 0)).ToString("C2", culture));
                                 table.Cell().Element(CellStyle).AlignRight().Text(((item.Quantity ?? 0) * ((item.PurchasePrice ?? 0) - (item.Discount ?? 0))).ToString("C2", culture));
 
                                 static IContainer CellStyle(IContainer container) =>

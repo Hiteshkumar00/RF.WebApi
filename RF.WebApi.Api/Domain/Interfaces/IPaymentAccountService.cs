@@ -11,5 +11,12 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> DeletePaymentAccount(int id);
         Task<ServiceResponse<List<PaymentAccountDto>>> GetAllPaymentAccounts();
         Task<ServiceResponse<List<PaymentHistoryDto>>> GetPaymentHistory(PaymentHistoryFilterDto filter);
+
+        // Payment Transfer
+        Task<ServiceResponse<int>> CreatePaymentTransfer(CreatePaymentTransferDto dto);
+        Task<ServiceResponse<bool>> UpdatePaymentTransfer(UpdatePaymentTransferDto dto);
+        Task<ServiceResponse<bool>> DeletePaymentTransfer(int id);
+        Task<ServiceResponse<List<PaymentTransferDto>>> GetPaymentTransfers(PaymentTransferFilterDto filter);
+        Task<ServiceResponse<PaymentTransferDto>> GetTransferById(int id);
     }
 }

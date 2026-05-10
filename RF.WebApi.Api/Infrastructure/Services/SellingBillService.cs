@@ -311,5 +311,32 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return true;
             });
         }
+
+        public Task<ServiceResponse<bool>> UpdatePayments(int billId, List<SellingBillPaymentDto> payments)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var bill = await _context.SellingBills
+                    .Include(b => b.Payments)
+                    .FirstOrDefaultAsync(b => b.Id == billId && b.AccountId == Token.AccountId);
+
+                if (bill == null)
+                {
+                    err.AddError(SellingBillMessages.NotFound);
+                    return false;
+                }
+
+                _context.SyncCollection(bill.Payments, payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+
+                foreach (var payment in bill.Payments)
+                {
+                    payment.Bill = bill;
+                    if (payment.Date == null) payment.Date = bill.Date;
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            });
+        }
     }
 }
