@@ -280,14 +280,16 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                 }
 
-                var totalProfit = totalSelling - totalCogs;
+                var grossProfit = totalSelling - totalCogs;
+                var netProfit = grossProfit - totalBusinessExpenceDeclared;
 
                 return new DashboardDto
                 {
                     TotalSellingAmount = totalSelling,
                     TotalBuyingAmount = totalBuying,
                     TotalExpenceAmount = totalBusinessExpenceDeclared,
-                    TotalProfit = totalProfit,
+                    GrossProfit = grossProfit,
+                    TotalProfit = netProfit,
                     SellingPendingAmount = totalSelling - totalSellingPaid,
                     BuyingPendingAmount = totalBuying - totalBuyingPaid,
                     ExpencePendingAmount = totalBusinessExpenceDeclared - totalBusinessExpencePaid
