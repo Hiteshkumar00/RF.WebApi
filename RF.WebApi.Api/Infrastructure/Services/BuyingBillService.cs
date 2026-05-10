@@ -361,6 +361,32 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
+        public Task<ServiceResponse<bool>> UpdatePayments(int billId, List<BuyingBillPaymentDto> payments)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var bill = await _context.BuyingBills
+                    .Include(b => b.Payments)
+                    .FirstOrDefaultAsync(b => b.Id == billId && b.AccountId == Token.AccountId);
+
+                if (bill == null)
+                {
+                    err.AddError(BuyingBillMessages.NotFound);
+                    return false;
+                }
+
+                _context.SyncCollection(bill.Payments, payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
+
+                foreach (var payment in bill.Payments)
+                {
+                    if (payment.Date == null) payment.Date = bill.Date;
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            });
+        }
+
         // ---------------------------------------------------------------------------
         // Private helpers
         // ---------------------------------------------------------------------------
