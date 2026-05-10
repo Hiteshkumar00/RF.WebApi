@@ -95,5 +95,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _sellingBillService.SendEmailMessage(id);
             return HandleResponse(result);
         }
+
+        [HttpPost("{billId}")]
+        public async Task<IActionResult> UpdatePayments(int billId, [FromBody] List<SellingBillPaymentDto> payments)
+        {
+            var result = await _sellingBillService.UpdatePayments(billId, payments);
+            return HandleResponse(result);
+        }
     }
 }

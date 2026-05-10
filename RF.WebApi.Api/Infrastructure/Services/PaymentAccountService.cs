@@ -444,5 +444,24 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return _mapper.Map<List<PaymentTransferDto>>(transfers);
             });
         }
+
+        public async Task<ServiceResponse<PaymentTransferDto>> GetTransferById(int id)
+        {
+            return await ServiceResponse<PaymentTransferDto>.Execute(async err =>
+            {
+                var transfer = await _context.PaymentTransfers
+                    .Include(t => t.FromPaymentAccount)
+                    .Include(t => t.ToPaymentAccount)
+                    .FirstOrDefaultAsync(t => t.Id == id && t.AccountId == Token.AccountId);
+
+                if (transfer == null)
+                {
+                    err.AddError("Transfer not found");
+                    return default;
+                }
+
+                return _mapper.Map<PaymentTransferDto>(transfer);
+            });
+        }
     }
 }

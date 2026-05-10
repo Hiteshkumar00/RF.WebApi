@@ -87,5 +87,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _paymentAccountService.GetPaymentTransfers(filter);
             return HandleResponse(result);
         }
+
+        [HttpGet()]
+        public async Task<IActionResult> GetTransferById(int id)
+        {
+            var result = await _paymentAccountService.GetTransferById(id);
+            return HandleResponse(result);
+        }
     }
 }

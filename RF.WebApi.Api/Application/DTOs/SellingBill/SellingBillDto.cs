@@ -17,5 +17,9 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         // Nested Collections
         public List<SellingBillItemDto> Items { get; set; } = new List<SellingBillItemDto>();
         public List<SellingBillPaymentDto> Payments { get; set; } = new List<SellingBillPaymentDto>();
+
+        // Rollups
+        public decimal TotalAmount { get; set; }
+        public decimal NetAmount { get; set; }
     }
 }
