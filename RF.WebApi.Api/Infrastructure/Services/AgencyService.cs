@@ -285,5 +285,61 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return dto;
             });
         }
+
+        public Task<ServiceResponse<bool>> PayOldestBillsAsync(PayAgencyOldestBillsDto dto)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var bills = await _context.BuyingBills
+                    .Include(b => b.Stocks)
+                    .Include(b => b.Payments)
+                    .Where(b => b.AccountId == accountId && b.AgencyId == dto.AgencyId)
+                    .OrderBy(b => b.Date)
+                    .ToListAsync();
+
+                var unpaidBills = bills.Select(b => 
+                {
+                    var totalAmount = b.Stocks.Sum(s => (s.Quantity ?? 0) * ((s.PurchasePrice ?? 0) - (s.Discount ?? 0)));
+                    var paidAmount = b.Payments.Sum(p => p.Amount ?? 0);
+                    return (Bill: b, Remaining: totalAmount - paidAmount);
+                }).Where(x => x.Remaining > 0).ToList();
+
+                foreach (var payment in dto.Payments)
+                {
+                    decimal remainingToPay = payment.Amount;
+
+                    for (int i = 0; i < unpaidBills.Count; i++)
+                    {
+                        if (remainingToPay <= 0) break;
+
+                        var item = unpaidBills[i];
+                        if (item.Remaining <= 0) continue;
+
+                        decimal paymentForThisBill = Math.Min(item.Remaining, remainingToPay);
+                        
+                        item.Bill.Payments.Add(new BuyingBillPayment
+                        {
+                            Amount = paymentForThisBill,
+                            PaymentAccountId = payment.PaymentAccountId,
+                            Date = payment.Date
+                        });
+
+                        remainingToPay -= paymentForThisBill;
+                        unpaidBills[i] = (item.Bill, item.Remaining - paymentForThisBill);
+                    }
+
+                    if (remainingToPay > 0)
+                    {
+                        err.AddError("Payment amounts exceed the total pending bills amount.");
+                        return false;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            });
+        }
     }
 }

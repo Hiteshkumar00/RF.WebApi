@@ -65,5 +65,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _agencyService.GetAgencyAllDetailAsync(agencyId);
             return HandleResponse(result);
         }
+
+        [HttpPost()]
+        public async Task<IActionResult> PayOldestBills(PayAgencyOldestBillsDto dto)
+        {
+            var result = await _agencyService.PayOldestBillsAsync(dto);
+            return HandleResponse(result);
+        }
     }
 }
