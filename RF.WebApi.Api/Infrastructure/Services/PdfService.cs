@@ -115,7 +115,15 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 c.Item().Text(t => t.Span("BILLED TO:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2));
                                 c.Item().Text(t => t.Span(bill.CustomerName).FontSize(12).Bold());
-                                c.Item().Text($"Phone: {bill.PhoneNo}");
+                                
+                                if (!string.IsNullOrWhiteSpace(bill.Address))
+                                    c.Item().PaddingTop(2).Text(bill.Address).FontSize(9);
+                                    
+                                if (!string.IsNullOrWhiteSpace(bill.PhoneNo))
+                                    c.Item().Text($"Phone: {bill.PhoneNo}").FontSize(9);
+                                    
+                                if (!string.IsNullOrWhiteSpace(bill.Email))
+                                    c.Item().Text($"Email: {bill.Email}").FontSize(9);
                             });
                         });
 
