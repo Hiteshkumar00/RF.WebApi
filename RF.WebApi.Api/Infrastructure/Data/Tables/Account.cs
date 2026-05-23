@@ -16,6 +16,7 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         
         public bool EnableSuggestions { get; set; }
         public bool EnableVoiceTyping { get; set; }
+        public bool ShowStatistics { get; set; }
 
         public string? WhatsAppNumber { get; set; }
         public bool EnableWhatsApp { get; set; }
