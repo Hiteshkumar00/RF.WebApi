@@ -357,7 +357,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return default;
                 }
 
-                return _pdfService.GenerateBuyingBillPdf(bill, account, expences);
+                return await _pdfService.GenerateBuyingBillPdf(bill, account, expences);
             });
         }
 

@@ -7,6 +7,9 @@ using RF.WebApi.Api.Infrastructure.Data.Tables;
 using System.Collections.Generic;
 using System.Linq;
 
+using System.Threading.Tasks;
+using System.Net.Http;
+
 namespace RF.WebApi.Api.Infrastructure.Services
 {
     public class PdfService : IPdfService
@@ -23,8 +26,19 @@ namespace RF.WebApi.Api.Infrastructure.Services
             }
         }
 
-        public byte[] GenerateSellingBillPdf(SellingBill bill, Account account)
+        public async Task<byte[]> GenerateSellingBillPdf(SellingBill bill, Account account)
         {
+            byte[] logoBytes = null;
+            if (!string.IsNullOrWhiteSpace(account.ProfileLogoLink))
+            {
+                try
+                {
+                    using var client = new HttpClient();
+                    logoBytes = await client.GetByteArrayAsync(account.ProfileLogoLink);
+                }
+                catch { }
+            }
+
             var totalAmount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Price ?? 0));
             var totalDiscount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
             var netAmount = totalAmount - totalDiscount;
@@ -47,11 +61,21 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Company Details
                         row.RelativeItem().Column((ColumnDescriptor col) =>
                         {
-                            col.Item().Text(t => t.Span(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.Blue.Medium));
-                            
-                            if (!string.IsNullOrEmpty(account.Title))
-                                col.Item().Text(t => t.Span(account.Title).FontSize(10).FontColor(Colors.Grey.Medium));
-                            
+                            col.Item().Row(logoRow => 
+                            {
+                                if (logoBytes != null)
+                                {
+                                    logoRow.ConstantItem(60).PaddingRight(10).Image(logoBytes);
+                                }
+                                logoRow.RelativeItem().AlignMiddle().Column(innerCol => 
+                                {
+                                    innerCol.Item().Text(t => t.Span(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.Blue.Medium));
+                                    
+                                    if (!string.IsNullOrEmpty(account.Title))
+                                        innerCol.Item().Text(t => t.Span(account.Title).FontSize(10).FontColor(Colors.Grey.Medium));
+                                });
+                            });
+
                             if (!string.IsNullOrEmpty(account.Address))
                                 col.Item().PaddingTop(5).Text(t => t.Span(account.Address).FontSize(9));
                             
@@ -69,10 +93,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Invoice Meta Details
                         row.ConstantItem(180).AlignRight().Column(col =>
                         {
-                            col.Item().Text(t => t.Span("TAX INVOICE").FontSize(18).ExtraBold().FontColor(Colors.BlueGrey.Darken2));
                             col.Item().PaddingTop(5).Text(text =>
                             {
-                                text.Span("Invoice No: ").SemiBold();
+                                text.Span("Bill No: ").SemiBold();
                                 text.Span(bill.BillNo);
                             });
                             col.Item().Text(text =>
@@ -86,7 +109,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     // 2. CONTENT
                     page.Content().Column(col =>
                     {
-                        // Customer & Status Information
+                        // Customer Information
                         col.Item().PaddingBottom(15).Row(row =>
                         {
                             // Billed To Box
@@ -95,18 +118,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 c.Item().Text(t => t.Span("BILLED TO:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2));
                                 c.Item().Text(t => t.Span(bill.CustomerName).FontSize(12).Bold());
                                 c.Item().Text($"Phone: {bill.PhoneNo}");
-                            });
-
-                            row.ConstantItem(20); // Spacer
-
-                            // Status Box
-                            row.RelativeItem().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(10).Column(c =>
-                            {
-                                c.Item().Text(t => t.Span("PAYMENT STATUS:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2));
-                                if (remainingAmount <= 0)
-                                    c.Item().Text(t => t.Span("PAID").FontSize(16).ExtraBold().FontColor(Colors.Green.Medium));
-                                else
-                                    c.Item().Text(t => t.Span("DUE").FontSize(16).ExtraBold().FontColor(Colors.Red.Medium));
                             });
                         });
 
@@ -224,8 +235,19 @@ namespace RF.WebApi.Api.Infrastructure.Services
             }).GeneratePdf();
         }
 
-        public byte[] GenerateBuyingBillPdf(BuyingBill bill, Account account, IEnumerable<BusinessExpence> expences)
+        public async Task<byte[]> GenerateBuyingBillPdf(BuyingBill bill, Account account, IEnumerable<BusinessExpence> expences)
         {
+            byte[] logoBytes = null;
+            if (!string.IsNullOrWhiteSpace(account.ProfileLogoLink))
+            {
+                try
+                {
+                    using var client = new HttpClient();
+                    logoBytes = await client.GetByteArrayAsync(account.ProfileLogoLink);
+                }
+                catch { }
+            }
+
             var expencesList = expences?.ToList() ?? new List<BusinessExpence>();
             var totalAmount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.PurchasePrice ?? 0));
             var totalDiscount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
@@ -250,11 +272,21 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         // Account / Internal Details
                         row.RelativeItem().Column((ColumnDescriptor col) =>
                         {
-                            col.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.Blue.Medium);
-                            
-                            if (!string.IsNullOrEmpty(account.Title))
-                                col.Item().Text(account.Title).FontSize(10).FontColor(Colors.Grey.Medium);
-                            
+                            col.Item().Row(logoRow => 
+                            {
+                                if (logoBytes != null)
+                                {
+                                    logoRow.ConstantItem(60).PaddingRight(10).Image(logoBytes);
+                                }
+                                logoRow.RelativeItem().AlignMiddle().Column(innerCol => 
+                                {
+                                    innerCol.Item().Text(account.ProfileName).FontSize(22).ExtraBold().FontColor(Colors.Blue.Medium);
+                                    
+                                    if (!string.IsNullOrEmpty(account.Title))
+                                        innerCol.Item().Text(account.Title).FontSize(10).FontColor(Colors.Grey.Medium);
+                                });
+                            });
+
                             if (!string.IsNullOrEmpty(account.Address))
                                 col.Item().PaddingTop(5).Text(account.Address).FontSize(9);
                             
