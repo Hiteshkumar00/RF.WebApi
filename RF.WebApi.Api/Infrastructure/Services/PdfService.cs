@@ -134,7 +134,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 columns.ConstantColumn(30);
                                 columns.RelativeColumn();
-                                                                columns.ConstantColumn(35);
+                                columns.ConstantColumn(35);
                                 columns.ConstantColumn(75);
                                 columns.ConstantColumn(65);
                                 columns.ConstantColumn(75);
@@ -352,7 +352,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 columns.ConstantColumn(30);
                                 columns.RelativeColumn();
-                                                                columns.ConstantColumn(35);
+                                columns.ConstantColumn(35);
                                 columns.ConstantColumn(75);
                                 columns.ConstantColumn(65);
                                 columns.ConstantColumn(75);
