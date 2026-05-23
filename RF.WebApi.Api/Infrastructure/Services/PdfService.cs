@@ -39,6 +39,17 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 catch { }
             }
 
+            byte[] signatureBytes = null;
+            if (!string.IsNullOrWhiteSpace(account.SignatureLink))
+            {
+                try
+                {
+                    using var client = new HttpClient();
+                    signatureBytes = await client.GetByteArrayAsync(account.SignatureLink);
+                }
+                catch { }
+            }
+
             var totalAmount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Price ?? 0));
             var totalDiscount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
             var netAmount = totalAmount - totalDiscount;
@@ -225,6 +236,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             row.RelativeItem(); // Spacer
                             row.ConstantItem(150).AlignRight().Column(c =>
                             {
+                                if (signatureBytes != null)
+                                {
+                                    c.Item().Height(40).AlignCenter().Image(signatureBytes);
+                                }
                                 c.Item().LineHorizontal(1).LineColor(Colors.Black);
                                 c.Item().AlignCenter().Text("Authorized Signatory").FontSize(9).SemiBold();
                             });
@@ -250,6 +265,17 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 {
                     using var client = new HttpClient();
                     logoBytes = await client.GetByteArrayAsync(account.ProfileLogoLink);
+                }
+                catch { }
+            }
+
+            byte[] signatureBytes = null;
+            if (!string.IsNullOrWhiteSpace(account.SignatureLink))
+            {
+                try
+                {
+                    using var client = new HttpClient();
+                    signatureBytes = await client.GetByteArrayAsync(account.SignatureLink);
                 }
                 catch { }
             }
@@ -511,6 +537,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             });
                             row.ConstantItem(150).AlignRight().Column(c =>
                             {
+                                if (signatureBytes != null)
+                                {
+                                    c.Item().Height(40).AlignCenter().Image(signatureBytes);
+                                }
                                 c.Item().LineHorizontal(1).LineColor(Colors.Black);
                                 c.Item().AlignCenter().Text("Authorized Signatory").FontSize(9).SemiBold();
                             });
