@@ -79,12 +79,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             if (!string.IsNullOrEmpty(account.Address))
                                 col.Item().PaddingTop(5).Text(t => t.Span(account.Address).FontSize(9));
                             
-                            var contactParts = new List<string>();
-                            if (!string.IsNullOrEmpty(account.Phone)) contactParts.Add($"Phone: {account.Phone}");
-                            if (!string.IsNullOrEmpty(account.Email)) contactParts.Add($"Email: {account.Email}");
-                            
-                            if (contactParts.Any())
-                                col.Item().Text(t => t.Span(string.Join(" | ", contactParts)).FontSize(9));
+                            if (!string.IsNullOrEmpty(account.Phone))
+                                col.Item().Text(t => t.Span($"Phone: {account.Phone}").FontSize(9));
+                            if (!string.IsNullOrEmpty(account.Email))
+                                col.Item().Text(t => t.Span($"Email: {account.Email}").FontSize(9));
  
                             if (!string.IsNullOrEmpty(account.GSTIN))
                                 col.Item().Text(t => t.Span($"GSTIN: {account.GSTIN}").FontSize(9).SemiBold());
@@ -290,12 +288,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             if (!string.IsNullOrEmpty(account.Address))
                                 col.Item().PaddingTop(5).Text(account.Address).FontSize(9);
                             
-                            var contactParts = new List<string>();
-                            if (!string.IsNullOrEmpty(account.Phone)) contactParts.Add($"Phone: {account.Phone}");
-                            if (!string.IsNullOrEmpty(account.Email)) contactParts.Add($"Email: {account.Email}");
-                            
-                            if (contactParts.Any())
-                                col.Item().Text(string.Join(" | ", contactParts)).FontSize(9);
+                            if (!string.IsNullOrEmpty(account.Phone))
+                                col.Item().Text($"Phone: {account.Phone}").FontSize(9);
+                            if (!string.IsNullOrEmpty(account.Email))
+                                col.Item().Text($"Email: {account.Email}").FontSize(9);
                         });
 
                         // Document Meta Details
