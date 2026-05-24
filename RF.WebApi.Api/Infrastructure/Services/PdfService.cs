@@ -238,9 +238,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 if (signatureBytes != null)
                                 {
-                                    c.Item().Height(40).AlignCenter().Image(signatureBytes);
+                                    c.Item().Height(30).AlignCenter().Image(signatureBytes).FitArea();
                                 }
-                                c.Item().LineHorizontal(1).LineColor(Colors.Black);
+                                c.Item().PaddingTop(5).LineHorizontal(1).LineColor(Colors.Black);
                                 c.Item().AlignCenter().Text("Authorized Signatory").FontSize(9).SemiBold();
                             });
                         });
@@ -539,9 +539,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 if (signatureBytes != null)
                                 {
-                                    c.Item().Height(40).AlignCenter().Image(signatureBytes);
+                                    c.Item().Height(30).AlignCenter().Image(signatureBytes).FitArea();
                                 }
-                                c.Item().LineHorizontal(1).LineColor(Colors.Black);
+                                c.Item().PaddingTop(5).LineHorizontal(1).LineColor(Colors.Black);
                                 c.Item().AlignCenter().Text("Authorized Signatory").FontSize(9).SemiBold();
                             });
                         });
