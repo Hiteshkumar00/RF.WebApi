@@ -181,36 +181,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<SellingBillItemSuggestionDto>>> GetItemSuggestions()
-        {
-            return ServiceResponse<List<SellingBillItemSuggestionDto>>.Execute(async err =>
-            {
-                var accountId = Token.AccountId;
-
-                // Fetch items with their names and prices, joined with bills to check AccountId and get latest date
-                var items = await (from sbi in _context.SellingBillItems
-                                   join sb in _context.SellingBills on sbi.BillId equals sb.Id
-                                   where sb.AccountId == accountId && sbi.Product != null && !string.IsNullOrWhiteSpace(sbi.Product.ProductName)
-                                   orderby sb.Date descending, sbi.Id descending
-                                   select new { sbi.Product.ProductName, sbi.Price })
-                                  .ToListAsync();
-
-                // Group in-memory to get count and latest price
-                var suggestions = items
-                    .GroupBy(x => x.ProductName)
-                    .Select(g => new SellingBillItemSuggestionDto
-                    {
-                        ItemName = g.Key,
-                        Count = g.Count(),
-                        Price = g.First().Price
-                    })
-                    .OrderByDescending(s => s.Count) // Show most popular first
-                    .ToList();
-
-                return suggestions;
-            });
-        }
-
         public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)
         {
             return ServiceResponse<byte[]>.Execute(async err =>
