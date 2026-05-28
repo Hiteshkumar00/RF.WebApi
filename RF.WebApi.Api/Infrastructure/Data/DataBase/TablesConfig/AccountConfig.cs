@@ -23,6 +23,10 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
 
             builder.Property(a => a.ProfileLogoLink)
                    .IsRequired(false);
+
+            builder.Property(a => a.SignatureLink)
+                   .HasMaxLength(500)
+                   .IsRequired(false);
             
             builder.Property(a => a.Title)
                    .HasMaxLength(250)

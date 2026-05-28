@@ -1,10 +1,12 @@
 using RF.WebApi.Api.Infrastructure.Data.Tables;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RF.WebApi.Api.Domain.Interfaces
 {
     public interface IPdfService
     {
-        byte[] GenerateSellingBillPdf(SellingBill bill, Account account);
-        byte[] GenerateBuyingBillPdf(BuyingBill bill, Account account, IEnumerable<BusinessExpence> expences);
+        Task<byte[]> GenerateSellingBillPdf(SellingBill bill, Account account);
+        Task<byte[]> GenerateBuyingBillPdf(BuyingBill bill, Account account, IEnumerable<BusinessExpence> expences);
     }
 }

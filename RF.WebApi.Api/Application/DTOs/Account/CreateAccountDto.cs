@@ -10,6 +10,7 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public string ProfileName { get; set; } = string.Empty;
 
         public string? ProfileLogoLink { get; set; }
+        public string? SignatureLink { get; set; }
         public string? Title { get; set; }
         public string? Address { get; set; }
         public string? Phone { get; set; }
@@ -20,6 +21,7 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public string? ShortDateFormat { get; set; }
         public bool EnableSuggestions { get; set; }
         public bool EnableVoiceTyping { get; set; }
+        public bool ShowStatistics { get; set; }
         public string? WhatsAppNumber { get; set; }
         public bool EnableWhatsApp { get; set; }
         public bool EnableAdvancedWhatsApp { get; set; }

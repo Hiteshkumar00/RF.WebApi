@@ -12,5 +12,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<List<AgencyDto>>> GetAllAgencies();
         Task<ServiceResponse<List<AgencyAdvancedListDto>>> GetAllAgencysAdvancedAsync();
         Task<ServiceResponse<ViewAgencyAllDetailDto>> GetAgencyAllDetailAsync(int agencyId);
+        Task<ServiceResponse<bool>> PayOldestBillsAsync(PayAgencyOldestBillsDto dto);
     }
 }

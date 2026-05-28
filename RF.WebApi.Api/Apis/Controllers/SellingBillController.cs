@@ -53,12 +53,7 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetItemSuggestions()
-        {
-            var result = await _sellingBillService.GetItemSuggestions();
-            return HandleResponse(result);
-        }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> DownloadInvoice(int id)

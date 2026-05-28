@@ -65,12 +65,7 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
-        [HttpGet()]
-        public async Task<IActionResult> GetItemSuggestions(int? agencyId)
-        {
-            var result = await _buyingBillService.GetItemSuggestions(agencyId);
-            return HandleResponse(result);
-        }
+
 
         [HttpGet()]
         public async Task<IActionResult> GetExpenceTypeSuggestions()

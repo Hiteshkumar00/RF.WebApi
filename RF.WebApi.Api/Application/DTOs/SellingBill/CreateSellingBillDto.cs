@@ -17,9 +17,8 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         [StringLength(250)]
         public string? Email { get; set; }
 
-        [Required(ErrorMessage = SellingBillMessages.PhoneNoRequired)]
         [StringLength(20)]
-        public string PhoneNo { get; set; } = string.Empty;
+        public string? PhoneNo { get; set; }
 
         [StringLength(500)]
         public string? Address { get; set; }

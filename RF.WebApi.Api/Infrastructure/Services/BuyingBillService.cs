@@ -274,40 +274,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<BuyingBillItemSuggestionDto>>> GetItemSuggestions(int? agencyId)
-        {
-            return ServiceResponse<List<BuyingBillItemSuggestionDto>>.Execute(async err =>
-            {
-                var accountId = Token.AccountId;
-
-                var query = from s in _context.Stocks
-                            join bb in _context.BuyingBills on s.BuyingBillId equals bb.Id
-                            join p in _context.Products on s.ProductId equals p.Id
-                            where bb.AccountId == accountId
-                            select new { p.ProductName, s.PurchasePrice, bb.Date, s.Id, bb.AgencyId };
-
-                if (agencyId.HasValue)
-                {
-                    query = query.Where(x => x.AgencyId == agencyId.Value);
-                }
-
-                var items = await query.OrderByDescending(x => x.Date).ThenByDescending(x => x.Id).ToListAsync();
-
-                var suggestions = items
-                    .GroupBy(x => x.ProductName)
-                    .Select(g => new BuyingBillItemSuggestionDto
-                    {
-                        ItemName = g.Key,
-                        Count = g.Count(),
-                        Price = g.First().PurchasePrice
-                    })
-                    .OrderByDescending(s => s.Count)
-                    .ToList();
-
-                return suggestions;
-            });
-        }
-
         public Task<ServiceResponse<List<string>>> GetExpenceTypeSuggestions()
         {
             return ServiceResponse<List<string>>.Execute(async err =>
@@ -357,7 +323,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return default;
                 }
 
-                return _pdfService.GenerateBuyingBillPdf(bill, account, expences);
+                return await _pdfService.GenerateBuyingBillPdf(bill, account, expences);
             });
         }
 
