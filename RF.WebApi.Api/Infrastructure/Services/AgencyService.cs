@@ -150,9 +150,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     dto.TotalBillsAmount = totalItems - totalDiscounts;
 
                     // 2. Total Paid Amount
-                    dto.TotalPaidAmount = await _context.BuyingBillPayments
-                        .Where(p => p.BillId != null && _context.BuyingBills.Any(b => b.Id == p.BillId && b.AccountId == accountId && b.AgencyId == agency.Id))
-                        .SumAsync(p => p.Amount ?? 0);
+                    dto.TotalPaidAmount = await _context.AgencyPaymentTransactions
+                        .Where(pt => _context.AgencyPayments.Any(ap => ap.Id == pt.AgencyPaymentId && ap.AccountId == accountId && ap.AgencyId == agency.Id))
+                        .SumAsync(pt => pt.Amount ?? 0);
 
                     // 3. Total Pending Amount
                     dto.TotalPendingAmount = dto.TotalBillsAmount - dto.TotalPaidAmount;
@@ -203,9 +203,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 dto.TotalBillsAmount = totalItems - totalDiscounts;
 
-                dto.TotalPaidAmount = await _context.BuyingBillPayments
-                    .Where(p => p.BillId != null && _context.BuyingBills.Any(b => b.Id == p.BillId && b.AccountId == accountId && b.AgencyId == agencyId))
-                    .SumAsync(p => p.Amount ?? 0);
+                dto.TotalPaidAmount = await _context.AgencyPaymentTransactions
+                    .Where(pt => _context.AgencyPayments.Any(ap => ap.Id == pt.AgencyPaymentId && ap.AccountId == accountId && ap.AgencyId == agencyId))
+                    .SumAsync(pt => pt.Amount ?? 0);
 
                 dto.TotalPendingAmount = dto.TotalBillsAmount - dto.TotalPaidAmount;
 
@@ -237,7 +237,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var billsResult = await _context.BuyingBills
                     .Include(b => b.Agency)
                     .Include(b => b.Stocks)
-                    .Include(b => b.Payments)
                     .Include(b => b.Expences)
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
                     .OrderByDescending(b => b.Date)
@@ -286,60 +285,51 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<bool>> PayOldestBillsAsync(PayAgencyOldestBillsDto dto)
+        public Task<ServiceResponse<AgencySummaryDto>> GetAgencySummaryAsync(int agencyId)
         {
-            return ServiceResponse<bool>.Execute(async err =>
+            return ServiceResponse<AgencySummaryDto>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
 
-                var bills = await _context.BuyingBills
-                    .Include(b => b.Stocks)
-                    .Include(b => b.Payments)
-                    .Where(b => b.AccountId == accountId && b.AgencyId == dto.AgencyId)
-                    .OrderBy(b => b.Date)
-                    .ToListAsync();
+                var agency = await _context.Agencies
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.Id == agencyId && a.AccountId == accountId);
 
-                var unpaidBills = bills.Select(b => 
+                if (agency == null)
                 {
-                    var totalAmount = b.Stocks.Sum(s => (s.Quantity ?? 0) * ((s.PurchasePrice ?? 0) - (s.Discount ?? 0)));
-                    var paidAmount = b.Payments.Sum(p => p.Amount ?? 0);
-                    return (Bill: b, Remaining: totalAmount - paidAmount);
-                }).Where(x => x.Remaining > 0).ToList();
-
-                foreach (var payment in dto.Payments)
-                {
-                    decimal remainingToPay = payment.Amount;
-
-                    for (int i = 0; i < unpaidBills.Count; i++)
-                    {
-                        if (remainingToPay <= 0) break;
-
-                        var item = unpaidBills[i];
-                        if (item.Remaining <= 0) continue;
-
-                        decimal paymentForThisBill = Math.Min(item.Remaining, remainingToPay);
-                        
-                        item.Bill.Payments.Add(new BuyingBillPayment
-                        {
-                            Amount = paymentForThisBill,
-                            PaymentAccountId = payment.PaymentAccountId,
-                            Date = payment.Date
-                        });
-
-                        remainingToPay -= paymentForThisBill;
-                        unpaidBills[i] = (item.Bill, item.Remaining - paymentForThisBill);
-                    }
-
-                    if (remainingToPay > 0)
-                    {
-                        err.AddError("Payment amounts exceed the total pending bills amount.");
-                        return false;
-                    }
+                    err.AddError(AgencyMessages.NotFound);
+                    return default;
                 }
 
-                await _context.SaveChangesAsync();
-                return true;
+                var totalItems = await _context.BuyingBills
+                    .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
+                    .SelectMany(b => b.Stocks)
+                    .SumAsync(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0));
+
+                var totalDiscounts = await _context.BuyingBills
+                    .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
+                    .SelectMany(b => b.Stocks)
+                    .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
+
+                var totalBills = totalItems - totalDiscounts;
+
+                var totalPaid = await _context.AgencyPaymentTransactions
+                    .Where(pt => _context.AgencyPayments.Any(ap =>
+                        ap.Id == pt.AgencyPaymentId &&
+                        ap.AccountId == accountId &&
+                        ap.AgencyId == agencyId))
+                    .SumAsync(pt => pt.Amount ?? 0);
+
+                return new AgencySummaryDto
+                {
+                    AgencyId      = agency.Id ?? 0,
+                    AgencyName    = agency.AgencyName ?? string.Empty,
+                    TotalBillsAmount  = totalBills,
+                    TotalPaidAmount   = totalPaid,
+                    TotalPendingAmount = totalBills - totalPaid
+                };
             });
         }
+
     }
 }

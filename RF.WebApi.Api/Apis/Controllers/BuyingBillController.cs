@@ -84,11 +84,5 @@ namespace RF.WebApi.Api.Apis.Controllers
             }
             return HandleResponse(result);
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePayments(int id, List<BuyingBillPaymentDto> payments)
-        {
-            var result = await _buyingBillService.UpdatePayments(id, payments);
-            return HandleResponse(result);
-        }
     }
 }

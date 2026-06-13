@@ -43,15 +43,10 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .HasForeignKey(b => b.AgencyId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // 6. Navigation: Stocks, Payments, Expences
+            // 6. Navigation: Stocks, Expences
             builder.HasMany(b => b.Stocks)
                    .WithOne(s => s.BuyingBill)
                    .HasForeignKey(s => s.BuyingBillId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(b => b.Payments)
-                   .WithOne()
-                   .HasForeignKey(p => p.BillId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(b => b.Expences)

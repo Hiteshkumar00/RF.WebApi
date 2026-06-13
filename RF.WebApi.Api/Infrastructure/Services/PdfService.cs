@@ -285,8 +285,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
             var totalDiscount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
             var totalExpence = expencesList.Sum(x => x.TotalAmount ?? 0);
             var finalAmount = totalAmount - totalDiscount;
-            var paidAmount = bill.Payments.Sum(x => x.Amount ?? 0);
-            var remainingAmount = finalAmount - paidAmount;
             var culture = GetCurrencyCulture(account.CurrencyType);
 
             return Document.Create((IDocumentContainer container) =>
@@ -348,7 +346,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     // 2. CONTENT
                     page.Content().Column((ColumnDescriptor col) =>
                     {
-                        // Vendor & Status Information
+                        // Vendor Information
                         col.Item().PaddingBottom(15).Row((RowDescriptor row) =>
                         {
                             // Vendor Box
@@ -356,18 +354,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 c.Item().Text("AGENCY DETAILS:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2);
                                 c.Item().Text(bill.Agency?.AgencyName ?? "Unknown Vendor").FontSize(12).Bold().FontColor(Colors.BlueGrey.Darken2);
-                            });
-
-                            row.ConstantItem(20); // Spacer
-
-                            // Payment Status Box
-                            row.RelativeItem().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(10).Column((ColumnDescriptor c) =>
-                            {
-                                c.Item().Text("ACCOUNTING STATUS:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2);
-                                if (remainingAmount <= 0)
-                                    c.Item().Text("SETTLED").FontSize(16).ExtraBold().FontColor(Colors.Green.Medium);
-                                else
-                                    c.Item().Text("OUTSTANDING").FontSize(16).ExtraBold().FontColor(Colors.Red.Medium);
                             });
                         });
 
@@ -428,23 +414,18 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             // Left Side (Empty spacer)
                             row.RelativeItem().PaddingRight(20);
 
-                            // Totals Box (Right Side)
-                            row.ConstantItem(260).Background(Colors.Grey.Lighten4).Padding(10).Column((ColumnDescriptor totals) =>
-                            {
-                                totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Sub Total:").SemiBold()); r.ConstantItem(100).AlignRight().Text(t => t.Span(totalAmount.ToString("C2", culture))); });
-                                
-                                if (totalDiscount > 0)
-                                {
-                                    totals.Item().PaddingVertical(2).Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Discount:").FontColor(Colors.Orange.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span($"- {totalDiscount.ToString("C2", culture)}").FontColor(Colors.Orange.Darken1)); });
-                                }
-                                
-                                totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("FINAL AMOUNT:").SemiBold().FontSize(12).FontColor(Colors.BlueGrey.Darken2)); r.ConstantItem(100).AlignRight().Text(t => t.Span(finalAmount.ToString("C2", culture)).SemiBold().FontSize(12).FontColor(Colors.BlueGrey.Darken2)); });
-                                
-                                totals.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
-                                
-                                totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Paid to Vendor:").FontColor(Colors.Green.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span(paidAmount.ToString("C2", culture)).FontColor(Colors.Green.Darken1)); });
-                                totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Outstanding:").SemiBold().FontColor(Colors.Red.Medium)); r.ConstantItem(100).AlignRight().Text(t => t.Span(remainingAmount.ToString("C2", culture)).SemiBold().FontColor(Colors.Red.Medium)); });
-                            });
+                             // Totals Box (Right Side)
+                             row.ConstantItem(260).Background(Colors.Grey.Lighten4).Padding(10).Column((ColumnDescriptor totals) =>
+                             {
+                                 totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Sub Total:").SemiBold()); r.ConstantItem(100).AlignRight().Text(t => t.Span(totalAmount.ToString("C2", culture))); });
+                                 
+                                 if (totalDiscount > 0)
+                                 {
+                                     totals.Item().PaddingVertical(2).Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("Discount:").FontColor(Colors.Orange.Darken1)); r.ConstantItem(100).AlignRight().Text(t => t.Span($"- {totalDiscount.ToString("C2", culture)}").FontColor(Colors.Orange.Darken1)); });
+                                 }
+                                 
+                                 totals.Item().Row((RowDescriptor r) => { r.RelativeItem().Text(t => t.Span("FINAL AMOUNT:").SemiBold().FontSize(12).FontColor(Colors.BlueGrey.Darken2)); r.ConstantItem(100).AlignRight().Text(t => t.Span(finalAmount.ToString("C2", culture)).SemiBold().FontSize(12).FontColor(Colors.BlueGrey.Darken2)); });
+                             });
                         });
 
                         // 4. SEPARATE EXPENSE SECTION

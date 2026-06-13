@@ -1,6 +1,7 @@
 using AutoMapper;
 using RF.WebApi.Api.Application.DTOs.BuyingBill;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
+using System.Linq;
 
 namespace RF.WebApi.Api.Application.Mappings
 {
@@ -19,10 +20,9 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.Expences, opt => opt.Ignore());
             CreateMap<UpdateBuyingBillDto, BuyingBill>()
                 .ForMember(dest => dest.Stocks, opt => opt.Ignore())
-                .ForMember(dest => dest.Payments, opt => opt.Ignore())
                 .ForMember(dest => dest.Expences, opt => opt.Ignore());
 
-            // Buying bill list: FinalAmount = Stocks - Discount + Payments (NO expense, tracked in BusinessExpence)
+            // Buying bill list: FinalAmount = Stocks - Discount (NO expense, tracked in BusinessExpence)
             CreateMap<BuyingBill, BuyingBillListDto>()
                 .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Agency != null ? src.Agency.AgencyName : string.Empty))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0))))
@@ -35,11 +35,7 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.TotalExpenceRemaining, opt => opt.MapFrom(src => 
                     src.Expences.Sum(e => e.TotalAmount ?? 0) - src.Expences.SelectMany(e => e.Payments).Sum(p => p.Amount ?? 0)))
                 .ForMember(dest => dest.FinalAmount, opt => opt.MapFrom(src =>
-                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))))
-                .ForMember(dest => dest.PaidAmount, opt => opt.MapFrom(src => src.Payments.Sum(p => p.Amount ?? 0)))
-                .ForMember(dest => dest.RemainingAmount, opt => opt.MapFrom(src =>
-                    (src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0)))
-                    - src.Payments.Sum(p => p.Amount ?? 0)));
+                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))));
 
             CreateMap<Stock, StockDto>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.ProductName : string.Empty));
@@ -51,16 +47,6 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.BuyingBillId, opt => opt.Ignore())
                 .ForMember(dest => dest.Date, opt => opt.Ignore());
-
-            CreateMap<BuyingBillPayment, BuyingBillPaymentDto>();
-            CreateMap<BuyingBillPaymentDto, BuyingBillPayment>();
-            CreateMap<CreateBuyingBillPaymentDto, BuyingBillPayment>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.BillId, opt => opt.Ignore());
-            CreateMap<UpdateBuyingBillPaymentDto, BuyingBillPayment>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.BillId, opt => opt.Ignore());
-
         }
     }
 }

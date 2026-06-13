@@ -19,7 +19,5 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         public decimal TotalExpencePaid { get; set; }
         public decimal TotalExpenceRemaining { get; set; }
         public decimal FinalAmount { get; set; }
-        public decimal PaidAmount { get; set; }
-        public decimal RemainingAmount { get; set; }
     }
 }

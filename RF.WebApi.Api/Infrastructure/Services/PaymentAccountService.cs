@@ -92,10 +92,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // 2. Check Buying Bill Payments
-                if (await _context.BuyingBillPayments.AnyAsync(p => p.PaymentAccountId == id))
+                // 2. Check Agency Payments
+                if (await _context.AgencyPaymentTransactions.AnyAsync(pt => pt.PaymentAccountId == id))
                 {
-                    err.AddError(PaymentAccountMessages.InUseInBuyingBill);
+                    err.AddError("Cannot delete because it is used in agency payments");
                     return false;
                 }
 
@@ -176,29 +176,31 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                 }
 
-                // 2. Buying Bill Payments (Paid)
+                // 2. Agency Payments (Paid)
                 if (string.IsNullOrEmpty(filter.Direction) || filter.Direction == "Paid")
                 {
-                    if (string.IsNullOrEmpty(filter.PaymentType) || filter.PaymentType == "Buying Bill")
+                    if (string.IsNullOrEmpty(filter.PaymentType) || filter.PaymentType == "Agency Payment")
                     {
-                        var payments = await _context.BuyingBillPayments
-                            .Include(p => p.Bill)
-                                .ThenInclude(b => b.Agency)
+                        var payments = await _context.AgencyPaymentTransactions
+                            .Include(p => p.AgencyPayment)
+                                .ThenInclude(ap => ap.Agency)
                             .Include(p => p.PaymentAccount)
-                            .Where(p => p.Bill.AccountId == accountId)
+                            .Where(p => p.AgencyPayment.AccountId == accountId)
                             .Where(p => filter.PaymentAccountId == null || p.PaymentAccountId == filter.PaymentAccountId)
-                            .Where(p => filter.FromDate == null || p.Date >= filter.FromDate)
-                            .Where(p => filter.ToDate == null || p.Date <= filter.ToDate)
+                            .Where(p => filter.FromDate == null || (p.Date ?? p.AgencyPayment.Date) >= filter.FromDate)
+                            .Where(p => filter.ToDate == null || (p.Date ?? p.AgencyPayment.Date) <= filter.ToDate)
                             .Select(p => new PaymentHistoryDto
                             {
                                 Id = p.Id ?? 0,
                                 PaymentAccountName = p.PaymentAccount != null ? p.PaymentAccount.MethodName ?? "" : "",
-                                Description = p.Bill.Agency != null ? p.Bill.Agency.AgencyName ?? "" : "",
+                                Description = p.AgencyPayment.Agency != null 
+                                    ? (p.AgencyPayment.Agency.AgencyName + (!string.IsNullOrEmpty(p.AgencyPayment.Description) ? $" ({p.AgencyPayment.Description})" : "")) 
+                                    : (p.AgencyPayment.Description ?? ""),
                                 Direction = "Paid",
                                 Amount = p.Amount ?? 0,
-                                Date = p.Date ?? p.Bill.Date ?? default,
-                                PaymentType = "Buying Bill",
-                                BillNo = p.Bill.BillNo
+                                Date = p.Date ?? p.AgencyPayment.Date ?? default,
+                                PaymentType = "Agency Payment",
+                                BillNo = null
                             })
                             .ToListAsync();
                         history.AddRange(payments);
