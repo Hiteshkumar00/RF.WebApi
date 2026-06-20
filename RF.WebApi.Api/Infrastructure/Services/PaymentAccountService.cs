@@ -164,7 +164,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             {
                                 Id = p.Id ?? 0,
                                 PaymentAccountName = p.PaymentAccount != null ? p.PaymentAccount.MethodName ?? "" : "",
-                                Description = p.Bill.CustomerName ?? "",
+                                Description = p.Bill.Customer != null ? p.Bill.Customer.CustomerName ?? "" : "",
                                 Direction = "Received",
                                 Amount = p.Amount ?? 0,
                                 Date = p.Date ?? p.Bill.Date ?? default,

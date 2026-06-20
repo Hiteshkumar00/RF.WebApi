@@ -11,6 +11,10 @@ namespace RF.WebApi.Api.Application.Mappings
         {
             // Main Bill mappings
             CreateMap<SellingBill, SellingBillDto>()
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.CustomerName : string.Empty))
+                .ForMember(dest => dest.PhoneNo, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.PhoneNo : string.Empty))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Email : string.Empty))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.Address : string.Empty))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0))))
                 .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src => 
                     src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0)) - src.Items.Sum(i => i.Discount ?? 0)));
@@ -22,6 +26,8 @@ namespace RF.WebApi.Api.Application.Mappings
 
             // List projection with mathematical rollups
             CreateMap<SellingBill, SellingBillListDto>()
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.CustomerName : string.Empty))
+                .ForMember(dest => dest.PhoneNo, opt => opt.MapFrom(src => src.Customer != null ? src.Customer.PhoneNo : string.Empty))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0))))
                 .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Items.Sum(i => i.Discount ?? 0)))
                 .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src => 

@@ -13,9 +13,10 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
         [StringLength(100)]
         public string BillNo { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = SellingBillMessages.CustomerNameRequired)]
+        public int? CustomerId { get; set; }
+
         [StringLength(250)]
-        public string CustomerName { get; set; } = string.Empty;
+        public string? CustomerName { get; set; }
 
         [StringLength(250)]
         public string? Email { get; set; }

@@ -125,16 +125,16 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             row.RelativeItem().Border(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(10).Column(c =>
                             {
                                 c.Item().Text(t => t.Span("BILLED TO:").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken2));
-                                c.Item().Text(t => t.Span(bill.CustomerName).FontSize(12).Bold());
+                                c.Item().Text(t => t.Span(bill.Customer?.CustomerName ?? string.Empty).FontSize(12).Bold());
                                 
-                                if (!string.IsNullOrWhiteSpace(bill.Address))
-                                    c.Item().PaddingTop(2).Text(bill.Address).FontSize(9);
+                                if (!string.IsNullOrWhiteSpace(bill.Customer?.Address))
+                                    c.Item().PaddingTop(2).Text(bill.Customer.Address).FontSize(9);
                                     
-                                if (!string.IsNullOrWhiteSpace(bill.PhoneNo))
-                                    c.Item().Text($"Phone: {bill.PhoneNo}").FontSize(9);
+                                if (!string.IsNullOrWhiteSpace(bill.Customer?.PhoneNo))
+                                    c.Item().Text($"Phone: {bill.Customer.PhoneNo}").FontSize(9);
                                     
-                                if (!string.IsNullOrWhiteSpace(bill.Email))
-                                    c.Item().Text($"Email: {bill.Email}").FontSize(9);
+                                if (!string.IsNullOrWhiteSpace(bill.Customer?.Email))
+                                    c.Item().Text($"Email: {bill.Customer.Email}").FontSize(9);
                             });
                         });
 

@@ -16,6 +16,7 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
         public DbSet<Entity> Entitys { get; set; }
         public DbSet<RelatedEntity> RelatedEntitys { get; set; }
         public DbSet<PaymentAccount> PaymentAccounts { get; set; }
+        public DbSet<Customer> Customers { get; set; }
         public DbSet<SellingBill> SellingBills { get; set; }
         public DbSet<SellingBillPayment> SellingBillPayments { get; set; }
         public DbSet<SellingBillItem> SellingBillItems { get; set; }
@@ -48,6 +49,7 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
             modelBuilder.ApplyConfiguration(new EntityConfig());
             modelBuilder.ApplyConfiguration(new RelatedEntityConfig());
             modelBuilder.ApplyConfiguration(new PaymentAccountConfig());
+            modelBuilder.ApplyConfiguration(new CustomerConfig());
             modelBuilder.ApplyConfiguration(new SellingBillConfig());
             modelBuilder.ApplyConfiguration(new SellingBillPaymentConfig());
             modelBuilder.ApplyConfiguration(new SellingBillItemConfig());

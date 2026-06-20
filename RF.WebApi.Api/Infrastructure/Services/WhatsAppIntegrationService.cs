@@ -44,7 +44,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                var phone = bill.PhoneNo?.Replace("+", "").Replace("-", "").Replace(" ", "");
+                var phone = bill.Customer?.PhoneNo?.Replace("+", "").Replace("-", "").Replace(" ", "");
                 if (string.IsNullOrEmpty(phone))
                 {
                     err.AddError("Customer phone number is missing.");
@@ -66,7 +66,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // 2. Upload Media to WhatsApp Meta API
                 var dateStrForFile = bill.Date?.ToString("dd-MM-yyyy") ?? DateTime.Now.ToString("dd-MM-yyyy");
                 var dateStrForTemplate = DateFormatHelper.Format(bill.Date, account.DateFormat);
-                string customerName = bill.CustomerName?.Replace(" ", "_") ?? "Customer";
+                string customerName = bill.Customer?.CustomerName?.Replace(" ", "_") ?? "Customer";
                 string fileName = $"Bill_{bill.BillNo}_{dateStrForFile}_{customerName}.pdf";
 
                 var mediaId = await UploadMediaAsync(account.WhatsAppPhoneNumberId, account.WhatsAppAccessToken, pdfBytes, fileName);
@@ -105,7 +105,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             new {
                                 type = "body",
                                 parameters = new[] {
-                                    new { type = "text", text = bill.CustomerName ?? "Customer" },
+                                    new { type = "text", text = bill.Customer?.CustomerName ?? "Customer" },
                                     new { type = "text", text = bill.BillNo ?? bill.Id.ToString() },
                                     new { type = "text", text = dateStrForTemplate },
                                     new { type = "text", text = $"{currency}{totalAmount:N2}" },
