@@ -132,7 +132,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     query = query.Where(p => p.ProductName!.Contains(filter.SearchTerm));
                 }
 
-                var products = await query.OrderBy(p => p.ProductName).ToListAsync();
+                var products = await query.ToListAsync();
                 return _mapper.Map<List<ProductDto>>(products);
             });
         }
@@ -150,7 +150,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     query = query.Where(p => p.ProductName!.Contains(searchTerm));
                 }
 
-                var products = await query.OrderBy(p => p.ProductName).Take(20).ToListAsync();
+                var products = await query.Take(20).ToListAsync();
                 return _mapper.Map<List<ProductDto>>(products);
             });
         }
