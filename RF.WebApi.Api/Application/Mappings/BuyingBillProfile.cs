@@ -14,7 +14,7 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0))))
                 .ForMember(dest => dest.TotalExpence, opt => opt.MapFrom(src => src.Expences.Sum(e => e.TotalAmount ?? 0)))
                 .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src =>
-                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))));
+                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => i.Discount ?? 0)));
             CreateMap<CreateBuyingBillDto, BuyingBill>()
                 .ForMember(dest => dest.Stocks, opt => opt.MapFrom(src => src.Stocks))
                 .ForMember(dest => dest.Expences, opt => opt.Ignore());
@@ -26,16 +26,16 @@ namespace RF.WebApi.Api.Application.Mappings
             CreateMap<BuyingBill, BuyingBillListDto>()
                 .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Agency != null ? src.Agency.AgencyName : string.Empty))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0))))
-                .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))))
+                .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Stocks.Sum(i => i.Discount ?? 0)))
                 .ForMember(dest => dest.NetAmount, opt => opt.MapFrom(src =>
-                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))))
+                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => i.Discount ?? 0)))
                 // TotalExpence mapped from BusinessExpence records
                 .ForMember(dest => dest.TotalExpence, opt => opt.MapFrom(src => src.Expences.Sum(e => e.TotalAmount ?? 0)))
                 .ForMember(dest => dest.TotalExpencePaid, opt => opt.MapFrom(src => src.Expences.SelectMany(e => e.Payments).Sum(p => p.Amount ?? 0)))
                 .ForMember(dest => dest.TotalExpenceRemaining, opt => opt.MapFrom(src => 
                     src.Expences.Sum(e => e.TotalAmount ?? 0) - src.Expences.SelectMany(e => e.Payments).Sum(p => p.Amount ?? 0)))
                 .ForMember(dest => dest.FinalAmount, opt => opt.MapFrom(src =>
-                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.Discount ?? 0))));
+                    src.Stocks.Sum(i => (i.Quantity ?? 0) * (i.PurchasePrice ?? 0)) - src.Stocks.Sum(i => i.Discount ?? 0)));
 
             CreateMap<Stock, StockDto>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.ProductName : string.Empty));

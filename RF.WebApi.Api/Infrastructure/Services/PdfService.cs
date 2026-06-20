@@ -51,7 +51,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             }
 
             var totalAmount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Price ?? 0));
-            var totalDiscount = bill.Items.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
+            var totalDiscount = bill.Items.Sum(x => x.Discount ?? 0);
             var netAmount = totalAmount - totalDiscount;
             var paidAmount = bill.Payments.Sum(x => x.Amount ?? 0);
             var remainingAmount = netAmount - paidAmount;
@@ -197,8 +197,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString());
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.Price ?? 0).ToString("C2", culture));
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.Discount ?? 0).ToString("C2", culture));
-                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Price ?? 0) - (item.Discount ?? 0)).ToString("C2", culture));
-                                table.Cell().Element(RowTotalStyle).AlignRight().Text(((item.Quantity ?? 0) * ((item.Price ?? 0) - (item.Discount ?? 0))).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Price ?? 0) - ((item.Quantity ?? 1) > 0 ? (item.Discount ?? 0) / (item.Quantity ?? 1) : 0)).ToString("C2", culture));
+                                table.Cell().Element(RowTotalStyle).AlignRight().Text(((item.Quantity ?? 0) * (item.Price ?? 0) - (item.Discount ?? 0)).ToString("C2", culture));
 
                                 static IContainer CellStyle(IContainer container) =>
                                     container.BorderBottom(1).BorderColor(Colors.Grey.Lighten3).PaddingVertical(8).PaddingHorizontal(5);
@@ -282,7 +282,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
             var expencesList = expences?.ToList() ?? new List<BusinessExpence>();
             var totalAmount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.PurchasePrice ?? 0));
-            var totalDiscount = bill.Stocks.Sum(x => (x.Quantity ?? 0) * (x.Discount ?? 0));
+            var totalDiscount = bill.Stocks.Sum(x => x.Discount ?? 0);
             var totalExpence = expencesList.Sum(x => x.TotalAmount ?? 0);
             var finalAmount = totalAmount - totalDiscount;
             var culture = GetCurrencyCulture(account.CurrencyType);
@@ -400,8 +400,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString());
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.PurchasePrice ?? 0).ToString("C2", culture));
                                 table.Cell().Element(CellStyle).AlignRight().Text((item.Discount ?? 0).ToString("C2", culture));
-                                table.Cell().Element(CellStyle).AlignRight().Text(((item.PurchasePrice ?? 0) - (item.Discount ?? 0)).ToString("C2", culture));
-                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Quantity ?? 0) * ((item.PurchasePrice ?? 0) - (item.Discount ?? 0))).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text(((item.PurchasePrice ?? 0) - ((item.Quantity ?? 1) > 0 ? (item.Discount ?? 0) / (item.Quantity ?? 1) : 0)).ToString("C2", culture));
+                                table.Cell().Element(CellStyle).AlignRight().Text(((item.Quantity ?? 0) * (item.PurchasePrice ?? 0) - (item.Discount ?? 0)).ToString("C2", culture));
 
                                 static IContainer CellStyle(IContainer container) =>
                                     container.BorderBottom(1).BorderColor(Colors.Grey.Lighten3).PaddingVertical(8).PaddingHorizontal(5);

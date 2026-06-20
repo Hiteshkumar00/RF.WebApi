@@ -145,7 +145,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     var totalDiscounts = await _context.BuyingBills
                         .Where(b => b.AccountId == accountId && b.AgencyId == agency.Id)
                         .SelectMany(b => b.Stocks)
-                        .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
+                        .SumAsync(i => i.Discount ?? 0);
 
                     dto.TotalBillsAmount = totalItems - totalDiscounts;
 
@@ -199,7 +199,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalDiscounts = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
                     .SelectMany(b => b.Stocks)
-                    .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
+                    .SumAsync(i => i.Discount ?? 0);
 
                 dto.TotalBillsAmount = totalItems - totalDiscounts;
 
@@ -309,7 +309,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalDiscounts = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId)
                     .SelectMany(b => b.Stocks)
-                    .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
+                    .SumAsync(i => i.Discount ?? 0);
 
                 var totalBills = totalItems - totalDiscounts;
 
