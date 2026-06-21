@@ -16,6 +16,7 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
         public DbSet<Entity> Entitys { get; set; }
         public DbSet<RelatedEntity> RelatedEntitys { get; set; }
         public DbSet<PaymentAccount> PaymentAccounts { get; set; }
+        public DbSet<Customer> Customers { get; set; }
         public DbSet<SellingBill> SellingBills { get; set; }
         public DbSet<SellingBillPayment> SellingBillPayments { get; set; }
         public DbSet<SellingBillItem> SellingBillItems { get; set; }
@@ -24,7 +25,8 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
         public DbSet<BuyingBill> BuyingBills { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<BuyingBillPayment> BuyingBillPayments { get; set; }
+        public DbSet<AgencyPayment> AgencyPayments { get; set; }
+        public DbSet<AgencyPaymentTransaction> AgencyPaymentTransactions { get; set; }
         public DbSet<BusinessYear> BusinessYears { get; set; }
         public DbSet<AccountPerson> AccountPersons { get; set; }
         public DbSet<BusinessExpence> BusinessExpences { get; set; }
@@ -47,6 +49,7 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
             modelBuilder.ApplyConfiguration(new EntityConfig());
             modelBuilder.ApplyConfiguration(new RelatedEntityConfig());
             modelBuilder.ApplyConfiguration(new PaymentAccountConfig());
+            modelBuilder.ApplyConfiguration(new CustomerConfig());
             modelBuilder.ApplyConfiguration(new SellingBillConfig());
             modelBuilder.ApplyConfiguration(new SellingBillPaymentConfig());
             modelBuilder.ApplyConfiguration(new SellingBillItemConfig());
@@ -55,7 +58,8 @@ namespace RF.WebApi.Infrastructure.Data.DataBase
             modelBuilder.ApplyConfiguration(new BuyingBillConfig());
             modelBuilder.ApplyConfiguration(new ProductConfig());
             modelBuilder.ApplyConfiguration(new StockConfig());
-            modelBuilder.ApplyConfiguration(new BuyingBillPaymentConfig());
+            modelBuilder.ApplyConfiguration(new AgencyPaymentConfig());
+            modelBuilder.ApplyConfiguration(new AgencyPaymentTransactionConfig());
             modelBuilder.ApplyConfiguration(new BusinessYearConfig());
             modelBuilder.ApplyConfiguration(new AccountPersonConfig());
             modelBuilder.ApplyConfiguration(new BusinessExpenceConfig());

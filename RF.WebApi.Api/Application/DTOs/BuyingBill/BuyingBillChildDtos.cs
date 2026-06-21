@@ -37,31 +37,6 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
     }
 
 
-    // Buying Bill Payment DTOs
-    public class BuyingBillPaymentDto
-    {
-        public int Id { get; set; }
-        public decimal Amount { get; set; }
-        public int PaymentAccountId { get; set; }
-        public DateOnly? Date { get; set; }
-    }
-
-    public class CreateBuyingBillPaymentDto
-    {
-        [Range(0.01, double.MaxValue, ErrorMessage = BuyingBillMessages.AmountPositive)]
-        public decimal Amount { get; set; }
-
-        [Required(ErrorMessage = BuyingBillMessages.PaymentAccountRequired)]
-        public int PaymentAccountId { get; set; }
-
-        public DateOnly? Date { get; set; }
-    }
-
-    public class UpdateBuyingBillPaymentDto : CreateBuyingBillPaymentDto
-    {
-        public int? Id { get; set; }
-    }
-
 
     // Buying Bill Expence DTOs
     public class BuyingBillExpencePaymentDto

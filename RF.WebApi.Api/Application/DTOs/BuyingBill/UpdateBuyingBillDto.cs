@@ -20,7 +20,6 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         public DateOnly Date { get; set; }
 
         public List<UpdateStockDto> Stocks { get; set; } = new List<UpdateStockDto>();
-        public List<UpdateBuyingBillPaymentDto> Payments { get; set; } = new List<UpdateBuyingBillPaymentDto>();
         public List<UpdateBuyingBillExpenceDto> Expences { get; set; } = new List<UpdateBuyingBillExpenceDto>();
     }
 }

@@ -42,7 +42,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                var targetEmail = bill.Email;
+                var targetEmail = bill.Customer?.Email;
                 if (string.IsNullOrEmpty(targetEmail))
                 {
                     err.AddError("Customer email address is missing on the bill.");
@@ -62,7 +62,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 // 2. Calculate Amounts for display
                 var subtotal = bill.Items?.Sum(i => (i.Price ?? 0) * (i.Quantity ?? 0)) ?? 0;
-                var totalAmount = bill.Items?.Sum(i => (i.Quantity ?? 0) * ((i.Price ?? 0) - (i.Discount ?? 0))) ?? 0;
+                var totalAmount = bill.Items?.Sum(i => (i.Quantity ?? 0) * (i.Price ?? 0) - (i.Discount ?? 0)) ?? 0;
                 var paidAmount = bill.Payments?.Sum(p => p.Amount ?? 0) ?? 0;
                 var remainingAmount = totalAmount - paidAmount;
                 var culture = GetCurrencyCulture(account.CurrencyType);
@@ -97,7 +97,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                                 </div>
                                 <div style='padding: 20px;'>
                                     <h3 style='color: #2c3e50;'>{account.ProfileName}</h3>
-                                    <p>Dear <strong>{bill.CustomerName}</strong>,</p>
+                                    <p>Dear <strong>{bill.Customer?.CustomerName}</strong>,</p>
                                     <p>{statusText}</p>
                                     
                                     <div style='background-color: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid {statusColor};'>
@@ -122,7 +122,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                     mailMessage.To.Add(targetEmail);
 
-                    string fileName = $"Bill_{bill.BillNo}_{bill.Date:dd-MM-yyyy}_{bill.CustomerName}.pdf";
+                    string fileName = $"Bill_{bill.BillNo}_{bill.Date:dd-MM-yyyy}_{bill.Customer?.CustomerName}.pdf";
                     using var ms = new MemoryStream(pdfBytes);
                     var attachment = new Attachment(ms, fileName, "application/pdf");
                     mailMessage.Attachments.Add(attachment);

@@ -13,11 +13,13 @@ namespace RF.WebApi.Api.Apis.Extensions
             services.AddScoped<IBusinessYearService, BusinessYearService>();
             services.AddScoped<IAccountPersonService, AccountPersonService>();
             services.AddScoped<IAgencyService, AgencyService>();
+            services.AddScoped<IAgencyPaymentService, AgencyPaymentService>();
             services.AddScoped<IAgencyPersonService, AgencyPersonService>();
             services.AddScoped<IPaymentAccountService, PaymentAccountService>();
             services.AddScoped<IBusinessExpenceService, BusinessExpenceService>();
             services.AddScoped<IBuyingBillService, BuyingBillService>();
             services.AddScoped<ISellingBillService, SellingBillService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IEntityService, EntityService>();
             services.AddScoped<IAddContributionService, AddContributionService>();
             services.AddScoped<IRemoveContributionService, RemoveContributionService>();

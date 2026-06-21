@@ -17,7 +17,6 @@ namespace RF.WebApi.Api.Application.DTOs.BuyingBill
         public DateOnly Date { get; set; }
 
         public List<CreateStockDto> Stocks { get; set; } = new List<CreateStockDto>();
-        public List<CreateBuyingBillPaymentDto> Payments { get; set; } = new List<CreateBuyingBillPaymentDto>();
         public List<CreateBuyingBillExpenceDto> Expences { get; set; } = new List<CreateBuyingBillExpenceDto>();
     }
 }

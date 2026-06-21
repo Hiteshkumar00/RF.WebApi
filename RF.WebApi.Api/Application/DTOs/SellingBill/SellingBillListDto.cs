@@ -6,6 +6,7 @@ namespace RF.WebApi.Api.Application.DTOs.SellingBill
     {
         public int Id { get; set; }
         public string BillNo { get; set; } = string.Empty;
+        public int? CustomerId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
         public string PhoneNo { get; set; } = string.Empty;
         public DateOnly Date { get; set; }

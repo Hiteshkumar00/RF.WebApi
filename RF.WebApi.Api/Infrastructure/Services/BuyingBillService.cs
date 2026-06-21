@@ -48,11 +48,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     stock.Date = bill.Date;
                 }
 
-                foreach (var payment in bill.Payments)
-                {
-                    if (payment.Date == null) payment.Date = bill.Date;
-                }
-
                 await _context.SaveChangesAsync();
 
                 if (bill.BillNo == "TEMP_BILL_NO")
@@ -94,7 +89,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bill = await _context.BuyingBills
                     .Include(b => b.Stocks)
                         .ThenInclude(s => s.Product)
-                    .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
@@ -136,7 +130,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bill = await _context.BuyingBills
                     .Include(b => b.Stocks)
                         .ThenInclude(s => s.Product)
-                    .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == dto.Id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
@@ -145,20 +138,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
-                // Sync scalar properties (Stocks, Payments are synced; Expences go to BusinessExpence)
+                // Sync scalar properties (Stocks are synced; Expences go to BusinessExpence)
                 _mapper.Map(dto, bill);
 
                 _context.SyncCollection(bill.Stocks, dto.Stocks, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
-                _context.SyncCollection(bill.Payments, dto.Payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
  
                 foreach (var stock in bill.Stocks)
                 {
                     stock.Date = bill.Date;
-                }
-
-                foreach (var payment in bill.Payments)
-                {
-                    if (payment.Date == null) payment.Date = bill.Date;
                 }
 
                 await _context.SaveChangesAsync();
@@ -185,7 +172,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bill = await _context.BuyingBills
                     .Include(b => b.Stocks)
                         .ThenInclude(s => s.Product)
-                    .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
@@ -207,7 +193,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 _context.Stocks.RemoveRange(bill.Stocks);
-                _context.BuyingBillPayments.RemoveRange(bill.Payments);
                 _context.BuyingBills.Remove(bill);
 
                 await _context.SaveChangesAsync();
@@ -234,7 +219,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bills = await _context.BuyingBills
                     .Include(b => b.Agency)
                     .Include(b => b.Stocks)
-                    .Include(b => b.Payments)
                     .Include(b => b.Expences)
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .OrderByDescending(b => b.Date)
@@ -263,7 +247,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var bills = await _context.BuyingBills
                     .Include(b => b.Agency)
                     .Include(b => b.Stocks)
-                    .Include(b => b.Payments)
                     .Include(b => b.Expences)
                     .Where(b => b.AccountId == accountId && b.AgencyId == agencyId && b.Date >= startDate && b.Date <= endDate)
                     .OrderByDescending(b => b.Date)
@@ -301,7 +284,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .Include(b => b.Agency)
                     .Include(b => b.Stocks)
                         .ThenInclude(s => s.Product)
-                    .Include(b => b.Payments)
                     .FirstOrDefaultAsync(b => b.Id == id && b.AccountId == Token.AccountId);
 
                 if (bill == null)
@@ -327,31 +309,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<bool>> UpdatePayments(int billId, List<BuyingBillPaymentDto> payments)
-        {
-            return ServiceResponse<bool>.Execute(async err =>
-            {
-                var bill = await _context.BuyingBills
-                    .Include(b => b.Payments)
-                    .FirstOrDefaultAsync(b => b.Id == billId && b.AccountId == Token.AccountId);
 
-                if (bill == null)
-                {
-                    err.AddError(BuyingBillMessages.NotFound);
-                    return false;
-                }
-
-                _context.SyncCollection(bill.Payments, payments, (e, d) => d.Id > 0 && e.Id == d.Id, _mapper);
-
-                foreach (var payment in bill.Payments)
-                {
-                    if (payment.Date == null) payment.Date = bill.Date;
-                }
-
-                await _context.SaveChangesAsync();
-                return true;
-            });
-        }
 
         // ---------------------------------------------------------------------------
         // Private helpers

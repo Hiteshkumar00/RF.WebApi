@@ -21,15 +21,8 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .IsRequired()
                    .HasMaxLength(100);
 
-            builder.Property(s => s.CustomerName)
-                   .IsRequired()
-                   .HasMaxLength(250);
-
             builder.Property(s => s.Date)
                    .IsRequired();
-
-            builder.Property(s => s.Email)
-                   .HasMaxLength(250);
 
 
             // 4. Foreign Key (Account FK)
@@ -40,6 +33,11 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                    .WithMany()
                    .HasForeignKey(s => s.AccountId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(s => s.Customer)
+                   .WithMany(c => c.SellingBills)
+                   .HasForeignKey(s => s.CustomerId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // 5. Navigation: Items, Payments
             builder.HasMany(s => s.Items)

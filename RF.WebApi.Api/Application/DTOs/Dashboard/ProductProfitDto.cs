@@ -24,7 +24,7 @@ namespace RF.WebApi.Api.Application.DTOs.Dashboard
         public decimal PurchasePrice { get; set; }
         public decimal Discount { get; set; }
         public int RemainingQty { get; set; }
-        public decimal TotalAmount => (Quantity * PurchasePrice) - (Quantity * Discount);
+        public decimal TotalAmount => (Quantity * PurchasePrice) - Discount;
     }
 
     public class ProductDashboardDto

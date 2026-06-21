@@ -50,11 +50,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
                     .ToListAsync();
 
-                // 2. Buying Payments (money OUT)
-                var buyingPayments = await _context.BuyingBillPayments
-                    .Where(p => _context.BuyingBills.Any(b => b.Id == p.BillId && b.AccountId == accountId) && p.PaymentAccountId != null)
-                    .GroupBy(p => p.PaymentAccountId)
-                    .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(p => p.Amount ?? 0) })
+                // 2. Buying Payments / Agency Payments (money OUT)
+                var buyingPayments = await _context.AgencyPaymentTransactions
+                    .Where(pt => _context.AgencyPayments.Any(ap => ap.Id == pt.AgencyPaymentId && ap.AccountId == accountId) && pt.PaymentAccountId != null)
+                    .GroupBy(pt => pt.PaymentAccountId)
+                    .Select(g => new { PaymentAccountId = g.Key!.Value, Amount = g.Sum(pt => pt.Amount ?? 0) })
                     .ToListAsync();
 
                 // 3. Business Expences (money OUT)
@@ -196,7 +196,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalSellingDiscounts = await _context.SellingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Items)
-                    .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
+                    .SumAsync(i => i.Discount ?? 0);
 
                 totalSelling -= totalSellingDiscounts;
 
@@ -214,14 +214,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var totalBuyingDiscounts = await _context.BuyingBills
                     .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
                     .SelectMany(b => b.Stocks)
-                    .SumAsync(i => (i.Quantity ?? 0) * (i.Discount ?? 0));
+                    .SumAsync(i => i.Discount ?? 0);
 
                 var totalBuying = totalBuyingItems - totalBuyingDiscounts;
 
-                var totalBuyingPaid = await _context.BuyingBills
-                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
-                    .SelectMany(b => b.Payments)
-                    .SumAsync(p => p.Amount ?? 0);
+                var totalBuyingPaid = await _context.AgencyPaymentTransactions
+                    .Where(pt => _context.AgencyPayments.Any(ap => ap.Id == pt.AgencyPaymentId && ap.AccountId == accountId) && (pt.Date ?? pt.AgencyPayment.Date) >= startDate && (pt.Date ?? pt.AgencyPayment.Date) <= endDate)
+                    .SumAsync(pt => pt.Amount ?? 0);
 
                 // 3. ALL Business Expences
                 var totalBusinessExpenceDeclared = await _context.BusinessExpences
@@ -270,14 +269,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         int avail = stockQty - skip;
                         skip = 0;
                         int consume = Math.Min(avail, cost);
-                        totalCogs += consume * ((stock.PurchasePrice ?? 0) - (stock.Discount ?? 0));
+                        totalCogs += consume * ((stock.PurchasePrice ?? 0) - ((stock.Quantity ?? 1) > 0 ? (stock.Discount ?? 0) / (stock.Quantity ?? 1) : 0));
                         cost -= consume;
                     }
 
                     if (cost > 0)
                     {
                         var last = stocks.LastOrDefault();
-                        totalCogs += cost * (last != null ? (last.PurchasePrice ?? 0) - (last.Discount ?? 0) : 0);
+                        totalCogs += cost * (last != null ? (last.PurchasePrice ?? 0) - ((last.Quantity ?? 1) > 0 ? (last.Discount ?? 0) / (last.Quantity ?? 1) : 0) : 0);
                     }
                 }
 
@@ -319,7 +318,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                     var totalSold = sales.Sum(s => s.Quantity ?? 0);
                     var totalBought = stocks.Sum(s => s.Quantity ?? 0);
-                    var totalSellingAmt = sales.Sum(s => (s.Quantity ?? 0) * ((s.Price ?? 0) - (s.Discount ?? 0)));
+                    var totalSellingAmt = sales.Sum(s => (s.Quantity ?? 0) * (s.Price ?? 0) - (s.Discount ?? 0));
                     
                     // FIFO Remaining
                     int soldSoFar = totalSold;
@@ -348,12 +347,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     {
                         if (costLeft <= 0) break;
                         int consume = Math.Min(s.Quantity ?? 0, costLeft);
-                        cogs += consume * ((s.PurchasePrice ?? 0) - (s.Discount ?? 0));
+                        cogs += consume * ((s.PurchasePrice ?? 0) - ((s.Quantity ?? 1) > 0 ? (s.Discount ?? 0) / (s.Quantity ?? 1) : 0));
                         costLeft -= consume;
                     }
                     if (costLeft > 0) {
                         var last = stocks.LastOrDefault();
-                        cogs += costLeft * (last != null ? (last.PurchasePrice ?? 0) - (last.Discount ?? 0) : 0);
+                        cogs += costLeft * (last != null ? (last.PurchasePrice ?? 0) - ((last.Quantity ?? 1) > 0 ? (last.Discount ?? 0) / (last.Quantity ?? 1) : 0) : 0);
                     }
 
                     productProfits.Add(new ProductProfitDto {

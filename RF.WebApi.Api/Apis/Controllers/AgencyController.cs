@@ -66,11 +66,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
-        [HttpPost()]
-        public async Task<IActionResult> PayOldestBills(PayAgencyOldestBillsDto dto)
+        [HttpGet()]
+        public async Task<IActionResult> GetSummary(int agencyId)
         {
-            var result = await _agencyService.PayOldestBillsAsync(dto);
+            var result = await _agencyService.GetAgencySummaryAsync(agencyId);
             return HandleResponse(result);
         }
+
     }
 }
