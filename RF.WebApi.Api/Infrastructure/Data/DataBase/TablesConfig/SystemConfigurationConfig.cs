@@ -27,14 +27,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.DataBase.TablesConfig
                     PropertyDisplayName = "Enable Account Deletion",
                     PropertyType = "boolean",
                     PropertyValue = "false"
-                },
-                new SystemConfiguration
-                {
-                    Id = 2,
-                    PropertyName = "TableScrollHeight",
-                    PropertyDisplayName = "Table Scroll Height",
-                    PropertyType = "string",
-                    PropertyValue = "65vh"
                 }
             );
         }
