@@ -53,6 +53,13 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [HttpGet("{customerId}")]
+        public async Task<IActionResult> GetByCustomerId(int customerId)
+        {
+            var result = await _sellingBillService.GetByCustomerId(customerId);
+            return HandleResponse(result);
+        }
+
 
 
         [HttpGet("{id}")]

@@ -232,6 +232,25 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
+        public Task<ServiceResponse<List<SellingBillListDto>>> GetByCustomerId(int customerId)
+        {
+            return ServiceResponse<List<SellingBillListDto>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var bills = await _context.SellingBills
+                    .Include(b => b.Customer)
+                    .Include(b => b.Payments)
+                    .Include(b => b.Items)
+                    .Where(b => b.AccountId == accountId && b.CustomerId == customerId)
+                    .OrderByDescending(b => b.Date)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return _mapper.Map<List<SellingBillListDto>>(bills);
+            });
+        }
+
         public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)
         {
             return ServiceResponse<byte[]>.Execute(async err =>

@@ -10,6 +10,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> UpdateSellingBill(UpdateSellingBillDto dto);
         Task<ServiceResponse<bool>> DeleteSellingBill(int id);
         Task<ServiceResponse<List<SellingBillListDto>>> GetAllSellingBills();
+        Task<ServiceResponse<List<SellingBillListDto>>> GetByCustomerId(int customerId);
 
         Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id);
         Task<ServiceResponse<bool>> SendWhatsAppMessage(int id);
