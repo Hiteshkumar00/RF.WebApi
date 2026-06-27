@@ -359,20 +359,22 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<bool>.Execute(async err =>
             {
-                bool anyFailed = false;
+                var allErrors = new List<string>();
                 foreach (var id in billIds)
                 {
                     var result = await SendWhatsAppMessage(id);
                     if (!result.Success)
                     {
-                        anyFailed = true;
-                        // Not breaking here so we can try the rest
+                        allErrors.AddRange(result.Errors);
                     }
                 }
                 
-                if (anyFailed)
+                if (allErrors.Any())
                 {
-                    err.AddError("Some messages failed to send. Check the system logs or try again.");
+                    foreach(var e in allErrors.Distinct())
+                    {
+                        err.AddError(e);
+                    }
                     return false;
                 }
                 
@@ -384,19 +386,22 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<bool>.Execute(async err =>
             {
-                bool anyFailed = false;
+                var allErrors = new List<string>();
                 foreach (var id in billIds)
                 {
                     var result = await SendEmailMessage(id);
                     if (!result.Success)
                     {
-                        anyFailed = true;
+                        allErrors.AddRange(result.Errors);
                     }
                 }
 
-                if (anyFailed)
+                if (allErrors.Any())
                 {
-                    err.AddError("Some emails failed to send. Check the system logs or try again.");
+                    foreach(var e in allErrors.Distinct())
+                    {
+                        err.AddError(e);
+                    }
                     return false;
                 }
                 
