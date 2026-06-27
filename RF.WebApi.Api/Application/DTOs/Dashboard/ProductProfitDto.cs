@@ -8,6 +8,7 @@ namespace RF.WebApi.Api.Application.DTOs.Dashboard
         public int TotalSoldCount { get; set; }
         public int TotalPurchaseCount { get; set; }
         public decimal TotalSellingAmount { get; set; }
+        public decimal TotalBuyingAmount { get; set; }
         public decimal TotalPurchaseCost { get; set; }
         public decimal TotalProfit { get; set; }
         public int AvailableStock { get; set; }

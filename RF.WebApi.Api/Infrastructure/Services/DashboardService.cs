@@ -319,6 +319,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     var totalSold = sales.Sum(s => s.Quantity ?? 0);
                     var totalBought = stocks.Sum(s => s.Quantity ?? 0);
                     var totalSellingAmt = sales.Sum(s => (s.Quantity ?? 0) * (s.Price ?? 0) - (s.Discount ?? 0));
+                    var totalBoughtAmt = stocks.Sum(s => (s.Quantity ?? 0) * (s.PurchasePrice ?? 0) - (s.Discount ?? 0));
                     
                     int soldSoFar = totalSold;
                     foreach (var s in stocks)
@@ -348,6 +349,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         TotalSoldCount = totalSold,
                         TotalPurchaseCount = totalBought,
                         TotalSellingAmount = totalSellingAmt,
+                        TotalBuyingAmount = totalBoughtAmt,
                         TotalPurchaseCost = cogs,
                         TotalProfit = totalSellingAmt - cogs,
                         AvailableStock = totalBought - totalSold
