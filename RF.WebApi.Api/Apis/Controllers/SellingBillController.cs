@@ -98,6 +98,20 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> BulkSendWhatsAppMessages([FromBody] List<int> billIds)
+        {
+            var result = await _sellingBillService.BulkSendWhatsAppMessages(billIds);
+            return HandleResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkSendEmailMessages([FromBody] List<int> billIds)
+        {
+            var result = await _sellingBillService.BulkSendEmailMessages(billIds);
+            return HandleResponse(result);
+        }
+
         [HttpPost("{billId}")]
         public async Task<IActionResult> UpdatePayments(int billId, [FromBody] List<SellingBillPaymentDto> payments)
         {

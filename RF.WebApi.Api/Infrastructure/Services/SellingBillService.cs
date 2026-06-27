@@ -355,6 +355,55 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
+        public Task<ServiceResponse<bool>> BulkSendWhatsAppMessages(List<int> billIds)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                bool anyFailed = false;
+                foreach (var id in billIds)
+                {
+                    var result = await SendWhatsAppMessage(id);
+                    if (!result.Success)
+                    {
+                        anyFailed = true;
+                        // Not breaking here so we can try the rest
+                    }
+                }
+                
+                if (anyFailed)
+                {
+                    err.AddError("Some messages failed to send. Check the system logs or try again.");
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
+        public Task<ServiceResponse<bool>> BulkSendEmailMessages(List<int> billIds)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                bool anyFailed = false;
+                foreach (var id in billIds)
+                {
+                    var result = await SendEmailMessage(id);
+                    if (!result.Success)
+                    {
+                        anyFailed = true;
+                    }
+                }
+
+                if (anyFailed)
+                {
+                    err.AddError("Some emails failed to send. Check the system logs or try again.");
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
         public Task<ServiceResponse<bool>> UpdatePayments(int billId, List<SellingBillPaymentDto> payments)
         {
             return ServiceResponse<bool>.Execute(async err =>
