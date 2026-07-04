@@ -43,5 +43,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _dashboardService.GetProductProfitMetricsAsync();
             return HandleResponse(result);
         }
+
+        [HttpGet("{productId}")]
+        public async Task<IActionResult> GetProductStockHistory(int productId)
+        {
+            var result = await _dashboardService.GetProductStockHistoryAsync(productId);
+            return HandleResponse(result);
+        }
     }
 }

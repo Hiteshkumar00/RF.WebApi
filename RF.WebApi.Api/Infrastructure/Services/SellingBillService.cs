@@ -232,6 +232,25 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
+        public Task<ServiceResponse<List<SellingBillListDto>>> GetByCustomerId(int customerId)
+        {
+            return ServiceResponse<List<SellingBillListDto>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var bills = await _context.SellingBills
+                    .Include(b => b.Customer)
+                    .Include(b => b.Payments)
+                    .Include(b => b.Items)
+                    .Where(b => b.AccountId == accountId && b.CustomerId == customerId)
+                    .OrderByDescending(b => b.Date)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return _mapper.Map<List<SellingBillListDto>>(bills);
+            });
+        }
+
         public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)
         {
             return ServiceResponse<byte[]>.Execute(async err =>
@@ -332,6 +351,60 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     return false;
                 }
 
+                return true;
+            });
+        }
+
+        public Task<ServiceResponse<bool>> BulkSendWhatsAppMessages(List<int> billIds)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var allErrors = new List<string>();
+                foreach (var id in billIds)
+                {
+                    var result = await SendWhatsAppMessage(id);
+                    if (!result.Success)
+                    {
+                        allErrors.AddRange(result.Errors);
+                    }
+                }
+                
+                if (allErrors.Any())
+                {
+                    foreach(var e in allErrors.Distinct())
+                    {
+                        err.AddError(e);
+                    }
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
+        public Task<ServiceResponse<bool>> BulkSendEmailMessages(List<int> billIds)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var allErrors = new List<string>();
+                foreach (var id in billIds)
+                {
+                    var result = await SendEmailMessage(id);
+                    if (!result.Success)
+                    {
+                        allErrors.AddRange(result.Errors);
+                    }
+                }
+
+                if (allErrors.Any())
+                {
+                    foreach(var e in allErrors.Distinct())
+                    {
+                        err.AddError(e);
+                    }
+                    return false;
+                }
+                
                 return true;
             });
         }

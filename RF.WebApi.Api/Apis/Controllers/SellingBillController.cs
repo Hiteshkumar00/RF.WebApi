@@ -53,6 +53,13 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [HttpGet("{customerId}")]
+        public async Task<IActionResult> GetByCustomerId(int customerId)
+        {
+            var result = await _sellingBillService.GetByCustomerId(customerId);
+            return HandleResponse(result);
+        }
+
 
 
         [HttpGet("{id}")]
@@ -88,6 +95,20 @@ namespace RF.WebApi.Api.Apis.Controllers
         public async Task<IActionResult> SendEmailMessage(int id)
         {
             var result = await _sellingBillService.SendEmailMessage(id);
+            return HandleResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkSendWhatsAppMessages([FromBody] List<int> billIds)
+        {
+            var result = await _sellingBillService.BulkSendWhatsAppMessages(billIds);
+            return HandleResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BulkSendEmailMessages([FromBody] List<int> billIds)
+        {
+            var result = await _sellingBillService.BulkSendEmailMessages(billIds);
             return HandleResponse(result);
         }
 

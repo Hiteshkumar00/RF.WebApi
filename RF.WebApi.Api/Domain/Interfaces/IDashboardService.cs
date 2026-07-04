@@ -9,5 +9,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<PaymentAccountDashboardDto>> GetPaymentAccountDashboardMetricsAsync();
         Task<ServiceResponse<List<AllTimeDashboardItemDto>>> GetAllTimeDashboardMetricsAsync();
         Task<ServiceResponse<ProductDashboardDto>> GetProductProfitMetricsAsync();
+        Task<ServiceResponse<List<ProductStockHistoryDto>>> GetProductStockHistoryAsync(int productId);
     }
 }

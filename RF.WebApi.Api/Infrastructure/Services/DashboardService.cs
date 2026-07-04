@@ -319,25 +319,12 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     var totalSold = sales.Sum(s => s.Quantity ?? 0);
                     var totalBought = stocks.Sum(s => s.Quantity ?? 0);
                     var totalSellingAmt = sales.Sum(s => (s.Quantity ?? 0) * (s.Price ?? 0) - (s.Discount ?? 0));
+                    var totalBoughtAmt = stocks.Sum(s => (s.Quantity ?? 0) * (s.PurchasePrice ?? 0) - (s.Discount ?? 0));
                     
-                    // FIFO Remaining
                     int soldSoFar = totalSold;
-                    var history = new List<ProductStockHistoryDto>();
                     foreach (var s in stocks)
                     {
-                        int remain = soldSoFar >= (s.Quantity ?? 0) ? 0 : (s.Quantity ?? 0) - soldSoFar;
                         soldSoFar = Math.Max(0, soldSoFar - (s.Quantity ?? 0));
-
-                        history.Add(new ProductStockHistoryDto {
-                            StockId = s.Id!.Value,
-                            BillNo = s.BuyingBill?.BillNo ?? "N/A",
-                            AgencyName = s.BuyingBill?.Agency?.AgencyName ?? "Direct Stock",
-                            Date = s.Date?.ToDateTime(TimeOnly.MinValue),
-                            Quantity = s.Quantity ?? 0,
-                            PurchasePrice = s.PurchasePrice ?? 0,
-                            Discount = s.Discount ?? 0,
-                            RemainingQty = remain
-                        });
                     }
 
                     // COGS (All Time)
@@ -362,14 +349,57 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         TotalSoldCount = totalSold,
                         TotalPurchaseCount = totalBought,
                         TotalSellingAmount = totalSellingAmt,
+                        TotalBuyingAmount = totalBoughtAmt,
                         TotalPurchaseCost = cogs,
                         TotalProfit = totalSellingAmt - cogs,
-                        AvailableStock = totalBought - totalSold,
-                        StockHistory = history.OrderByDescending(h => h.Date).ToList()
+                        AvailableStock = totalBought - totalSold
                     });
                 }
 
                 return new ProductDashboardDto { ProductProfits = productProfits.OrderByDescending(p => p.TotalProfit).ToList() };
+            });
+        }
+
+        public async Task<ServiceResponse<List<ProductStockHistoryDto>>> GetProductStockHistoryAsync(int productId)
+        {
+            return await ServiceResponse<List<ProductStockHistoryDto>>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId && p.AccountId == accountId);
+                if (product == null)
+                {
+                    err.AddError("Product not found.");
+                    return default;
+                }
+
+                var stocks = await _context.Stocks
+                    .Include(s => s.BuyingBill).ThenInclude(b => b.Agency)
+                    .Where(s => s.ProductId == productId)
+                    .OrderBy(s => s.Date).ToListAsync();
+
+                var totalSold = await _context.SellingBillItems.Where(sbi => sbi.ProductId == productId).SumAsync(s => s.Quantity ?? 0);
+
+                int soldSoFar = totalSold;
+                var history = new List<ProductStockHistoryDto>();
+                foreach (var s in stocks)
+                {
+                    int remain = soldSoFar >= (s.Quantity ?? 0) ? 0 : (s.Quantity ?? 0) - soldSoFar;
+                    soldSoFar = Math.Max(0, soldSoFar - (s.Quantity ?? 0));
+
+                    history.Add(new ProductStockHistoryDto {
+                        StockId = s.Id!.Value,
+                        BillId = s.BuyingBillId ?? 0,
+                        BillNo = s.BuyingBill?.BillNo ?? "N/A",
+                        AgencyName = s.BuyingBill?.Agency?.AgencyName ?? "Direct Stock",
+                        Date = s.Date?.ToDateTime(TimeOnly.MinValue),
+                        Quantity = s.Quantity ?? 0,
+                        PurchasePrice = s.PurchasePrice ?? 0,
+                        Discount = s.Discount ?? 0,
+                        RemainingQty = remain
+                    });
+                }
+
+                return history.OrderByDescending(h => h.Date).ThenByDescending(h => h.StockId).ToList();
             });
         }
     }
