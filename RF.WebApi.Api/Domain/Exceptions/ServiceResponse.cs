@@ -1,4 +1,4 @@
-﻿namespace RF.WebApi.Api.Domain.Exceptions
+namespace RF.WebApi.Api.Domain.Exceptions
 {
     public class ServiceResponse<T>
     {
@@ -20,6 +20,8 @@
                 this.Errors.AddRange(otherResponse.Errors);
             }
         }
+
+
 
         public static async Task<ServiceResponse<T>> Execute(Func<ServiceResponse<T>, Task<T>> businessLogic)
         {

@@ -1,4 +1,5 @@
 using RF.WebApi.Api.Application.DTOs.Product;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 
 namespace RF.WebApi.Api.Domain.Interfaces
@@ -11,5 +12,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<ProductDto>> GetProductById(int id);
         Task<ServiceResponse<List<ProductDto>>> GetAllProducts(ProductFilterDto filter);
         Task<ServiceResponse<List<ProductDto>>> GetProductSuggestions(string searchTerm);
+        Task<ServiceResponse<byte[]>> ExportProducts(ProductFilterDto filter);
+        Task<ServiceResponse<ImportResultDto>> ImportProducts(List<ImportProductDto> dtos);
     }
 }

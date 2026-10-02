@@ -1,4 +1,5 @@
 using RF.WebApi.Api.Application.DTOs.Agency;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 
 namespace RF.WebApi.Api.Domain.Interfaces
@@ -13,5 +14,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<List<AgencyAdvancedListDto>>> GetAllAgencysAdvancedAsync();
         Task<ServiceResponse<ViewAgencyAllDetailDto>> GetAgencyAllDetailAsync(int agencyId);
         Task<ServiceResponse<AgencySummaryDto>> GetAgencySummaryAsync(int agencyId);
+        Task<ServiceResponse<byte[]>> ExportAgencies();
+        Task<ServiceResponse<ImportResultDto>> ImportAgencies(List<ImportAgencyDto> dtos);
     }
 }

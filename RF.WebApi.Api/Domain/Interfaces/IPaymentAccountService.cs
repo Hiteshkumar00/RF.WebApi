@@ -1,4 +1,5 @@
 using RF.WebApi.Api.Application.DTOs.PaymentAccount;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 
 namespace RF.WebApi.Api.Domain.Interfaces
@@ -18,5 +19,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> DeletePaymentTransfer(int id);
         Task<ServiceResponse<List<PaymentTransferDto>>> GetPaymentTransfers(PaymentTransferFilterDto filter);
         Task<ServiceResponse<PaymentTransferDto>> GetTransferById(int id);
+        Task<ServiceResponse<byte[]>> ExportPaymentAccounts();
+        Task<ServiceResponse<ImportResultDto>> ImportPaymentAccounts(List<ImportPaymentAccountDto> dtos);
     }
 }

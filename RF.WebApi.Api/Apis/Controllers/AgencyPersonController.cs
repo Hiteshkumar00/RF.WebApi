@@ -51,5 +51,23 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _agencyPersonService.GetAllAgencyPersons();
             return HandleResponse(result);
         }
+
+        [HttpGet()]
+        public async Task<IActionResult> Export()
+        {
+            var result = await _agencyPersonService.ExportAgencyPersons();
+            if (result.Success && result.Data != null)
+            {
+                return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AgencyPersons.xlsx");
+            }
+            return HandleResponse(result);
+        }
+
+        [HttpPost()]
+        public async Task<IActionResult> Import(List<ImportAgencyPersonDto> dtos)
+        {
+            var result = await _agencyPersonService.ImportAgencyPersons(dtos);
+            return HandleResponse(result);
+        }
     }
 }

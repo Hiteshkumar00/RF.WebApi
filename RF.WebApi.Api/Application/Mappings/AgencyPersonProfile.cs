@@ -11,6 +11,7 @@ namespace RF.WebApi.Api.Application.Mappings
             CreateMap<AgencyPerson, AgencyPersonDto>().ReverseMap();
             CreateMap<CreateAgencyPersonDto, AgencyPerson>();
             CreateMap<UpdateAgencyPersonDto, AgencyPerson>();
+            CreateMap<ImportAgencyPersonDto, AgencyPerson>();
         }
     }
 }

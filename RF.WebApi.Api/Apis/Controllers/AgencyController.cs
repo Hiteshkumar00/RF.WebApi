@@ -73,5 +73,23 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [HttpGet()]
+        public async Task<IActionResult> Export()
+        {
+            var result = await _agencyService.ExportAgencies();
+            if (result.Success && result.Data != null)
+            {
+                return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Agencies.xlsx");
+            }
+            return HandleResponse(result);
+        }
+
+        [HttpPost()]
+        public async Task<IActionResult> Import(List<ImportAgencyDto> dtos)
+        {
+            var result = await _agencyService.ImportAgencies(dtos);
+            return HandleResponse(result);
+        }
+
     }
 }

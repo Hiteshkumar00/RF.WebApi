@@ -14,6 +14,9 @@ namespace RF.WebApi.Api.Application.Mappings
                 .ForMember(dest => dest.AccountId, opt => opt.Ignore());
             CreateMap<UpdateProductDto, Product>()
                 .ForMember(dest => dest.AccountId, opt => opt.Ignore());
+            CreateMap<ImportProductDto, Product>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.AccountId, opt => opt.Ignore());
         }
     }
 }

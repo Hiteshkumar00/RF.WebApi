@@ -4,6 +4,7 @@ using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Application.DTOs.Agency;
 using RF.WebApi.Api.Application.DTOs.AgencyPerson;
 using RF.WebApi.Api.Application.DTOs.BuyingBill;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
@@ -12,17 +13,17 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
-    public class AgencyService : IAgencyService
+    public class AgencyService : BaseService, IAgencyService
     {
-        private readonly RFDBContext _context;
         private readonly IMapper _mapper;
         private readonly IBusinessYearService _businessYearService;
+        private readonly IExcelService _excelService;
 
-        public AgencyService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService)
+        public AgencyService(RFDBContext context, IMapper mapper, IBusinessYearService businessYearService, IExcelService excelService) : base(context)
         {
-            _context = context;
             _mapper = mapper;
             _businessYearService = businessYearService;
+            _excelService = excelService;
         }
 
         public async Task<ServiceResponse<int>> CreateAgency(CreateAgencyDto dto)
@@ -328,6 +329,70 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     TotalPaidAmount   = totalPaid,
                     TotalPendingAmount = totalBills - totalPaid
                 };
+            });
+        }
+
+        public Task<ServiceResponse<byte[]>> ExportAgencies()
+        {
+            return ServiceResponse<byte[]>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+                var agencies = await _context.Agencies
+                    .Where(a => a.AccountId == accountId)
+                    .AsNoTracking()
+                    .ToListAsync();
+                
+                var dtos = _mapper.Map<List<AgencyDto>>(agencies);
+                return _excelService.Export(dtos, "Agencies");
+            });
+        }
+
+        public Task<ServiceResponse<ImportResultDto>> ImportAgencies(List<ImportAgencyDto> dtos)
+        {
+            return ServiceResponse<ImportResultDto>.Execute(async err =>
+            {
+                var result = new ImportResultDto();
+                var accountId = Token.AccountId;
+
+                var existingNames = await _context.Agencies
+                    .Where(a => a.AccountId == accountId)
+                    .Select(a => a.AgencyName)
+                    .ToListAsync();
+                
+                var existingSet = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
+                var toAdd = new List<Agency>();
+
+                foreach(var dto in dtos)
+                {
+                    // Trim string fields
+                    dto.AgencyName = dto.AgencyName?.Trim();
+                    
+                    if (existingSet.Contains(dto.AgencyName))
+                    {
+                        result.Errors.Add(new ImportRowMessageDto { RowNo = dto.RowNo, Message = $"Agency '{dto.AgencyName}' already exists." });
+                        continue;
+                    }
+
+                    var agency = _mapper.Map<Agency>(dto);
+                    agency.AccountId = accountId;
+                    toAdd.Add(agency);
+                    
+                    existingSet.Add(dto.AgencyName);
+                    result.SuccessCount++;
+                }
+                
+                if (result.Errors.Count > 0)
+                {
+                    result.SuccessCount = 0;
+                    return result;
+                }
+
+                await RunInTransactionAsync(async () =>
+                {
+                    _context.Agencies.AddRange(toAdd);
+                });
+
+                return result;
             });
         }
 

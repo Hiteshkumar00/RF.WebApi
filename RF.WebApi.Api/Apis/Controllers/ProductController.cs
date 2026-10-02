@@ -58,5 +58,23 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _productService.GetProductSuggestions(searchTerm);
             return HandleResponse(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Export([FromQuery] ProductFilterDto filter)
+        {
+            var result = await _productService.ExportProducts(filter);
+            if (result.Success && result.Data != null)
+            {
+                return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Products.xlsx");
+            }
+            return HandleResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Import(List<ImportProductDto> dtos)
+        {
+            var result = await _productService.ImportProducts(dtos);
+            return HandleResponse(result);
+        }
     }
 }
