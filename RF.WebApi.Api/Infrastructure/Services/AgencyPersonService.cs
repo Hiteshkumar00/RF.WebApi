@@ -101,8 +101,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             where a.AccountId == Token.AccountId
                             select new AgencyPersonDto
                             {
-                                Id = ap.Id,
-                                AgencyId = ap.AgencyId,
+                                Id = ap.Id ?? 0,
+                                AgencyId = ap.AgencyId ?? 0,
                                 AgencyName = a.AgencyName,
                                 Name = ap.Name,
                                 PhoneNo = ap.PhoneNo,
@@ -125,8 +125,8 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             where a.AccountId == Token.AccountId
                             select new AgencyPersonDto
                             {
-                                Id = ap.Id,
-                                AgencyId = ap.AgencyId,
+                                Id = ap.Id ?? 0,
+                                AgencyId = ap.AgencyId ?? 0,
                                 AgencyName = a.AgencyName,
                                 Name = ap.Name,
                                 PhoneNo = ap.PhoneNo,
