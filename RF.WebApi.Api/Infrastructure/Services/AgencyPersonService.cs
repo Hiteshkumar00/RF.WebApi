@@ -136,12 +136,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .ToDictionaryAsync(a => a.AgencyName ?? "", a => a.Id);
 
                 var toAdd = new List<AgencyPerson>();
-                var existingNames = await _context.AgencyPersons
-                    .Where(ap => _context.Agencies.Any(a => a.Id == ap.AgencyId && a.AccountId == accountId))
-                    .Select(ap => new { ap.AgencyId, ap.Name })
-                    .ToListAsync();
-
-                var existingSet = new HashSet<string>(existingNames.Select(x => $"{x.AgencyId}_{x.Name}"), StringComparer.OrdinalIgnoreCase);
 
                 foreach(var dto in dtos)
                 {
@@ -154,11 +148,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         continue;
                     }
 
-                    if (existingSet.Contains($"{agencyId}_{dto.Name}"))
-                    {
-                        result.Errors.Add(new ImportRowMessageDto { RowNo = dto.RowNo, Message = $"Agency Person '{dto.Name}' already exists for Agency '{dto.AgencyName}'." });
-                        continue;
-                    }
+
 
                     var person = new AgencyPerson 
                     {
@@ -170,7 +160,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                         Address = dto.Address
                     };
                     toAdd.Add(person);
-                    existingSet.Add($"{agencyId}_{dto.Name}");
                     result.SuccessCount++;
                 }
                 
