@@ -96,17 +96,23 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<List<AgencyPersonDto>>.Execute(async err =>
             {
-                // To list securely we should probably join via Agency -> AccountId
                 var query = from ap in _context.AgencyPersons
                             join a in _context.Agencies on ap.AgencyId equals a.Id
                             where a.AccountId == Token.AccountId
-                            select ap;
+                            select new AgencyPersonDto
+                            {
+                                Id = ap.Id,
+                                AgencyId = ap.AgencyId,
+                                AgencyName = a.AgencyName,
+                                Name = ap.Name,
+                                PhoneNo = ap.PhoneNo,
+                                Email = ap.Email,
+                                PersonOccupation = ap.PersonOccupation,
+                                Address = ap.Address
+                            };
 
-                var agencyPersons = await query
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                return _mapper.Map<List<AgencyPersonDto>>(agencyPersons);
+                var dtos = await query.ToListAsync();
+                return dtos;
             });
         }
 
@@ -117,10 +123,19 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var query = from ap in _context.AgencyPersons
                             join a in _context.Agencies on ap.AgencyId equals a.Id
                             where a.AccountId == Token.AccountId
-                            select ap;
+                            select new AgencyPersonDto
+                            {
+                                Id = ap.Id,
+                                AgencyId = ap.AgencyId,
+                                AgencyName = a.AgencyName,
+                                Name = ap.Name,
+                                PhoneNo = ap.PhoneNo,
+                                Email = ap.Email,
+                                PersonOccupation = ap.PersonOccupation,
+                                Address = ap.Address
+                            };
 
-                var persons = await query.AsNoTracking().ToListAsync();
-                var dtos = _mapper.Map<List<AgencyPersonDto>>(persons);
+                var dtos = await query.ToListAsync();
                 return _excelService.Export(dtos, "Agency Persons");
             });
         }
