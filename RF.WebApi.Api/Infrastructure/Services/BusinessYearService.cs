@@ -244,7 +244,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 else
                 {
                     // If no next year, till now
-                    endDate = DateOnly.FromDateTime(DateTime.Now);
+                    endDate = DateOnly.FromDateTime(DateTime.MaxValue);
                 }
 
                 return (startDate, endDate);
