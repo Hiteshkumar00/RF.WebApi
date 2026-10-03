@@ -6,6 +6,9 @@ using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
+using RF.WebApi.Api.Application.DTOs.Common;
+using RF.WebApi.Api.Application.Extensions;
+using AutoMapper.QueryableExtensions;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
 
@@ -204,9 +207,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<SellingBillListDto>>> GetAllSellingBills()
+        public Task<ServiceResponse<PagedResult<SellingBillListDto>>> GetAllSellingBills(TableLazyLoadEventDto request, int? customerId = null)
         {
-            return ServiceResponse<List<SellingBillListDto>>.Execute(async err =>
+            return ServiceResponse<PagedResult<SellingBillListDto>>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
 
@@ -219,37 +222,20 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 var (startDate, endDate) = dateRangeResponse.Data;
 
-                var bills = await _context.SellingBills
-                    .Include(b => b.Customer)
-                    .Include(b => b.Payments)
-                    .Include(b => b.Items)
-                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
-                    .OrderByDescending(b => b.Date)
-                    .AsNoTracking()
-                    .ToListAsync();
+                var query = _context.SellingBills
+                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate);
 
-                return _mapper.Map<List<SellingBillListDto>>(bills);
+                if (customerId.HasValue)
+                {
+                    query = query.Where(b => b.CustomerId == customerId.Value);
+                }
+
+                var projectedQuery = query.ProjectTo<SellingBillListDto>(_mapper.ConfigurationProvider);
+                return await projectedQuery.ApplyPrimeNgAsync(request);
             });
         }
 
-        public Task<ServiceResponse<List<SellingBillListDto>>> GetByCustomerId(int customerId)
-        {
-            return ServiceResponse<List<SellingBillListDto>>.Execute(async err =>
-            {
-                var accountId = Token.AccountId;
 
-                var bills = await _context.SellingBills
-                    .Include(b => b.Customer)
-                    .Include(b => b.Payments)
-                    .Include(b => b.Items)
-                    .Where(b => b.AccountId == accountId && b.CustomerId == customerId)
-                    .OrderByDescending(b => b.Date)
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                return _mapper.Map<List<SellingBillListDto>>(bills);
-            });
-        }
 
         public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)
         {

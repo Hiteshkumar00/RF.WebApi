@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -11,6 +12,8 @@ namespace RF.WebApi.Api.Application.Extensions
 {
     public static class PrimeNgFilterExtensions
     {
+        private static readonly ConcurrentDictionary<Type, string?> _idPropertyCache = new();
+
         public static async Task<RF.WebApi.Api.Application.DTOs.Common.PagedResult<T>> ApplyPrimeNgAsync<T>(
             this IQueryable<T> query,
             TableLazyLoadEventDto request,
@@ -113,6 +116,21 @@ namespace RF.WebApi.Api.Application.Extensions
             var totalRecords = await query.CountAsync(cancellationToken);
 
             // 3. Dynamic Sorting
+            if (string.IsNullOrWhiteSpace(request.SortField))
+            {
+                var idPropertyName = _idPropertyCache.GetOrAdd(typeof(T), type =>
+                {
+                    var prop = type.GetProperty("Id", System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    return prop?.Name;
+                });
+
+                if (idPropertyName != null)
+                {
+                    request.SortField = idPropertyName;
+                    request.SortOrder = -1;
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(request.SortField))
             {
                 var direction = request.SortOrder == -1 ? "descending" : "ascending";
