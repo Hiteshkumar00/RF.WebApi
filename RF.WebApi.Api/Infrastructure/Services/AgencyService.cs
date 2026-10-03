@@ -30,8 +30,16 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return await ServiceResponse<int>.Execute(async err =>
             {
+                var accountId = Token.AccountId;
+                var exists = await _context.Agencies.AnyAsync(a => a.AccountId == accountId && a.AgencyName == dto.AgencyName);
+                if (exists)
+                {
+                    err.AddError($"Agency '{dto.AgencyName}' already exists.");
+                    return default;
+                }
+
                 var agency = _mapper.Map<Agency>(dto);
-                agency.AccountId = Token.AccountId;
+                agency.AccountId = accountId;
 
                 _context.Agencies.Add(agency);
                 await _context.SaveChangesAsync();
@@ -67,6 +75,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 if (agency == null)
                 {
                     err.AddError(AgencyMessages.NotFound);
+                    return false;
+                }
+
+                var exists = await _context.Agencies.AnyAsync(a => a.AccountId == Token.AccountId && a.AgencyName == dto.AgencyName && a.Id != dto.Id);
+                if (exists)
+                {
+                    err.AddError($"Agency '{dto.AgencyName}' already exists.");
                     return false;
                 }
 

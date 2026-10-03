@@ -491,29 +491,16 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var result = new ImportResultDto();
                 var accountId = Token.AccountId;
 
-                var existingNames = await _context.PaymentAccounts
-                    .Where(p => p.AccountId == accountId)
-                    .Select(p => p.MethodName)
-                    .ToListAsync();
-                
-                var existingSet = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
                 var toAdd = new List<PaymentAccount>();
 
                 foreach(var dto in dtos)
                 {
                     dto.MethodName = dto.MethodName?.Trim();
 
-                    if (existingSet.Contains(dto.MethodName))
-                    {
-                        result.Errors.Add(new ImportRowMessageDto { RowNo = dto.RowNo, Message = $"Payment Account '{dto.MethodName}' already exists." });
-                        continue;
-                    }
-
                     var paymentAccount = _mapper.Map<PaymentAccount>(dto);
                     paymentAccount.AccountId = accountId;
                     toAdd.Add(paymentAccount);
                     
-                    existingSet.Add(dto.MethodName);
                     result.SuccessCount++;
                 }
                 
