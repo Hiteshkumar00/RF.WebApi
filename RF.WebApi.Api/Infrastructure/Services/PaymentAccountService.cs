@@ -477,7 +477,10 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .ToListAsync();
                 
                 var dtos = _mapper.Map<List<PaymentAccountDto>>(accounts);
-                return _excelService.Export(dtos, "Bank Accounts");
+                var mapping = new Dictionary<string, string> {
+                    { "MethodName", "Method Name" }
+                };
+                return _excelService.Export(dtos, "BankAccounts_Import_Template", mapping);
             });
         }
 

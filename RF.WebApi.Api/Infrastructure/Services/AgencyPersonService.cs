@@ -136,7 +136,15 @@ namespace RF.WebApi.Api.Infrastructure.Services
                             };
 
                 var dtos = await query.ToListAsync();
-                return _excelService.Export(dtos, "Agency Persons");
+                var mapping = new Dictionary<string, string> {
+                    { "Name", "Person Name" },
+                    { "AgencyName", "Agency Name" },
+                    { "PhoneNo", "Mobile No" },
+                    { "Email", "Email" },
+                    { "PersonOccupation", "Position" },
+                    { "Address", "Address" }
+                };
+                return _excelService.Export(dtos, "AgencyPersons_Import_Template", mapping);
             });
         }
 

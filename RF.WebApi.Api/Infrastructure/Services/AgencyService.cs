@@ -343,7 +343,11 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     .ToListAsync();
                 
                 var dtos = _mapper.Map<List<AgencyDto>>(agencies);
-                return _excelService.Export(dtos, "Agencies");
+                var mapping = new Dictionary<string, string> {
+                    { "AgencyName", "Agency Name" },
+                    { "Address", "Address" }
+                };
+                return _excelService.Export(dtos, "Agencies_Import_Template", mapping);
             });
         }
 

@@ -4,6 +4,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
 {
     public interface IExcelService
     {
-        byte[] Export<T>(IEnumerable<T> data, string sheetName = "Sheet1");
+        byte[] Export<T>(IEnumerable<T> data, string sheetName = "Sheet1", Dictionary<string, string> columnMapping = null);
     }
 }

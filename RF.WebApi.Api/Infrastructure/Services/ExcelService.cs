@@ -9,37 +9,61 @@ namespace RF.WebApi.Api.Infrastructure.Services
 {
     public class ExcelService : IExcelService
     {
-        public byte[] Export<T>(IEnumerable<T> data, string sheetName = "Sheet1")
+        public byte[] Export<T>(IEnumerable<T> data, string sheetName = "Sheet1", Dictionary<string, string> columnMapping = null)
         {
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add(sheetName);
 
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            var allProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                       .Where(p => p.CanRead)
                                       .ToList();
 
-            // Headers
-            for (int i = 0; i < properties.Count; i++)
+            var propertiesToExport = allProperties;
+            if (columnMapping != null && columnMapping.Any())
             {
-                worksheet.Cell(1, i + 1).Value = properties[i].Name;
+                propertiesToExport = allProperties
+                    .Where(p => columnMapping.ContainsKey(p.Name) || columnMapping.ContainsKey(char.ToLower(p.Name[0]) + p.Name.Substring(1)))
+                    .ToList();
+            }
+
+            // Headers
+            for (int i = 0; i < propertiesToExport.Count; i++)
+            {
+                var propName = propertiesToExport[i].Name;
+                var camelCasePropName = char.ToLower(propName[0]) + propName.Substring(1);
+
+                string headerName = propName;
+                if (columnMapping != null)
+                {
+                    if (columnMapping.ContainsKey(propName))
+                        headerName = columnMapping[propName];
+                    else if (columnMapping.ContainsKey(camelCasePropName))
+                        headerName = columnMapping[camelCasePropName];
+                }
+
+                worksheet.Cell(1, i + 1).Value = headerName;
             }
 
             // Data
             int rowIndex = 2;
             foreach (var item in data)
             {
-                for (int i = 0; i < properties.Count; i++)
+                for (int i = 0; i < propertiesToExport.Count; i++)
                 {
-                    var value = properties[i].GetValue(item);
+                    var value = propertiesToExport[i].GetValue(item);
                     worksheet.Cell(rowIndex, i + 1).Value = value != null ? value.ToString() : string.Empty;
                 }
                 rowIndex++;
             }
 
             // Style headers
-            var headerRange = worksheet.Range(1, 1, 1, properties.Count);
-            headerRange.Style.Font.Bold = true;
-            headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+            if (propertiesToExport.Count > 0)
+            {
+                var headerRange = worksheet.Range(1, 1, 1, propertiesToExport.Count);
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#4F81BD"); // Blue header
+                headerRange.SetAutoFilter();
+            }
 
             worksheet.Columns().AdjustToContents();
 

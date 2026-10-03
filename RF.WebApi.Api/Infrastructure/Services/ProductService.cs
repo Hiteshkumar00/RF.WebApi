@@ -189,7 +189,14 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 var dtos = _mapper.Map<List<ProductDto>>(products);
                 
                 // Usually we format for export, but directly exporting DTOs is fine here.
-                var excelData = _excelService.Export(dtos, "Products");
+                var mapping = new Dictionary<string, string> {
+                    { "ProductName", "Product Name" },
+                    { "WarrantyYear", "Warranty Year" },
+                    { "WarrantyMonth", "Warranty Month" },
+                    { "WarrantyDay", "Warranty Day" },
+                    { "ImageLink", "Image Link" }
+                };
+                var excelData = _excelService.Export(dtos, "Products_Import_Template", mapping);
                 return excelData;
             });
         }
