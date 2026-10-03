@@ -235,6 +235,44 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
+        public Task<ServiceResponse<SellingBillStatisticsDto>> GetSellingBillStatistics(int? customerId = null)
+        {
+            return ServiceResponse<SellingBillStatisticsDto>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+
+                var dateRangeResponse = await _businessYearService.GetSelectedBusinessYearDates();
+                if (!dateRangeResponse.Success)
+                {
+                    err.SetErrors(dateRangeResponse);
+                    return default;
+                }
+
+                var (startDate, endDate) = dateRangeResponse.Data;
+
+                var query = _context.SellingBills
+                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate);
+
+                if (customerId.HasValue)
+                {
+                    query = query.Where(b => b.CustomerId == customerId.Value);
+                }
+
+                var projectedQuery = query.ProjectTo<SellingBillListDto>(_mapper.ConfigurationProvider);
+
+                var totalSellingAmount = await projectedQuery.SumAsync(b => (decimal?)b.NetAmount) ?? 0;
+                var totalReceivedAmount = await projectedQuery.SumAsync(b => (decimal?)b.PaidAmount) ?? 0;
+                var totalRemainingAmount = await projectedQuery.SumAsync(b => (decimal?)b.RemainingAmount) ?? 0;
+
+                return new SellingBillStatisticsDto
+                {
+                    TotalSellingAmount = totalSellingAmount,
+                    TotalReceivedAmount = totalReceivedAmount,
+                    TotalRemainingAmount = totalRemainingAmount
+                };
+            });
+        }
+
 
 
         public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)

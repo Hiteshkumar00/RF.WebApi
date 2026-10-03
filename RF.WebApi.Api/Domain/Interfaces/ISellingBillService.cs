@@ -11,6 +11,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> UpdateSellingBill(UpdateSellingBillDto dto);
         Task<ServiceResponse<bool>> DeleteSellingBill(int id);
         Task<ServiceResponse<PagedResult<SellingBillListDto>>> GetAllSellingBills(TableLazyLoadEventDto request, int? customerId = null);
+        Task<ServiceResponse<SellingBillStatisticsDto>> GetSellingBillStatistics(int? customerId = null);
 
         Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id);
         Task<ServiceResponse<bool>> SendWhatsAppMessage(int id);

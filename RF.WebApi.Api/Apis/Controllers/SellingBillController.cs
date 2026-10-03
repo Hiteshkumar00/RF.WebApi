@@ -53,7 +53,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             var result = await _sellingBillService.GetAllSellingBills(request, customerId);
             return HandleResponse(result);
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetStatistics([FromQuery] int? customerId = null)
+        {
+            var result = await _sellingBillService.GetSellingBillStatistics(customerId);
+            return HandleResponse(result);
+        }
 
 
         [HttpGet("{id}")]

@@ -19,11 +19,61 @@ namespace RF.WebApi.Api.Application.Extensions
             TableLazyLoadEventDto request,
             CancellationToken cancellationToken = default)
         {
+            query = query.ApplyPrimeNgFilters(request);
+
+            // 2. Count Total Records Before Paging
+            var totalRecords = await query.CountAsync(cancellationToken);
+
+            // 3. Dynamic Sorting
+            if (string.IsNullOrWhiteSpace(request.SortField))
+            {
+                var idPropertyName = _idPropertyCache.GetOrAdd(typeof(T), type =>
+                {
+                    var prop = type.GetProperty("Id", System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    return prop?.Name;
+                });
+
+                if (idPropertyName != null)
+                {
+                    request.SortField = idPropertyName;
+                    request.SortOrder = -1;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.SortField))
+            {
+                var direction = request.SortOrder == -1 ? "descending" : "ascending";
+                query = query.OrderBy($"{request.SortField} {direction}");
+            }
+
+            // 4. Pagination
+            int skip = request.First ?? 0;
+            int take = request.Rows ?? 10;
+            
+            List<T> data;
+            if (take == -1)
+            {
+                data = await query.Skip(skip).ToListAsync(cancellationToken);
+            }
+            else
+            {
+                data = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+            }
+
+            return new RF.WebApi.Api.Application.DTOs.Common.PagedResult<T>
+            {
+                Data = data,
+                TotalRecords = totalRecords
+            };
+        }
+
+        public static IQueryable<T> ApplyPrimeNgFilters<T>(
+            this IQueryable<T> query,
+            TableLazyLoadEventDto request)
+        {
             // 0. Global Filter (Search Term)
             if (!string.IsNullOrWhiteSpace(request.GlobalFilter))
             {
-                // This is a generic approach for string properties. 
-                // Alternatively, you can pass a specific search expression or fields.
                 var stringProperties = typeof(T).GetProperties()
                     .Where(p => p.PropertyType == typeof(string))
                     .Select(p => p.Name);
@@ -51,8 +101,6 @@ namespace RF.WebApi.Api.Application.Extensions
                 {
                     var field = kvp.Key;
                     
-                    // PrimeNG sends global filter in the 'Filters' object as well sometimes (key is "global"). 
-                    // We've handled it above, so skip if present here
                     if (field.ToLower() == "global") continue;
 
                     var metaList = kvp.Value;
@@ -112,50 +160,7 @@ namespace RF.WebApi.Api.Application.Extensions
                 }
             }
 
-            // 2. Count Total Records Before Paging
-            var totalRecords = await query.CountAsync(cancellationToken);
-
-            // 3. Dynamic Sorting
-            if (string.IsNullOrWhiteSpace(request.SortField))
-            {
-                var idPropertyName = _idPropertyCache.GetOrAdd(typeof(T), type =>
-                {
-                    var prop = type.GetProperty("Id", System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                    return prop?.Name;
-                });
-
-                if (idPropertyName != null)
-                {
-                    request.SortField = idPropertyName;
-                    request.SortOrder = -1;
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.SortField))
-            {
-                var direction = request.SortOrder == -1 ? "descending" : "ascending";
-                query = query.OrderBy($"{request.SortField} {direction}");
-            }
-
-            // 4. Pagination
-            int skip = request.First ?? 0;
-            int take = request.Rows ?? 10;
-            
-            List<T> data;
-            if (take == -1)
-            {
-                data = await query.Skip(skip).ToListAsync(cancellationToken);
-            }
-            else
-            {
-                data = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
-            }
-
-            return new RF.WebApi.Api.Application.DTOs.Common.PagedResult<T>
-            {
-                Data = data,
-                TotalRecords = totalRecords
-            };
+            return query;
         }
 
         private static string BuildExpression(string field, string? matchMode, int idx) => matchMode?.ToLower() switch
