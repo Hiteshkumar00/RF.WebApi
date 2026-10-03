@@ -258,11 +258,13 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     query = query.Where(b => b.CustomerId == customerId.Value);
                 }
 
-                var projectedQuery = query.ProjectTo<SellingBillListDto>(_mapper.ConfigurationProvider);
+                var totalSellingAmount = await query.SelectMany(b => b.Items)
+                    .SumAsync(i => (decimal?)(((i.Quantity ?? 0) * (i.Price ?? 0)) - (i.Discount ?? 0))) ?? 0;
 
-                var totalSellingAmount = await projectedQuery.SumAsync(b => (decimal?)b.NetAmount) ?? 0;
-                var totalReceivedAmount = await projectedQuery.SumAsync(b => (decimal?)b.PaidAmount) ?? 0;
-                var totalRemainingAmount = await projectedQuery.SumAsync(b => (decimal?)b.RemainingAmount) ?? 0;
+                var totalReceivedAmount = await query.SelectMany(b => b.Payments)
+                    .SumAsync(p => (decimal?)p.Amount) ?? 0;
+
+                var totalRemainingAmount = totalSellingAmount - totalReceivedAmount;
 
                 return new SellingBillStatisticsDto
                 {
