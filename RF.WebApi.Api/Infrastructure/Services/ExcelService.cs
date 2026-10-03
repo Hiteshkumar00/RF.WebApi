@@ -9,14 +9,19 @@ namespace RF.WebApi.Api.Infrastructure.Services
 {
     public class ExcelService : IExcelService
     {
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, List<PropertyInfo>> _propertiesCache 
+            = new System.Collections.Concurrent.ConcurrentDictionary<Type, List<PropertyInfo>>();
+
         public byte[] Export<T>(IEnumerable<T> data, string sheetName = "Sheet1", Dictionary<string, string> columnMapping = null)
         {
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add(sheetName);
 
-            var allProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                      .Where(p => p.CanRead)
-                                      .ToList();
+            var allProperties = _propertiesCache.GetOrAdd(typeof(T), type => 
+                type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.CanRead)
+                    .ToList()
+            );
 
             var propertiesToExport = allProperties;
             if (columnMapping != null && columnMapping.Any())
