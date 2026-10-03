@@ -7,6 +7,7 @@ using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using RF.WebApi.Api.Application.Extensions;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
@@ -120,25 +121,24 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<ProductDto>>> GetAllProducts(ProductFilterDto filter)
+        public Task<ServiceResponse<PagedResult<ProductDto>>> GetAllProducts(TableLazyLoadEventDto request)
         {
-            return ServiceResponse<List<ProductDto>>.Execute(async err =>
+            return ServiceResponse<PagedResult<ProductDto>>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
-
                 var query = _context.Products.Where(p => p.AccountId == accountId).AsNoTracking();
 
-                if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-                {
-                    query = query.Where(p => p.ProductName!.Contains(filter.SearchTerm));
-                }
+                var pagedProduct = await query.ApplyPrimeNgAsync(request);
 
-                var products = await query.ToListAsync();
-                return _mapper.Map<List<ProductDto>>(products);
+                return new PagedResult<ProductDto>
+                {
+                    Data = _mapper.Map<List<ProductDto>>(pagedProduct.Data),
+                    TotalRecords = pagedProduct.TotalRecords
+                };
             });
         }
 
-        public Task<ServiceResponse<List<ProductDto>>> GetProductSuggestions(string searchTerm)
+        public Task<ServiceResponse<List<ProductDto>>> GetProductSuggestions(string? searchTerm, List<int>? includeIds = null)
         {
             return ServiceResponse<List<ProductDto>>.Execute(async err =>
             {
@@ -151,7 +151,24 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     query = query.Where(p => p.ProductName!.Contains(searchTerm));
                 }
 
-                var products = await query.Take(20).ToListAsync();
+                var products = await query.OrderByDescending(p => p.Id).ToListAsync();
+
+                if (includeIds != null && includeIds.Any())
+                {
+                    var existingIds = products.Select(p => p.Id).ToHashSet();
+                    var missingIds = includeIds.Where(id => !existingIds.Contains(id)).ToList();
+                    
+                    if (missingIds.Any())
+                    {
+                        var missingProducts = await _context.Products
+                            .Where(p => p.AccountId == accountId && p.Id.HasValue && missingIds.Contains(p.Id.Value))
+                            .AsNoTracking()
+                            .ToListAsync();
+                            
+                        products.AddRange(missingProducts);
+                    }
+                }
+
                 return _mapper.Map<List<ProductDto>>(products);
             });
         }
@@ -224,5 +241,6 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 return result;
             });
         }
+
     }
 }
