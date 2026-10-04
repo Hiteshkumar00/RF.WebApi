@@ -11,5 +11,6 @@ namespace RF.WebApi.Api.Infrastructure.Data.Tables
         public int? WarrantyYear { get; set; }
         public int? WarrantyMonth { get; set; }
         public int? WarrantyDay { get; set; }
+        public decimal? Price { get; set; }
     }
 }

@@ -11,6 +11,7 @@ namespace RF.WebApi.Api.Application.DTOs.Product
         public int? WarrantyYear { get; set; }
         public int? WarrantyMonth { get; set; }
         public int? WarrantyDay { get; set; }
+        public decimal? Price { get; set; }
     }
 
     public class CreateProductDto
@@ -21,6 +22,7 @@ namespace RF.WebApi.Api.Application.DTOs.Product
         public int? WarrantyYear { get; set; }
         public int? WarrantyMonth { get; set; }
         public int? WarrantyDay { get; set; }
+        public decimal? Price { get; set; }
     }
 
     public class UpdateProductDto : CreateProductDto

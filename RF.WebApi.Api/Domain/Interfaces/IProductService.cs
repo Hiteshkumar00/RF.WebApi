@@ -14,5 +14,6 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<List<ProductDto>>> GetProductSuggestions(string? searchTerm, List<int>? includeIds = null);
         Task<ServiceResponse<byte[]>> ExportProducts(ProductFilterDto filter);
         Task<ServiceResponse<ImportResultDto>> ImportProducts(List<ImportProductDto> dtos);
+        Task<ServiceResponse<bool>> MigratePrice(MigratePriceDto dto);
     }
 }

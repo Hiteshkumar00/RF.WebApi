@@ -78,5 +78,12 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> MigratePrice([FromBody] MigratePriceDto dto)
+        {
+            var result = await _productService.MigratePrice(dto);
+            return HandleResponse(result);
+        }
+
     }
 }

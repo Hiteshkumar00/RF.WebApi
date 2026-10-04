@@ -280,7 +280,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     }
                     else
                     {
-                        endDate = DateOnly.FromDateTime(DateTime.Now);
+                        endDate = DateOnly.FromDateTime(DateTime.MaxValue);
                     }
 
                     results.Add(new BusinessYearDateRangeDto

@@ -191,6 +191,7 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 // Usually we format for export, but directly exporting DTOs is fine here.
                 var mapping = new Dictionary<string, string> {
                     { "ProductName", "Product Name" },
+                    { "Price", "Price" },
                     { "WarrantyYear", "Warranty Year" },
                     { "WarrantyMonth", "Warranty Month" },
                     { "WarrantyDay", "Warranty Day" },
@@ -246,6 +247,52 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 });
 
                 return result;
+            });
+        }
+
+        public Task<ServiceResponse<bool>> MigratePrice(MigratePriceDto dto)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+                
+                if (dto.MarginPercentage < 0)
+                {
+                    err.AddError("Margin percentage cannot be less than 0.");
+                    return false;
+                }
+
+                if (dto.ProductIds == null || !dto.ProductIds.Any())
+                {
+                    err.AddError("No products selected.");
+                    return false;
+                }
+
+                var products = await _context.Products
+                    .Where(p => p.AccountId == accountId && dto.ProductIds.Contains(p.Id ?? 0))
+                    .ToListAsync();
+
+                var productIdsList = products.Select(p => p.Id).ToList();
+                var latestStocks = await _context.Stocks
+                    .Where(s => productIdsList.Contains(s.ProductId))
+                    .GroupBy(s => s.ProductId)
+                    .Select(g => g.OrderByDescending(s => s.Id).FirstOrDefault())
+                    .ToListAsync();
+
+                var stockDict = latestStocks
+                    .Where(s => s != null && s.ProductId.HasValue && s.PurchasePrice.HasValue)
+                    .ToDictionary(s => s.ProductId.Value, s => s.PurchasePrice.Value);
+
+                foreach (var product in products)
+                {
+                    if (product.Id.HasValue && stockDict.TryGetValue(product.Id.Value, out var purchasePrice))
+                    {
+                        product.Price = purchasePrice * (1 + (dto.MarginPercentage / 100));
+                    }
+                }
+                
+                await _context.SaveChangesAsync();
+                return true;
             });
         }
 
