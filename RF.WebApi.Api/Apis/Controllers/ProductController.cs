@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RF.WebApi.Api.Application.DTOs.Product;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Interfaces;
 
 namespace RF.WebApi.Api.Apis.Controllers
@@ -45,18 +46,44 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] ProductFilterDto filter)
+        [HttpPost]
+        public async Task<IActionResult> GetAll([FromBody] TableLazyLoadEventDto request)
         {
-            var result = await _productService.GetAllProducts(filter);
+            var result = await _productService.GetAllProducts(request);
             return HandleResponse(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSuggestions([FromQuery] string searchTerm)
+        public async Task<IActionResult> GetSuggestions([FromQuery] string? searchTerm, [FromQuery] List<int>? includeIds)
         {
-            var result = await _productService.GetProductSuggestions(searchTerm);
+            var result = await _productService.GetProductSuggestions(searchTerm, includeIds);
             return HandleResponse(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Export([FromQuery] ProductFilterDto filter)
+        {
+            var result = await _productService.ExportProducts(filter);
+            if (result.Success && result.Data != null)
+            {
+                return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Products.xlsx");
+            }
+            return HandleResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Import(List<ImportProductDto> dtos)
+        {
+            var result = await _productService.ImportProducts(dtos);
+            return HandleResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MigratePrice([FromBody] MigratePriceDto dto)
+        {
+            var result = await _productService.MigratePrice(dto);
+            return HandleResponse(result);
+        }
+
     }
 }

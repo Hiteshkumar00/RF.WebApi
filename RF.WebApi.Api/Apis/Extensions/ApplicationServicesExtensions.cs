@@ -29,6 +29,7 @@ namespace RF.WebApi.Api.Apis.Extensions
             services.AddScoped<IEmailIntegrationService, EmailIntegrationService>();
             services.AddScoped<ISystemConfigurationService, SystemConfigurationService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IExcelService, ExcelService>();
 
             return services;
         }

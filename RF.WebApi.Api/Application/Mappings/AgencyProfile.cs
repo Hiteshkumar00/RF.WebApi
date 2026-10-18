@@ -13,6 +13,7 @@ namespace RF.WebApi.Api.Application.Mappings
             CreateMap<Agency, ViewAgencyAllDetailDto>().ReverseMap();
             CreateMap<CreateAgencyDto, Agency>();
             CreateMap<UpdateAgencyDto, Agency>();
+            CreateMap<ImportAgencyDto, Agency>();
         }
     }
 }

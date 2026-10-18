@@ -2,22 +2,24 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Application.DTOs.Product;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 using RF.WebApi.Infrastructure.Data.DataBase;
+using RF.WebApi.Api.Application.Extensions;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
-    public class ProductService : IProductService
+    public class ProductService : BaseService, IProductService
     {
-        private readonly RFDBContext _context;
         private readonly IMapper _mapper;
+        private readonly IExcelService _excelService;
 
-        public ProductService(RFDBContext context, IMapper mapper)
+        public ProductService(RFDBContext context, IMapper mapper, IExcelService excelService) : base(context)
         {
-            _context = context;
             _mapper = mapper;
+            _excelService = excelService;
         }
 
         public async Task<ServiceResponse<int>> CreateProduct(CreateProductDto dto)
@@ -119,25 +121,24 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<ProductDto>>> GetAllProducts(ProductFilterDto filter)
+        public Task<ServiceResponse<PagedResult<ProductDto>>> GetAllProducts(TableLazyLoadEventDto request)
         {
-            return ServiceResponse<List<ProductDto>>.Execute(async err =>
+            return ServiceResponse<PagedResult<ProductDto>>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
-
                 var query = _context.Products.Where(p => p.AccountId == accountId).AsNoTracking();
 
-                if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-                {
-                    query = query.Where(p => p.ProductName!.Contains(filter.SearchTerm));
-                }
+                var pagedProduct = await query.ApplyPrimeNgAsync(request);
 
-                var products = await query.ToListAsync();
-                return _mapper.Map<List<ProductDto>>(products);
+                return new PagedResult<ProductDto>
+                {
+                    Data = _mapper.Map<List<ProductDto>>(pagedProduct.Data),
+                    TotalRecords = pagedProduct.TotalRecords
+                };
             });
         }
 
-        public Task<ServiceResponse<List<ProductDto>>> GetProductSuggestions(string searchTerm)
+        public Task<ServiceResponse<List<ProductDto>>> GetProductSuggestions(string? searchTerm, List<int>? includeIds = null)
         {
             return ServiceResponse<List<ProductDto>>.Execute(async err =>
             {
@@ -150,9 +151,150 @@ namespace RF.WebApi.Api.Infrastructure.Services
                     query = query.Where(p => p.ProductName!.Contains(searchTerm));
                 }
 
-                var products = await query.Take(20).ToListAsync();
+                var products = await query.OrderByDescending(p => p.Id).ToListAsync();
+
+                if (includeIds != null && includeIds.Any())
+                {
+                    var existingIds = products.Select(p => p.Id).ToHashSet();
+                    var missingIds = includeIds.Where(id => !existingIds.Contains(id)).ToList();
+                    
+                    if (missingIds.Any())
+                    {
+                        var missingProducts = await _context.Products
+                            .Where(p => p.AccountId == accountId && p.Id.HasValue && missingIds.Contains(p.Id.Value))
+                            .AsNoTracking()
+                            .ToListAsync();
+                            
+                        products.AddRange(missingProducts);
+                    }
+                }
+
                 return _mapper.Map<List<ProductDto>>(products);
             });
         }
+
+        public Task<ServiceResponse<byte[]>> ExportProducts(ProductFilterDto filter)
+        {
+            return ServiceResponse<byte[]>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+                var query = _context.Products.Where(p => p.AccountId == accountId).AsNoTracking();
+
+                if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+                {
+                    query = query.Where(p => p.ProductName!.Contains(filter.SearchTerm));
+                }
+
+                var products = await query.ToListAsync();
+                var dtos = _mapper.Map<List<ProductDto>>(products);
+                
+                // Usually we format for export, but directly exporting DTOs is fine here.
+                var mapping = new Dictionary<string, string> {
+                    { "ProductName", "Product Name" },
+                    { "Price", "Price" },
+                    { "WarrantyYear", "Warranty Year" },
+                    { "WarrantyMonth", "Warranty Month" },
+                    { "WarrantyDay", "Warranty Day" },
+                    { "ImageLink", "Image Link" }
+                };
+                var excelData = _excelService.Export(dtos, "Products_Import_Template", mapping);
+                return excelData;
+            });
+        }
+
+        public Task<ServiceResponse<ImportResultDto>> ImportProducts(List<ImportProductDto> dtos)
+        {
+            return ServiceResponse<ImportResultDto>.Execute(async err =>
+            {
+                var result = new ImportResultDto();
+                var accountId = Token.AccountId;
+
+                var existingNames = await _context.Products
+                    .Where(p => p.AccountId == accountId)
+                    .Select(p => p.ProductName)
+                    .ToListAsync();
+
+                var existingSet = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
+                var toAdd = new List<Product>();
+
+                foreach(var dto in dtos)
+                {
+                    dto.ProductName = dto.ProductName?.Trim();
+
+                    if (existingSet.Contains(dto.ProductName))
+                    {
+                        result.Errors.Add(new ImportRowMessageDto { RowNo = dto.RowNo, Message = $"Product '{dto.ProductName}' already exists." });
+                        continue;
+                    }
+
+                    var product = _mapper.Map<Product>(dto);
+                    product.AccountId = accountId;
+                    toAdd.Add(product);
+                    
+                    existingSet.Add(dto.ProductName);
+                    result.SuccessCount++;
+                }
+                
+                if (result.Errors.Count > 0)
+                {
+                    result.SuccessCount = 0;
+                    return result;
+                }
+                
+                await RunInTransactionAsync(async () =>
+                {
+                    _context.Products.AddRange(toAdd);
+                });
+
+                return result;
+            });
+        }
+
+        public Task<ServiceResponse<bool>> MigratePrice(MigratePriceDto dto)
+        {
+            return ServiceResponse<bool>.Execute(async err =>
+            {
+                var accountId = Token.AccountId;
+                
+                if (dto.MarginPercentage < 0)
+                {
+                    err.AddError("Margin percentage cannot be less than 0.");
+                    return false;
+                }
+
+                if (dto.ProductIds == null || !dto.ProductIds.Any())
+                {
+                    err.AddError("No products selected.");
+                    return false;
+                }
+
+                var products = await _context.Products
+                    .Where(p => p.AccountId == accountId && dto.ProductIds.Contains(p.Id ?? 0))
+                    .ToListAsync();
+
+                var productIdsList = products.Select(p => p.Id).ToList();
+                var latestStocks = await _context.Stocks
+                    .Where(s => productIdsList.Contains(s.ProductId))
+                    .GroupBy(s => s.ProductId)
+                    .Select(g => g.OrderByDescending(s => s.Id).FirstOrDefault())
+                    .ToListAsync();
+
+                var stockDict = latestStocks
+                    .Where(s => s != null && s.ProductId.HasValue && s.PurchasePrice.HasValue)
+                    .ToDictionary(s => s.ProductId.Value, s => s.PurchasePrice.Value);
+
+                foreach (var product in products)
+                {
+                    if (product.Id.HasValue && stockDict.TryGetValue(product.Id.Value, out var purchasePrice))
+                    {
+                        product.Price = purchasePrice * (1 + (dto.MarginPercentage / 100));
+                    }
+                }
+                
+                await _context.SaveChangesAsync();
+                return true;
+            });
+        }
+
     }
 }

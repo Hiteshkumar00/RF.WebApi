@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Application.DTOs.PaymentAccount;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
@@ -10,15 +11,15 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
-    public class PaymentAccountService : IPaymentAccountService
+    public class PaymentAccountService : BaseService, IPaymentAccountService
     {
-        private readonly RFDBContext _context;
         private readonly IMapper _mapper;
+        private readonly IExcelService _excelService;
 
-        public PaymentAccountService(RFDBContext context, IMapper mapper)
+        public PaymentAccountService(RFDBContext context, IMapper mapper, IExcelService excelService) : base(context)
         {
-            _context = context;
             _mapper = mapper;
+            _excelService = excelService;
         }
 
         public async Task<ServiceResponse<int>> CreatePaymentAccount(CreatePaymentAccountDto dto)
@@ -463,6 +464,58 @@ namespace RF.WebApi.Api.Infrastructure.Services
                 }
 
                 return _mapper.Map<PaymentTransferDto>(transfer);
+            });
+        }
+
+        public Task<ServiceResponse<byte[]>> ExportPaymentAccounts()
+        {
+            return ServiceResponse<byte[]>.Execute(async err =>
+            {
+                var accounts = await _context.PaymentAccounts
+                    .Where(p => p.AccountId == Token.AccountId)
+                    .AsNoTracking()
+                    .ToListAsync();
+                
+                var dtos = _mapper.Map<List<PaymentAccountDto>>(accounts);
+                var mapping = new Dictionary<string, string> {
+                    { "MethodName", "Method Name" }
+                };
+                return _excelService.Export(dtos, "BankAccounts_Import_Template", mapping);
+            });
+        }
+
+        public Task<ServiceResponse<ImportResultDto>> ImportPaymentAccounts(List<ImportPaymentAccountDto> dtos)
+        {
+            return ServiceResponse<ImportResultDto>.Execute(async err =>
+            {
+                var result = new ImportResultDto();
+                var accountId = Token.AccountId;
+
+                var toAdd = new List<PaymentAccount>();
+
+                foreach(var dto in dtos)
+                {
+                    dto.MethodName = dto.MethodName?.Trim();
+
+                    var paymentAccount = _mapper.Map<PaymentAccount>(dto);
+                    paymentAccount.AccountId = accountId;
+                    toAdd.Add(paymentAccount);
+                    
+                    result.SuccessCount++;
+                }
+                
+                if (result.Errors.Count > 0)
+                {
+                    result.SuccessCount = 0;
+                    return result;
+                }
+
+                await RunInTransactionAsync(async () =>
+                {
+                    _context.PaymentAccounts.AddRange(toAdd);
+                });
+
+                return result;
             });
         }
     }

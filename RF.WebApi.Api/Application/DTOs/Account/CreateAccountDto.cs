@@ -22,6 +22,7 @@ namespace RF.WebApi.Api.Application.DTOs.Account
         public bool EnableSuggestions { get; set; }
         public bool EnableVoiceTyping { get; set; }
         public bool ShowStatistics { get; set; }
+        public bool EnableMigration { get; set; }
         public string? WhatsAppNumber { get; set; }
         public bool EnableWhatsApp { get; set; }
         public bool EnableAdvancedWhatsApp { get; set; }

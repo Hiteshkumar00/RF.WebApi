@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RF.WebApi.Api.Apis.Authentication;
 using RF.WebApi.Api.Application.DTOs.AgencyPerson;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
@@ -10,15 +11,15 @@ using RF.WebApi.Infrastructure.Data.DataBase;
 
 namespace RF.WebApi.Api.Infrastructure.Services
 {
-    public class AgencyPersonService : IAgencyPersonService
+    public class AgencyPersonService : BaseService, IAgencyPersonService
     {
-        private readonly RFDBContext _context;
         private readonly IMapper _mapper;
+        private readonly IExcelService _excelService;
 
-        public AgencyPersonService(RFDBContext context, IMapper mapper)
+        public AgencyPersonService(RFDBContext context, IMapper mapper, IExcelService excelService) : base(context)
         {
-            _context = context;
             _mapper = mapper;
+            _excelService = excelService;
         }
 
         public async Task<ServiceResponse<int>> CreateAgencyPerson(CreateAgencyPersonDto dto)
@@ -95,17 +96,108 @@ namespace RF.WebApi.Api.Infrastructure.Services
         {
             return ServiceResponse<List<AgencyPersonDto>>.Execute(async err =>
             {
-                // To list securely we should probably join via Agency -> AccountId
                 var query = from ap in _context.AgencyPersons
                             join a in _context.Agencies on ap.AgencyId equals a.Id
                             where a.AccountId == Token.AccountId
-                            select ap;
+                            select new AgencyPersonDto
+                            {
+                                Id = ap.Id ?? 0,
+                                AgencyId = ap.AgencyId ?? 0,
+                                AgencyName = a.AgencyName,
+                                Name = ap.Name,
+                                PhoneNo = ap.PhoneNo,
+                                Email = ap.Email,
+                                PersonOccupation = ap.PersonOccupation,
+                                Address = ap.Address
+                            };
 
-                var agencyPersons = await query
-                    .AsNoTracking()
-                    .ToListAsync();
+                var dtos = await query.ToListAsync();
+                return dtos;
+            });
+        }
 
-                return _mapper.Map<List<AgencyPersonDto>>(agencyPersons);
+        public Task<ServiceResponse<byte[]>> ExportAgencyPersons()
+        {
+            return ServiceResponse<byte[]>.Execute(async err =>
+            {
+                var query = from ap in _context.AgencyPersons
+                            join a in _context.Agencies on ap.AgencyId equals a.Id
+                            where a.AccountId == Token.AccountId
+                            select new AgencyPersonDto
+                            {
+                                Id = ap.Id ?? 0,
+                                AgencyId = ap.AgencyId ?? 0,
+                                AgencyName = a.AgencyName,
+                                Name = ap.Name,
+                                PhoneNo = ap.PhoneNo,
+                                Email = ap.Email,
+                                PersonOccupation = ap.PersonOccupation,
+                                Address = ap.Address
+                            };
+
+                var dtos = await query.ToListAsync();
+                var mapping = new Dictionary<string, string> {
+                    { "Name", "Person Name" },
+                    { "AgencyName", "Agency Name" },
+                    { "PhoneNo", "Mobile No" },
+                    { "Email", "Email" },
+                    { "PersonOccupation", "Position" },
+                    { "Address", "Address" }
+                };
+                return _excelService.Export(dtos, "AgencyPersons_Import_Template", mapping);
+            });
+        }
+
+        public Task<ServiceResponse<ImportResultDto>> ImportAgencyPersons(List<ImportAgencyPersonDto> dtos)
+        {
+            return ServiceResponse<ImportResultDto>.Execute(async err =>
+            {
+                var result = new ImportResultDto();
+                var accountId = Token.AccountId;
+                var agencies = await _context.Agencies
+                    .Where(a => a.AccountId == accountId)
+                    .ToDictionaryAsync(a => a.AgencyName ?? "", a => a.Id);
+
+                var toAdd = new List<AgencyPerson>();
+
+                foreach(var dto in dtos)
+                {
+                    dto.AgencyName = dto.AgencyName?.Trim();
+                    dto.Name = dto.Name?.Trim();
+
+                    if (!agencies.TryGetValue(dto.AgencyName ?? "", out var agencyId))
+                    {
+                        result.Errors.Add(new ImportRowMessageDto { RowNo = dto.RowNo, Message = $"Agency '{dto.AgencyName}' not found for person '{dto.Name}'." });
+                        continue;
+                    }
+
+
+
+                    var person = new AgencyPerson 
+                    {
+                        AgencyId = agencyId,
+                        Name = dto.Name,
+                        PhoneNo = dto.PhoneNo,
+                        Email = dto.Email,
+                        PersonOccupation = dto.PersonOccupation,
+                        Address = dto.Address
+                    };
+                    toAdd.Add(person);
+                    result.SuccessCount++;
+                }
+                
+                if (result.Errors.Count > 0)
+                {
+                    result.SuccessCount = 0;
+                    return result;
+                }
+
+                await RunInTransactionAsync(async () =>
+                {
+                    _context.AgencyPersons.AddRange(toAdd);
+                });
+
+                return result;
             });
         }
     }

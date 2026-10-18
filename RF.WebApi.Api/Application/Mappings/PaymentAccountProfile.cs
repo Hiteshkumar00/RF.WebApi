@@ -11,6 +11,7 @@ namespace RF.WebApi.Api.Application.Mappings
             CreateMap<PaymentAccount, PaymentAccountDto>();
             CreateMap<CreatePaymentAccountDto, PaymentAccount>();
             CreateMap<UpdatePaymentAccountDto, PaymentAccount>();
+            CreateMap<ImportPaymentAccountDto, PaymentAccount>();
 
             CreateMap<PaymentTransfer, PaymentTransferDto>()
                 .ForMember(dest => dest.FromPaymentAccountName, opt => opt.MapFrom(src => src.FromPaymentAccount != null ? src.FromPaymentAccount.MethodName : ""))

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RF.WebApi.Api.Application.DTOs.SellingBill;
 using RF.WebApi.Api.Domain.Interfaces;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
 
 namespace RF.WebApi.Api.Apis.Controllers
@@ -46,20 +47,18 @@ namespace RF.WebApi.Api.Apis.Controllers
             return HandleResponse(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GetAll([FromBody] TableLazyLoadEventDto request, [FromQuery] int? customerId = null)
+        {
+            var result = await _sellingBillService.GetAllSellingBills(request, customerId);
+            return HandleResponse(result);
+        }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetStatistics([FromQuery] int? customerId = null)
         {
-            var result = await _sellingBillService.GetAllSellingBills();
+            var result = await _sellingBillService.GetSellingBillStatistics(customerId);
             return HandleResponse(result);
         }
-
-        [HttpGet("{customerId}")]
-        public async Task<IActionResult> GetByCustomerId(int customerId)
-        {
-            var result = await _sellingBillService.GetByCustomerId(customerId);
-            return HandleResponse(result);
-        }
-
 
 
         [HttpGet("{id}")]

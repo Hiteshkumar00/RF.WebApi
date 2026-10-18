@@ -1,4 +1,5 @@
 using RF.WebApi.Api.Application.DTOs.AgencyPerson;
+using RF.WebApi.Api.Application.DTOs.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 
 namespace RF.WebApi.Api.Domain.Interfaces
@@ -10,5 +11,7 @@ namespace RF.WebApi.Api.Domain.Interfaces
         Task<ServiceResponse<bool>> UpdateAgencyPerson(UpdateAgencyPersonDto dto);
         Task<ServiceResponse<bool>> DeleteAgencyPerson(int id);
         Task<ServiceResponse<List<AgencyPersonDto>>> GetAllAgencyPersons();
+        Task<ServiceResponse<byte[]>> ExportAgencyPersons();
+        Task<ServiceResponse<ImportResultDto>> ImportAgencyPersons(List<ImportAgencyPersonDto> dtos);
     }
 }

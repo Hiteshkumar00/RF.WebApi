@@ -6,6 +6,9 @@ using RF.WebApi.Api.Domain.Common;
 using RF.WebApi.Api.Domain.Exceptions;
 using RF.WebApi.Api.Domain.Interfaces;
 using RF.WebApi.Api.Infrastructure.Data.Tables;
+using RF.WebApi.Api.Application.DTOs.Common;
+using RF.WebApi.Api.Application.Extensions;
+using AutoMapper.QueryableExtensions;
 using RF.WebApi.Infrastructure.Data.DataBase;
 
 
@@ -204,9 +207,9 @@ namespace RF.WebApi.Api.Infrastructure.Services
             });
         }
 
-        public Task<ServiceResponse<List<SellingBillListDto>>> GetAllSellingBills()
+        public Task<ServiceResponse<PagedResult<SellingBillListDto>>> GetAllSellingBills(TableLazyLoadEventDto request, int? customerId = null)
         {
-            return ServiceResponse<List<SellingBillListDto>>.Execute(async err =>
+            return ServiceResponse<PagedResult<SellingBillListDto>>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
 
@@ -219,37 +222,60 @@ namespace RF.WebApi.Api.Infrastructure.Services
 
                 var (startDate, endDate) = dateRangeResponse.Data;
 
-                var bills = await _context.SellingBills
-                    .Include(b => b.Customer)
-                    .Include(b => b.Payments)
-                    .Include(b => b.Items)
-                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate)
-                    .OrderByDescending(b => b.Date)
-                    .AsNoTracking()
-                    .ToListAsync();
+                var query = _context.SellingBills
+                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate);
 
-                return _mapper.Map<List<SellingBillListDto>>(bills);
+                if (customerId.HasValue)
+                {
+                    query = query.Where(b => b.CustomerId == customerId.Value);
+                }
+
+                var projectedQuery = query.ProjectTo<SellingBillListDto>(_mapper.ConfigurationProvider);
+                return await projectedQuery.ApplyPrimeNgAsync(request);
             });
         }
 
-        public Task<ServiceResponse<List<SellingBillListDto>>> GetByCustomerId(int customerId)
+        public Task<ServiceResponse<SellingBillStatisticsDto>> GetSellingBillStatistics(int? customerId = null)
         {
-            return ServiceResponse<List<SellingBillListDto>>.Execute(async err =>
+            return ServiceResponse<SellingBillStatisticsDto>.Execute(async err =>
             {
                 var accountId = Token.AccountId;
 
-                var bills = await _context.SellingBills
-                    .Include(b => b.Customer)
-                    .Include(b => b.Payments)
-                    .Include(b => b.Items)
-                    .Where(b => b.AccountId == accountId && b.CustomerId == customerId)
-                    .OrderByDescending(b => b.Date)
-                    .AsNoTracking()
-                    .ToListAsync();
+                var dateRangeResponse = await _businessYearService.GetSelectedBusinessYearDates();
+                if (!dateRangeResponse.Success)
+                {
+                    err.SetErrors(dateRangeResponse);
+                    return default;
+                }
 
-                return _mapper.Map<List<SellingBillListDto>>(bills);
+                var (startDate, endDate) = dateRangeResponse.Data;
+
+                var query = _context.SellingBills
+                    .Where(b => b.AccountId == accountId && b.Date >= startDate && b.Date <= endDate);
+
+                if (customerId.HasValue)
+                {
+                    query = query.Where(b => b.CustomerId == customerId.Value);
+                }
+
+                var totalSellingAmount = await query.SelectMany(b => b.Items)
+                    .SumAsync(i => (decimal?)(((i.Quantity ?? 0) * (i.Price ?? 0)) - (i.Discount ?? 0))) ?? 0;
+
+                var totalReceivedAmount = await query.SelectMany(b => b.Payments)
+                    .SumAsync(p => (decimal?)p.Amount) ?? 0;
+
+                var totalRemainingAmount = totalSellingAmount - totalReceivedAmount;
+
+                return new SellingBillStatisticsDto
+                {
+                    TotalSellingAmount = totalSellingAmount,
+                    TotalReceivedAmount = totalReceivedAmount,
+                    TotalRemainingAmount = totalRemainingAmount
+                };
             });
         }
+
+
 
         public Task<ServiceResponse<byte[]>> GenerateInvoicePdf(int id)
         {
